@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?use version="3.0.0"?>
+<plugin name="RestrictedGraphTrafo" version="0.1">
+	<actions>
+		<action label="RTL compiler" icon="resources/rtl.png"
+			class="org.uet.dse.rtlplus.actions.ActionOpenRTL"
+			tooltip="RTL Parser"
+			menu="RTL plugin"
+			menuitem="RTL Parser"
+			toolbaritem="RTL Parser"
+			id="org.uet.dse.rtlplus.actions.ActionOpenRTL">
+		</action>
+		<action label="Run matches automatically" icon="resources/autorun.png"
+			class="org.uet.dse.rtlplus.actions.ActionAutoRunMatches"
+			tooltip="Run matches automatically"
+			menu="RTL plugin"
+			menuitem="Run matches automatically"
+			toolbaritem="Run matches automatically"
+			id="org.uet.dse.rtlplus.actions.ActionAutoRunMatches">
+		</action>
+		<action label="Find matches" icon="resources/next.png"
+			class="org.uet.dse.rtlplus.actions.ActionFindMatches"
+			tooltip="Find matches"
+			menu="RTL plugin"
+			menuitem="Find matches"
+			toolbaritem="Find matches"
+			id="org.uet.dse.rtlplus.actions.ActionFindMatches">
+		</action>
+		<action label="Show rule list" 
+			icon="resources/list.png" 
+			class="org.uet.dse.rtlplus.actions.ActionShowRuleList" 
+			tooltip="Show rule list" 
+			menu="RTL plugin" 
+			menuitem="Show rule list"
+			toolbaritem="Show rule list" 
+			id="org.uet.dse.rtlplus.actions.ActionShowRuleList">
+		</action>
+	</actions>
+</plugin>
