@@ -21,5 +21,6 @@ public class Main {
 		lexer.init(handler);
 		parser.init(handler);
 		AstRuleCollection rc = parser.tggRuleCollection();
+		System.out.println(rc);
 	}
 }

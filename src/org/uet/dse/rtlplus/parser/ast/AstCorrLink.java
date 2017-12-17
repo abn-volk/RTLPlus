@@ -10,7 +10,8 @@ public class AstCorrLink {
 	private String role1;
 	private String role2;
 	private String className;
-	
+	private boolean multipleSource = false;
+	private boolean multipleTarget = false;
 	
 
 	public String getSourceClass() {
@@ -72,6 +73,36 @@ public class AstCorrLink {
 
 	public void setClass(Object object) {
 		className = (String) object;
+	}
+
+	public void setMultipleSource() {
+		multipleSource = true;
+	}
+
+	public void setMultipleTarget() {
+		multipleTarget = true;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("(");
+		if (sourceClass != null)
+			sb.append('(').append(sourceClass).append(") ");
+		sb.append(sourceObject);
+		if (multipleSource)
+			sb.append('*');
+		sb.append(',');
+		if (targetClass != null)
+			sb.append('(').append(targetClass).append(") ");
+		sb.append(targetObject);
+		if (multipleTarget)
+			sb.append('*');
+		sb.append(") ");
+		if (role1 != null) {
+			sb.append("as ").append('(').append(role1)
+				.append(',').append(role2).append(") ");
+		}
+		sb.append("in ").append(className).append(':').append(className);
+		return sb.toString();
 	}
 
 }

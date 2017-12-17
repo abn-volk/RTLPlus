@@ -40,7 +40,7 @@ import org.tzi.use.parser.ParseErrorHandler;
 tggRuleCollection returns [AstRuleCollection n]
 	:	
 		'transformation' name=IDENT { $n = new AstRuleCollection($name.text); }  
-		'direction' ('forward'|'backward'|'integration'|'co-evolution'|'synchronization')
+		'direction' direction=('forward'|'backward'|'integration'|'co-evolution'|'synchronization') { $n.setDirection($direction.text); }
 		(rule=tggRuleDefinition { $n.addRuleDefinition($rule.n); } )+
 		EOF
 	;
@@ -83,7 +83,7 @@ patternDefinition returns [AstPattern n]
 	:	
 		(obj=objectDefinition { $n.addObject($obj.n); })*
 		(lnk=linkDefinition { $n.addLink($lnk.n); })*
-		(cond=conditionDefinition { $n.addCondition($cond.n); })*
+		(cond=(COND_EXPR | EQUAL_COND_EXPR) { $n.addCondition($cond.text); })*
 	;
 
 corrPatternDefinition returns [AstCorr n]
@@ -103,7 +103,7 @@ invariantTGG returns [AstInvariantTgg n]
 	:	
 		name=IDENT { $n = new AstInvariantTgg($name.text); }
 		COLON 
-		(cond=conditionDefinition { $n.addCondition($cond.n); } )+
+		(cond=EQUAL_COND_EXPR { $n.addCondition($cond.text); } )+
 	;
 	
 /*
@@ -130,12 +130,6 @@ linkDefinition returns [AstLink n]
 		asc=IDENT { $n.setAssociation($asc.text); } 
 	;
 
-conditionDefinition returns [AstCondition n]
-	:	
-		cond=COND_EXPR
-		{ $n = new AstCondition($cond.text); }
-	;
-
 corrLinkDefinition returns [AstCorrLink n]
 @init {
 	n = new AstCorrLink();
@@ -143,9 +137,9 @@ corrLinkDefinition returns [AstCorrLink n]
 	:
 		LPAREN
 		(LPAREN srcCls=IDENT RPAREN { $n.setSourceClass($srcCls.text); })?
-		srcObj=IDENT COMMA { $n.setSourceObject($srcObj.text); }
+		srcObj=IDENT (STAR { $n.setMultipleSource(); })? COMMA { $n.setSourceObject($srcObj.text); }
 		(LPAREN trgCls=IDENT RPAREN { $n.setTargetClass($trgCls.text); })?
-		trgObj=IDENT RPAREN  { $n.setTargetObject($trgObj.text); }
+		trgObj=IDENT (STAR { $n.setMultipleTarget(); })? RPAREN  { $n.setTargetObject($trgObj.text); }
 		('as' LPAREN role1=IDENT COMMA role2=IDENT RPAREN { $n.setRoleNames($role1.text, $role2.text); } )?
 		'in' corrObj=IDENT COLON corrCls=IDENT 
 		{ $n.setName($corrObj.text); $n.setClass($corrCls.text); }
@@ -283,7 +277,13 @@ VOCAB:
 /*
 --------- Start of file RTLLexerRules.gpart --------------------
 */
+
+EQUAL_COND_EXPR
+	:
+	 	LBRACK (~(RBRACK|EQUAL))* EQUAL (~(RBRACK|EQUAL))* RBRACK {setText(getText().substring(1, getText().length()-1));}
+	;
+
 COND_EXPR
-:
-    ('[') (~(']'))* (']')
-    ;
+	:
+	    LBRACK (~(']'))* RBRACK {setText(getText().substring(1, getText().length()-1));}
+	;

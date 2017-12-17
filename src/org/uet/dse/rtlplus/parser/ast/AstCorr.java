@@ -15,5 +15,15 @@ public class AstCorr {
 	public void addInv(AstInvariantTgg _inv) {
 		invList.add(_inv);
 	}
-
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (AstCorrLink lnk : linkList) {
+			sb.append(lnk.toString()).append('\n');
+		}
+		for (AstInvariantTgg inv : invList) {
+			sb.append(inv.toString()).append('\n');
+		}
+		return sb.toString();
+	}
 }

@@ -6,28 +6,26 @@ import java.util.List;
 public class AstInvariantTgg {
 	
 	private String name;
-	private List<AstAttrCorr> corrList = new ArrayList<>(1);
-	private List<AstCondition> condList = new ArrayList<>(1);
+	private List<String> condList = new ArrayList<>(1);
 
 	public String getName() {
 		return name;
-	}
-
-	public List<AstAttrCorr> getCorrList() {
-		return corrList;
 	}
 
 	public AstInvariantTgg(Object object) {
 		name = (String) object;
 	}
 
-	public void addAttrCorr(AstAttrCorr ac) {
-		corrList.add(ac);
-		
-	}
-
-	public void addCondition(AstCondition cond) {
+	public void addCondition(String cond) {
 		condList.add(cond);
 	}
-
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder(name);
+		sb.append(':');
+		for (String cond : condList) {
+			sb.append('[').append(cond).append(']');
+		}
+		return sb.toString();
+	}
 }

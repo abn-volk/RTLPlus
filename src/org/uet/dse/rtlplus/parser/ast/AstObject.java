@@ -7,9 +7,13 @@ public class AstObject {
 	
 	public AstObject(Object object, Object object2) {
 		name = (String) object;
-		className = (String) object;
-		System.out.println(String.format("Object: %s: %s", name, className));
-
+		className = (String) object2;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(name).append(':').append(className);
+		return sb.toString();
 	}
 
 }
