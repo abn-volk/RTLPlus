@@ -1,5 +1,13 @@
 package org.uet.dse.rtlplus.parser.ast;
 
+import org.tzi.use.uml.mm.MInvalidModelException;
+import org.tzi.use.uml.mm.MModel;
+import org.tzi.use.uml.sys.MSystem;
+import org.tzi.use.uml.sys.MSystemException;
+import org.uet.dse.rtlplus.mm.MCorrRule;
+import org.uet.dse.rtlplus.mm.MRule;
+import org.uet.dse.rtlplus.mm.MTggRule;
+import org.uet.dse.rtlplus.parser.Context;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class AstTggRule {
@@ -24,6 +32,16 @@ public class AstTggRule {
 			.append(RTLKeyword.checkCorr).append(corr.toString())
 			.append(RTLKeyword.endTGGRule).append('\n');
 		return sb.toString();
+	}
+
+
+	public MTggRule gen(Context ctx) throws MInvalidModelException, MSystemException {
+		ctx.setLhsState(new MSystem(ctx.model()).state());
+		ctx.setRhsState(new MSystem(ctx.model()).state());
+		MRule srcRule = src.gen(ctx);
+		MRule trgRule = trg.gen(ctx);
+		MCorrRule corrRule = corr.gen(ctx);
+		return new MTggRule(name, srcRule, trgRule, corrRule, toString());
 	}
 
 }

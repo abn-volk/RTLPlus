@@ -11,6 +11,10 @@ public class AstInvariantTgg {
 	public String getName() {
 		return name;
 	}
+	
+	public List<String> getConditions() {
+		return condList;
+	}
 
 	public AstInvariantTgg(Object object) {
 		name = (String) object;

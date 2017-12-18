@@ -3,6 +3,10 @@ package org.uet.dse.rtlplus.parser.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.uet.dse.rtlplus.parser.Context;
+import org.tzi.use.uml.mm.MInvalidModelException;
+import org.tzi.use.uml.sys.MSystemException;
+import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class AstRuleCollection {
@@ -36,5 +40,13 @@ public class AstRuleCollection {
 
 	public void setDirection(Object object) {
 		direction = (String) object;
+	}
+	
+	public MRuleCollection gen(Context ctx) throws MInvalidModelException, MSystemException {
+		MRuleCollection collection = new MRuleCollection();
+		for (AstTggRule rule : ruleList) {
+			collection.addRule(rule.gen(ctx));
+		}
+		return collection;
 	}
 }

@@ -1,7 +1,17 @@
 package org.uet.dse.rtlplus.parser.ast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.tzi.use.uml.mm.MInvalidModelException;
+import org.tzi.use.uml.sys.MLink;
+import org.tzi.use.uml.sys.MObject;
+import org.tzi.use.uml.sys.MSystemException;
+import org.uet.dse.rtlplus.mm.MCorrLink;
+import org.uet.dse.rtlplus.mm.MPattern;
+import org.uet.dse.rtlplus.parser.Context;
 
 public class AstCorr {
 	
@@ -25,5 +35,21 @@ public class AstCorr {
 			sb.append(inv.toString()).append('\n');
 		}
 		return sb.toString();
+	}
+
+	public MPattern gen(Context ctx) throws MInvalidModelException, MSystemException {
+		List<MObject> objs = new ArrayList<>();
+		List<MLink> lnks = new ArrayList<>();
+		Map<String, List<String>> invs = new HashMap<>();
+		for (AstCorrLink corrLink : linkList) {
+			MCorrLink lnk = corrLink.gen(ctx);
+			objs.add(lnk.getObj());
+			lnks.add(lnk.getSrcLink());
+			lnks.add(lnk.getTrgLink());
+		}
+		for (AstInvariantTgg inv : invList) {
+			invs.put(inv.getName(), inv.getConditions());
+		}
+		return new MPattern(ctx.systemState(), objs, lnks, invs);
 	}
 }
