@@ -40,12 +40,13 @@ import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 /**
  * RTL1.1
+ * 
  * @author Khoa-Hai Nguyen
  * 
  */
 @SuppressWarnings("serial")
 public class RTLParserParameter extends JDialog {
-    private Session fSession;
+	private Session fSession;
 	private MainWindow fParent;
 	private JTextField fTextModel2;
 	private JTextField fTextTgg;
@@ -55,11 +56,11 @@ public class RTLParserParameter extends JDialog {
 	private MModel fModel;
 	private MRuleCollection fTggRules;
 	private String modelName;
-	private String useContent;
+	private StringBuilder useContent  = new StringBuilder();
 
 	public RTLParserParameter(Session session, MainWindow parent) {
 		super(parent, "RTL Parser Parameter");
-        fSession = session;
+		fSession = session;
 		fSession.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -70,25 +71,21 @@ public class RTLParserParameter extends JDialog {
 		fParent = parent;
 		fLogWriter = parent.logWriter();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		// Label for source metamodel, which is already loaded
 		JLabel labelModel1 = new JLabel("Source metamodel: " + Options.getRecentFile("use").getFileName());
 
-		// create object name field and label
+		// Label and text field for target metamodel
 		fTextModel2 = new JTextField(35);
 		JLabel labelModel2 = new JLabel("Target metamodel:");
-		labelModel2.setDisplayedMnemonic('1');
 		labelModel2.setLabelFor(fTextModel2);
 
-		// create object name field and label
+		// Label and text field for TGG rules
 		fTextTgg = new JTextField(35);
 		JLabel labelTgg = new JLabel("TGG rules:");
-		labelTgg.setDisplayedMnemonic('2');
 		labelTgg.setLabelFor(fTextTgg);
 
-		
-		JButton btnPath2 = new JButton("...");
-		// btnPath2.setMnemonic('P');
+		JButton btnPath2 = new JButton("Browse...");
 		btnPath2.addActionListener(new ActionListener() {
 			private JFileChooser fChooser;
 
@@ -97,25 +94,22 @@ public class RTLParserParameter extends JDialog {
 				if (fChooser == null) {
 					path = Options.getLastDirectory().toString();
 					fChooser = new JFileChooser(path);
-					ExtFileFilter filter = new ExtFileFilter("use",
-							"USE specifications");
+					ExtFileFilter filter = new ExtFileFilter("use", "USE specifications");
 					fChooser.setFileFilter(filter);
 					fChooser.setDialogTitle("Open specification");
 				}
-				int returnVal = fChooser
-						.showOpenDialog(RTLParserParameter.this);
+				int returnVal = fChooser.showOpenDialog(RTLParserParameter.this);
 				if (returnVal != JFileChooser.APPROVE_OPTION)
 					return;
 
 				path = fChooser.getCurrentDirectory().toString();
 				Options.setLastDirectory(new File(path).toPath());
 
-				fTextModel2.setText(Paths.get(path,
-						fChooser.getSelectedFile().getName()).toString());
+				fTextModel2.setText(Paths.get(path, fChooser.getSelectedFile().getName()).toString());
 
 			}
 		});
-		JButton btnPath3 = new JButton("...");
+		JButton btnPath3 = new JButton("Browse...");
 		// btnPath3.setMnemonic('P');
 		btnPath3.addActionListener(new ActionListener() {
 			private JFileChooser fChooser;
@@ -125,20 +119,18 @@ public class RTLParserParameter extends JDialog {
 				if (fChooser == null) {
 					path = Options.getLastDirectory().toString();
 					fChooser = new JFileChooser(path);
-					ExtFileFilter filter = new ExtFileFilter("tgg", "TGG Rules");
+					ExtFileFilter filter = new ExtFileFilter("tgg", "TGG rules");
 					fChooser.setFileFilter(filter);
-					fChooser.setDialogTitle("TGG rules");
+					fChooser.setDialogTitle("Open TGG file");
 				}
-				int returnVal = fChooser
-						.showOpenDialog(RTLParserParameter.this);
+				int returnVal = fChooser.showOpenDialog(RTLParserParameter.this);
 				if (returnVal != JFileChooser.APPROVE_OPTION)
 					return;
 
 				path = fChooser.getCurrentDirectory().toString();
 				Options.setLastDirectory(new File(path).toPath());
 
-				fTextTgg.setText(Paths.get(path,
-						fChooser.getSelectedFile().getName()).toString());
+				fTextTgg.setText(Paths.get(path, fChooser.getSelectedFile().getName()).toString());
 
 			}
 		});
@@ -177,13 +169,9 @@ public class RTLParserParameter extends JDialog {
 		setLocationRelativeTo(parent);
 		// fListClasses.requestFocus();
 
-		// allow dialog close on escape key
+		// Close dialog on escape key
 		CloseOnEscapeKeyListener ekl = new CloseOnEscapeKeyListener(this);
 		addKeyListener(ekl);
-        /* Hard code to load model */
-		//fTextModel1.setText("demo/uml2csp/Act.use");
-		//fTextModel2.setText("demo/uml2csp/CSP.use");
-		//fTextTgg.setText("demo/uml2csp/uml2cspRule.tgg");
 	}
 
 	private void closeDialog() {
@@ -198,55 +186,52 @@ public class RTLParserParameter extends JDialog {
 			// Parse TGG rule
 			parseTGGRule();
 			// gen USE file
-			//genUSEContent();
+			genUSEContent();
 			writeUSEFile();
 
-            /* Load model and RTL rules */
-            if (fModel != null) {
-                /* Load USE model */
-                MModel newModel = null;
-                MSystem system = null;
-                try {
-                    newModel = USECompiler.compileSpecification(useContent, modelName,
-                            fLogWriter, new ModelFactory());
-                    fLogWriter.println("Load model " + modelName + " ...");
-                    if (newModel != null) {
-                        fLogWriter.println(newModel.getStats());
-                        // create system
-                        system = new MSystem(newModel);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                // set new system (may be null if compilation failed)
-                final MSystem system2 = system; // need final variable for Runnable
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        fSession.setSystem(system2);
-                    }
-                });
-                /* Load TGG rules
-                Rules.setMainWindow(fParent);
-                Rules.setRTLRule(fTggRules);
-                Rules.setRTLRuleFileName(fTextTgg.getText());
-				*/
-                fLogWriter.println("Compile successfully");
-            } else {
-                fLogWriter.println("Can not compile source files");
-            }
+			/* Load model and RTL rules */
+			if (fModel != null) {
+				/* Load USE model */
+				MModel newModel = null;
+				MSystem system = null;
+				try {
+					newModel = USECompiler.compileSpecification(useContent.toString(), modelName, fLogWriter, new ModelFactory());
+					fLogWriter.println("Load model " + modelName + " ...");
+					if (newModel != null) {
+						fLogWriter.println(newModel.getStats());
+						// create system
+						system = new MSystem(newModel);
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				// set new system (may be null if compilation failed)
+				final MSystem system2 = system; // need final variable for Runnable
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						fSession.setSystem(system2);
+					}
+				});
+				/*
+				 * Load TGG rules Rules.setMainWindow(fParent); Rules.setRTLRule(fTggRules);
+				 * Rules.setRTLRuleFileName(fTextTgg.getText());
+				 */
+				fLogWriter.println("Compile successfully");
+			} else {
+				fLogWriter.println("Can not compile source files");
+			}
 
 		} else {
 			fLogWriter.println("Error in path file");
 		}
 	}
 
-//	private void genUSEContent() {
-//		fLogWriter.println("Compile USE model specification...");
-//		useContent += genClassesCorr();
-//		useContent += genAssociationsCorr();
-//		useContent += genInvariantsCorr();
-//		useContent += genRuleCollection();
-//	}
+	private void genUSEContent() {
+		fLogWriter.println("Compile USE model specification...");
+		useContent.append(fTggRules.getContext().generateCorrelations());
+		useContent.append(fTggRules.genCorrInvs());
+		//useContent += genRuleCollection();
+	}
 
 	/**
 	 * Generate class RuleCollection
@@ -282,10 +267,8 @@ public class RTLParserParameter extends JDialog {
 //		use += RTLKeyword.endClass + "\n";
 //		// before generate pre, postcondition, reload model to have class
 //		// RuleCollection and operations
-//		fModel = USECompiler.compileSpecification(useContent + use, modelName,
-//				fLogWriter, new ModelFactory());
-//		List<MOperation> ops = fModel.getClass("RuleCollection")
-//				.allOperations();
+//		fModel = USECompiler.compileSpecification(useContent + use, modelName, fLogWriter, new ModelFactory());
+//		List<MOperation> ops = fModel.getClass("RuleCollection").allOperations();
 //		MOperation operation = null;
 //		// Pre, Post-condition
 //		use += "------------------------------------------------------------Pre, post-conditions\n";
@@ -296,8 +279,7 @@ public class RTLParserParameter extends JDialog {
 //			MTggRule tgg = (MTggRule) iter.next();
 //			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
 //				operation = (MOperation) iter1.next();
-//				if (operation.name()
-//						.equals(tgg.name() + RTLKeyword.coEvolution))
+//				if (operation.name().equals(tgg.name() + RTLKeyword.coEvolution))
 //					break;
 //			}
 //
@@ -311,8 +293,7 @@ public class RTLParserParameter extends JDialog {
 //			MTggRule tgg = (MTggRule) iter.next();
 //			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
 //				operation = (MOperation) iter1.next();
-//				if (operation.name().equals(
-//						tgg.name() + RTLKeyword.forwardTransform))
+//				if (operation.name().equals(tgg.name() + RTLKeyword.forwardTransform))
 //					break;
 //			}
 //			use += "\ncontext RuleCollection::" + tgg.buildParamsForFwdTrafo(0);
@@ -325,112 +306,16 @@ public class RTLParserParameter extends JDialog {
 //			MTggRule tgg = (MTggRule) iter.next();
 //			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
 //				operation = (MOperation) iter1.next();
-//				if (operation.name()
-//						.equals(tgg.name() + RTLKeyword.integration))
+//				if (operation.name().equals(tgg.name() + RTLKeyword.integration))
 //					break;
 //			}
-//			use += "\ncontext RuleCollection::"
-//					+ tgg.buildParamsForIntegration(0);
+//			use += "\ncontext RuleCollection::" + tgg.buildParamsForIntegration(0);
 //			use += tgg.buildPreConditionForIntegration(operation, 2) + "\n";
 //			use += tgg.buildPostConditionForIntegration(operation, 2) + "\n";
 //		}
 //		return use;
 //	}
-//
-//	/**
-//	 * Generate class string for correspondence class
-//	 * 
-//	 * @return
-//	 */
-//	@SuppressWarnings("unchecked")
-//	private String genClassesCorr() {
-//		String use = "";
-//		for (Iterator iter = fModel.classes().iterator(); iter.hasNext();) {
-//			MClass cls = (MClass) iter.next();
-//			if (!fModel1.classes().contains(cls)
-//					&& !fModel2.classes().contains(cls)) {
-//				use += "\n" + RTLKeyword.startClass + " " + cls.name() + "\n";
-//				if (cls.attributes().size() > 0)
-//					use += RTLKeyword.startAttributes + "\n";
-//				for (Iterator atts = cls.attributes().iterator(); atts
-//						.hasNext();) {
-//					MAttribute att = (MAttribute) atts.next();
-//					use += RTLKeyword.indent + att.name() + " : "
-//							+ att.type().toString() + "\n";
-//				}
-//				if (cls.operations().size() > 0)
-//					use += RTLKeyword.startOperation + "\n";
-//				for (Iterator ops = cls.operations().iterator(); ops.hasNext();) {
-//					// MOperation op = (MOperation) ops.next();
-//					// use += RTLKeyword.indent + op.name() + " : " +
-//					// op.hasBody();
-//				}
-//				use += RTLKeyword.endClass + "\n";
-//			}
-//
-//		}
-//		return use;
-//	}
-//
-//	/**
-//	 * Generate association string for correspondence class
-//	 * 
-//	 * @return
-//	 */
-//	@SuppressWarnings("unchecked")
-//	private String genAssociationsCorr() {
-//		String use = "";
-//		for (Iterator iter = fModel.associations().iterator(); iter.hasNext();) {
-//			MAssociation assoc = (MAssociation) iter.next();
-//			if (!fModel1.associations().contains(assoc)
-//					&& !fModel2.associations().contains(assoc)) {
-//				use += RTLKeyword.startAssociation + " " + assoc.name() + " "
-//						+ RTLKeyword.between + "\n";
-//				for (Iterator iter1 = assoc.associationEnds().iterator(); iter1
-//						.hasNext();) {
-//					MAssociationEnd assocEnd = (MAssociationEnd) iter1.next();
-//					use += RTLKeyword.indent + assocEnd.cls().name() + "["
-//							+ assocEnd.multiplicity().toString() + "] "
-//							+ RTLKeyword.role + " " + assocEnd.nameAsRolename()
-//							+ "\n";
-//				}
-//				use += RTLKeyword.endAssociation + "\n";
-//			}
-//		}
-//		return use;
-//	}
-//
-//	/**
-//	 * generate invariant string for correspondence class
-//	 * 
-//	 * @return String: invariant
-//	 */
-//	@SuppressWarnings("unchecked")
-//	private String genInvariantsCorr() {
-//		String use = "", tmp = "";
-//		boolean flag = true;
-//		Map<String, Object> invs;
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule rule = (MTggRule) iter.next();
-//			invs = rule.genCorrInvariant();
-//			for (Iterator iter2 = invs.keySet().iterator(); iter2.hasNext();) {
-//				if (flag) {
-//					use += "\n-- Invariants for Correspondence classes";
-//					use += "\n" + RTLKeyword.startConstraint + "\n";
-//					flag = false;
-//				}
-//				String key = (String) iter2.next();
-//				String expr = (String) invs.get(key);
-//				tmp = "context " + key + " inv: "
-//						+ expr.toString().substring(1, expr.length() - 1)
-//						+ "\n";
-//				if (!use.contains(tmp))
-//					use += tmp;
-//			}
-//		}
-//		return use;
-//	}
-//
+
 	/**
 	 * Join source and target model
 	 * 
@@ -443,28 +328,23 @@ public class RTLParserParameter extends JDialog {
 			String mm1 = "", mm2 = "";
 			File f1 = Options.getRecentFile("use").toFile();
 			stream = new FileInputStream(f1);
-			fModel1 = USECompiler.compileSpecification(stream, f1.getName(),
-					fLogWriter, new ModelFactory());
+			fModel1 = USECompiler.compileSpecification(stream, f1.getName(), fLogWriter, new ModelFactory());
 			byte[] bytes = Files.readAllBytes(f1.toPath());
 			mm1 = new String(bytes, "UTF-8");
 			mm1 = mm1.substring(mm1.indexOf(RTLKeyword.startClass));
 
 			File f2 = new File(fTextModel2.getText());
 			stream = new FileInputStream(f2);
-			fModel2 = USECompiler.compileSpecification(stream, f2.getName(),
-					fLogWriter, new ModelFactory());
+			fModel2 = USECompiler.compileSpecification(stream, f2.getName(), fLogWriter, new ModelFactory());
 			bytes = Files.readAllBytes(f2.toPath());
 			mm2 = new String(bytes, "UTF-8");
 			mm2 = mm2.substring(mm2.indexOf(RTLKeyword.startClass));
 			modelName = fModel1.name() + "2" + fModel2.name();
 			// All model
-			result = RTLKeyword.model + " " + modelName + "\n" + mm1 + "\n"
-					+ mm2;
+			result = RTLKeyword.model + " " + modelName + "\n" + mm1 + "\n" + mm2;
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;
@@ -476,9 +356,8 @@ public class RTLParserParameter extends JDialog {
 	private void parseModels() {
 		fLogWriter.println("Loading source and target metamodel...");
 		String model = unionModel();
-		useContent = model;
-		fModel = USECompiler.compileSpecification(model, modelName, fLogWriter,
-				new ModelFactory());
+		useContent.append(model);
+		fModel = USECompiler.compileSpecification(model, modelName, fLogWriter, new ModelFactory());
 	}
 
 	/**
@@ -487,28 +366,25 @@ public class RTLParserParameter extends JDialog {
 	private void parseTGGRule() {
 		fLogWriter.println("Compile TGG rules...");
 		try {
-			fTggRules = RTLCompiler.compileSpecification(fTextTgg.getText(), fTextTgg.getText(), fLogWriter, fModel);
-			System.out.println("OK");
+			fTggRules = RTLCompiler.compileSpecification(fTextTgg.getText(), fLogWriter, fModel);
 		} catch (MSystemException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * This function writes file model.use
+	 * Write USE specification for models and transformations
 	 */
 	private void writeUSEFile() {
 		File f = new File(fTextTgg.getText());
 		String fTGGsRule = modelName + ".use";
 		String path = f.getPath();
-		String fullPath = path.substring(0, path.length()
-				- f.getName().length());
-		fLogWriter.println("Writing USE model specification to file: "
-				+ Paths.get(fullPath, fTGGsRule).toString());
+		String fullPath = path.substring(0, path.length() - f.getName().length());
+		fLogWriter.println("Writing USE model specification to file: " + Paths.get(fullPath, fTGGsRule).toString());
 		try {
-			PrintWriter out = new PrintWriter(new FileWriter(Paths.get(
-					fullPath, fTGGsRule).toString()));
+			PrintWriter out = new PrintWriter(new FileWriter(Paths.get(fullPath, fTGGsRule).toString()));
 			out.print(useContent);
 			out.close();
 		} catch (IOException e) {
@@ -519,7 +395,6 @@ public class RTLParserParameter extends JDialog {
 	/**
 	 * Check valid for path
 	 * 
-	 * @return
 	 */
 	private boolean checkPath() {
 		File f = new File(fTextModel2.getText());

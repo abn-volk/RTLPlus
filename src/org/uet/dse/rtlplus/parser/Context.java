@@ -22,9 +22,12 @@
 package org.uet.dse.rtlplus.parser;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.antlr.runtime.Token;
@@ -32,7 +35,9 @@ import org.tzi.use.gen.assl.statics.GProcedure;
 import org.tzi.use.parser.ExprContext;
 import org.tzi.use.parser.SemanticException;
 import org.tzi.use.parser.Symtable;
+import org.tzi.use.uml.mm.MAssociation;
 import org.tzi.use.uml.mm.MClass;
+import org.tzi.use.uml.mm.MMPrintVisitor;
 import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.ocl.type.Type;
@@ -73,26 +78,6 @@ public class Context {
     
     private boolean fIsInsideTestCase;
     
-    // Left- and right-hand side system states
-    private MSystemState lhsState;
-    private MSystemState rhsState;
-
-	public MSystemState getLhsState() {
-		return lhsState;
-	}
-
-	public void setLhsState(MSystemState lhsState) {
-		this.lhsState = lhsState;
-	}
-
-	public MSystemState getRhsState() {
-		return rhsState;
-	}
-
-	public void setRhsState(MSystemState rhsState) {
-		this.rhsState = rhsState;
-	}
-
 	public Context(String filename, PrintWriter err, 
                    VarBindings globalBindings,
                    ModelFactory factory) {
@@ -243,7 +228,55 @@ public class Context {
 		generatorProcedures = procedures;
 	}
 	
+	// Left- and right-hand side system states
+    private MSystemState lhsState;
+    private MSystemState rhsState;
+	
 	public List<GProcedure> getProcedures() {
 		return generatorProcedures;
 	}
+	
+	public MSystemState getLhsState() {
+		return lhsState;
+	}
+
+	public void setLhsState(MSystemState lhsState) {
+		this.lhsState = lhsState;
+	}
+
+	public MSystemState getRhsState() {
+		return rhsState;
+	}
+
+	public void setRhsState(MSystemState rhsState) {
+		this.rhsState = rhsState;
+	}
+	
+	// Correlation classes and associations
+    private Set<MClass> corrClasses = new LinkedHashSet<>();
+	private Set<MAssociation> corrAssociations = new LinkedHashSet<>();
+	
+	public void addCorrClass(MClass cls) {
+		corrClasses.add(cls);
+	}
+	
+	public void addCorrAssociation(MAssociation assoc) {
+		corrAssociations.add(assoc);
+	}
+	
+	public String generateCorrelations() {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		MMPrintVisitor visitor = new MMPrintVisitor(pw);
+		for (MClass cls : corrClasses) {
+			cls.processWithVisitor(visitor);
+			sw.write("\n");
+		}
+		for (MAssociation ass : corrAssociations) {
+			ass.processWithVisitor(visitor);
+			sw.write("\n");
+		}
+		return sw.toString();
+	}
+
 }

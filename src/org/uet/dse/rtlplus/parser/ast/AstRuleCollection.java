@@ -47,6 +47,7 @@ public class AstRuleCollection {
 		for (AstTggRule rule : ruleList) {
 			collection.addRule(rule.gen(ctx));
 		}
+		collection.setContext(ctx);
 		return collection;
 	}
 }

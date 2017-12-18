@@ -9,5 +9,12 @@ public class MCorrRule {
 		lhs = left;
 		rhs = right;
 	}
+	
+	public MPattern getLhs() {
+		return lhs;
+	}
 
+	public MPattern getRhs() {
+		return rhs;
+	}
 }

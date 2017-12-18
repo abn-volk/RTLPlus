@@ -1,13 +1,9 @@
 package org.uet.dse.rtlplus.parser.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.tzi.use.uml.mm.MAssociation;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
-import org.tzi.use.uml.sys.MObjectState;
 import org.tzi.use.uml.sys.MSystemException;
+import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.mm.MPattern;
 import org.uet.dse.rtlplus.mm.MRule;
 import org.uet.dse.rtlplus.parser.Context;
@@ -34,17 +30,15 @@ public class AstRule {
 		ctx.setSystemState(ctx.getLhsState());
 		try {
 			MPattern left = lhs.gen(ctx);
-			// Because the rules are non-deleting, the RHS system state is the same as the LHS system state
-			// Clone the LHS system state before adding new objects and links
+			// Copy the LHS state to the RHS state because the rules are non-deleting
 			ctx.setSystemState(ctx.getRhsState());
 			for (MObject obj : ctx.getLhsState().allObjects()) {
-				MObjectState objState = new MObjectState(obj);
-				ctx.getRhsState().restoreObject(objState);
+				if (!ctx.getRhsState().hasObjectWithName(obj.name()))
+					ctx.getRhsState().createObject(obj.cls(), obj.name());
 			}
 			for (MLink lnk : ctx.getLhsState().allLinks()) {
-				MAssociation assoc = lnk.association();
-				List<MObject> objects = lnk.linkedObjects();
-				ctx.getRhsState().createLink(assoc, new ArrayList<MObject>(objects), null);
+				if (!ctx.getRhsState().hasLink(lnk.association(), lnk.linkedObjects(), null)) 
+					ctx.getRhsState().createLink(lnk.association(), lnk.linkedObjects(), null);
 			}
 			MPattern right = rhs.gen(ctx);
 			return new MRule(left, right);

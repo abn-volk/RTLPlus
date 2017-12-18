@@ -1,7 +1,6 @@
 package org.uet.dse.rtlplus.parser.ast;
 
 import org.tzi.use.uml.mm.MInvalidModelException;
-import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
 import org.uet.dse.rtlplus.mm.MCorrRule;

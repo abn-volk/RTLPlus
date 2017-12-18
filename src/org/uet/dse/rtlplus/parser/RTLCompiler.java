@@ -1,6 +1,7 @@
 package org.uet.dse.rtlplus.parser;
 
-import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -20,20 +21,19 @@ public class RTLCompiler {
 	private RTLCompiler() {
 	};
 
-	public static MRuleCollection compileSpecification(String in, String inName, PrintWriter err, MModel model)
-			throws MSystemException {
-		InputStream inStream = new ByteArrayInputStream(in.getBytes());
+	public static MRuleCollection compileSpecification(String inName, PrintWriter err, MModel model)
+			throws MSystemException, FileNotFoundException {
+		InputStream inStream = new FileInputStream(inName);
 		ParseErrorHandler errHandler = new ParseErrorHandler(inName, err);
 		ANTLRInputStream input;
 		try {
 			input = new ANTLRInputStream(inStream);
 			input.name = inName;
-		}
-		catch (IOException exception) {
+		} catch (IOException exception) {
 			err.println(exception.getMessage());
 			return null;
 		}
-		
+
 		RTLLexer lexer = new RTLLexer(input);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		RTLParser parser = new RTLParser(tokenStream);
@@ -46,10 +46,9 @@ public class RTLCompiler {
 				ctx.setModel(model);
 				return ruleCollection.gen(ctx);
 			}
-		}
-		catch (RecognitionException e) {
-			err.println(String.format("%s:%d:%d:%s", parser.getSourceName(), 
-					e.line, e.charPositionInLine, e.getMessage()));
+		} catch (RecognitionException e) {
+			err.println(
+					String.format("%s:%d:%d:%s", parser.getSourceName(), e.line, e.charPositionInLine, e.getMessage()));
 		} catch (MInvalidModelException e) {
 			e.printStackTrace();
 		}

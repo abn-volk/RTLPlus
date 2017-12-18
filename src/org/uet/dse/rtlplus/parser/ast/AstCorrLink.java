@@ -15,6 +15,7 @@ import org.tzi.use.uml.mm.MMultiplicity;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
+import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
 import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.mm.MCorrLink;
@@ -135,25 +136,37 @@ public class AstCorrLink {
 		if (corrCls == null) {
 			corrCls = ctx.modelFactory().createClass(className, false);
 			model.addClass(corrCls);
+			ctx.addCorrClass(corrCls);
 		}
 		MObject corrObj = systemState.objectByName(name);
 		if (corrObj == null)
 			corrObj = systemState.createObject(corrCls, name);
-		// Create link between source and correlation object
 		List<MAssociation> assocs = createAssociations(ctx, srcCls, trgCls, corrCls);
+		// Need to create a new system state because the model has changed. 
+		// Using the old system state causes NPEs because the new link/obj map entries are not there.
+		MSystem newSystem = new MSystem(model);
+		MSystemState newSS = newSystem.state();
+		for (MObject obj : systemState.allObjects()) {
+			newSS.createObject(obj.cls(), obj.name());
+		}
+		for (MLink lnk : systemState.allLinks()) {
+			newSS.insertLink(lnk);
+		}
+		// Create link between source and correlation object
 		List<MObject> srcAndCorr = Arrays.asList(srcObj, corrObj);
 		MLink srcAndCorrLink;
-		if (systemState.hasLink(assocs.get(0), srcAndCorr, null))
-			srcAndCorrLink = systemState.linkBetweenObjects(assocs.get(0), srcAndCorr).iterator().next();
+		if (newSS.hasLink(assocs.get(0), srcAndCorr, null))
+			srcAndCorrLink = newSS.linkBetweenObjects(assocs.get(0), srcAndCorr).iterator().next();
 		else
-			srcAndCorrLink = systemState.createLink(assocs.get(0), srcAndCorr, null);
+			srcAndCorrLink = newSS.createLink(assocs.get(0), srcAndCorr, null);
 		// Create link between target and correlation object
 		MLink trgAndCorrLink;
 		List<MObject> trgAndCorr = Arrays.asList(trgObj, corrObj);
-		if (systemState.hasLink(assocs.get(1), srcAndCorr, null))
-			trgAndCorrLink = systemState.linkBetweenObjects(assocs.get(1), trgAndCorr).iterator().next();
+		if (newSS.hasLink(assocs.get(1), trgAndCorr, null))
+			trgAndCorrLink = newSS.linkBetweenObjects(assocs.get(1), trgAndCorr).iterator().next();
 		else
-			trgAndCorrLink = systemState.createLink(assocs.get(1), trgAndCorr, null);
+			trgAndCorrLink = newSS.createLink(assocs.get(1), trgAndCorr, null);
+		ctx.setSystemState(newSS);
 		return new MCorrLink(corrObj, srcAndCorrLink, trgAndCorrLink);
 	}
 
@@ -178,6 +191,7 @@ public class AstCorrLink {
 					mf.createAssociationEnd(corr, corr.nameAsRolename(), mult, MAggregationKind.NONE, false, null));
 			ctx.model().addAssociation(ass);
 			result.add(ass);
+			ctx.addCorrAssociation(ass);
 		} else
 			result.add(assocs.iterator().next());
 		classes = new HashSet<>(2);
@@ -194,6 +208,7 @@ public class AstCorrLink {
 					mf.createAssociationEnd(corr, corr.nameAsRolename(), mult, MAggregationKind.NONE, false, null));
 			ctx.model().addAssociation(ass);
 			result.add(ass);
+			ctx.addCorrAssociation(ass);
 		} else
 			result.add(assocs.iterator().next());
 		return result;
