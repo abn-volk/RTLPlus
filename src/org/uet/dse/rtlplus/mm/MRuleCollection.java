@@ -20,20 +20,19 @@ public class MRuleCollection {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void addRule(MTggRule rule) {
 		ruleList.add(rule);
 	}
 
 	public void setContext(Context ctx) {
-		System.out.println("setContext");
 		context = ctx;
 	}
-	
+
 	public Context getContext() {
 		return context;
 	}
-	
+
 	public String genCorrInvs() {
 		boolean hasConstraints = false;
 		StringBuilder sb = new StringBuilder("---------- Correlation invariants ----------\nconstraints\n");
@@ -64,6 +63,25 @@ public class MRuleCollection {
 		sb.append('\n');
 		if (hasConstraints)
 			return sb.toString();
-		else return "";
+		else
+			return "";
+	}
+
+	public void genForwardTransformation(StringBuilder ops, StringBuilder cons) {
+		for (MTggRule rule : ruleList) {
+			rule.genForwardTransformation(ops, cons);
+		}
+	}
+	
+	public void genBackwardTransformation(StringBuilder ops, StringBuilder cons) {
+		for (MTggRule rule : ruleList) {
+			rule.genBackwardTransformation(ops, cons);
+		}
+	}
+	
+	public void genIntegration(StringBuilder ops, StringBuilder cons) {
+		for (MTggRule rule : ruleList) {
+			rule.genIntegration(ops, cons);
+		}
 	}
 }

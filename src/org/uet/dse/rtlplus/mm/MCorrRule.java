@@ -1,13 +1,8 @@
 package org.uet.dse.rtlplus.mm;
 
-public class MCorrRule {
-	
-	private MPattern lhs;
-	private MPattern rhs;
-
+public class MCorrRule extends MRule {
 	public MCorrRule(MPattern left, MPattern right) {
-		lhs = left;
-		rhs = right;
+		super(left, right);
 	}
 	
 	public MPattern getLhs() {

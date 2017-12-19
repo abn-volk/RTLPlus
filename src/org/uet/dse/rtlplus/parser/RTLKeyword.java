@@ -41,6 +41,7 @@ public class RTLKeyword {
 	 * Keyword When We Generate File
 	 */
 	public static String forwardTransform = "_forwTrafo";
+	public static String backwardTransform = "_backTrafo";
 	public static String coEvolution = "_coEvol";
 	public static String integration = "_integration";
 	public static String pre = "_pre:";

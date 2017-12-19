@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -31,6 +32,7 @@ import org.tzi.use.main.ChangeListener;
 import org.tzi.use.main.Session;
 import org.tzi.use.parser.use.USECompiler;
 import org.tzi.use.uml.mm.MModel;
+import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
@@ -230,7 +232,27 @@ public class RTLParserParameter extends JDialog {
 		fLogWriter.println("Compile USE model specification...");
 		useContent.append(fTggRules.getContext().generateCorrelations());
 		useContent.append(fTggRules.genCorrInvs());
-		//useContent += genRuleCollection();
+		useContent.append(genRuleCollection());
+		useContent.append("\n---------- Transformation constraints ----------\n");
+		// Reload models to get RuleCollection's operations
+		// fModel = USECompiler.compileSpecification(useContent.toString(), modelName, fLogWriter, new ModelFactory());
+		//List<MOperation> ops = fModel.getClass("RuleCollection").allOperations();
+//		MOperation operation = null;
+	}
+	
+	private String genRuleCollection() {
+		StringBuilder ops = new StringBuilder("---------- RuleCollection ----------\nclass RuleCollection\n");
+		StringBuilder cons = new StringBuilder("---------- Transformation constraints ----------\nconstraints");
+		ops.append(RTLKeyword.startOperation);
+		ops.append("\n---------- Forward transformations ----------\n");
+		fTggRules.genForwardTransformation(ops, cons);
+		ops.append("\n---------- Backward transformations ----------\n");
+		fTggRules.genBackwardTransformation(ops, cons);
+		ops.append("\n---------- Integration transformations ----------\n");
+		fTggRules.genIntegration(ops, cons);
+		ops.append(RTLKeyword.endClass).append('\n');
+		ops.append(cons);
+		return ops.toString();
 	}
 
 	/**
@@ -393,8 +415,7 @@ public class RTLParserParameter extends JDialog {
 	}
 
 	/**
-	 * Check valid for path
-	 * 
+	 * Check if paths are valid
 	 */
 	private boolean checkPath() {
 		File f = new File(fTextModel2.getText());

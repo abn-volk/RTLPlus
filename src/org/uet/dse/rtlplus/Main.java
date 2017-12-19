@@ -35,6 +35,5 @@ public class Main implements IPlugin {
 
 	@Override
 	public void run(IPluginRuntime pluginRuntime) throws Exception {
-		System.out.println("run");
 	}
 }
