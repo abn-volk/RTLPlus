@@ -42,132 +42,172 @@ public class MTggRule {
 	}
 
 	public void genForwardTransformation(StringBuilder ops, StringBuilder cons) {
-		System.out.println("Generating forward transformation for " + name);
 		// Operations
 		StringBuilder sb = new StringBuilder();
 		sb.append(name + RTLKeyword.forwardTransform + " (");
 		// matchSR: Tuple (obj1: cls1, obj2: cls2)
 		String sr = srcRule.genMatchBoth();
 		if (!sr.isEmpty())
-			sb.append("\n    matchS: Tuple(").append(sr).append(")");
+			sb.append("\n    matchSR: Tuple(").append(sr).append(")");
 		// matchCL
 		String cl = corrRule.genMatchLeft();
 		if (!cl.isEmpty()) {
 			if (!sr.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchC: Tuple(").append(cl).append(")");
+			sb.append("\n    matchCL: Tuple(").append(cl).append(")");
 		}
 		// matchTL
 		String tl = trgRule.genMatchLeft();
 		if (!tl.isEmpty()) {
 			if (!sr.isEmpty() || !cl.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchT: Tuple(").append(tl).append(")");
+			sb.append("\n    matchTL: Tuple(").append(tl).append(")");
 		}
 		sb.append(")\n");
 		ops.append(sb);
 		// Constraints
-		if (!sr.isEmpty() || !cl.isEmpty() || !!tl.isEmpty()) {
-			cons.append("\ncontext RuleCollection::").append(sb).append("pre: ").append(srcRule.genLetBoth("matchS"))
-					.append(corrRule.genLetLeft("matchC")).append(trgRule.genLetLeft("matchT"));
-			String srcCond = srcRule.genPreCondBoth();
-			String trgCond = trgRule.genPreCondLeft();
-			String corrCond = corrRule.genPreCondLeft();
-			String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
-					.collect(Collectors.joining(" and\n"));
-			if (result.isEmpty())
-				cons.append("true\n");
+		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
+				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetLeft("matchTL")).toString();
+		// Pre-conditions
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		String srcPre = srcRule.genPreCondBoth();
+		String trgPre = trgRule.genPreCondLeft();
+		String corrPre = corrRule.genPreCondLeft();
+		String result = Arrays.asList(srcPre, trgPre, corrPre).stream().filter(it -> !it.isEmpty())
+				.collect(Collectors.joining(" and\n"));
+		if (result.isEmpty())
+			cons.append("true\n");
+		else
+			cons.append(result);
+		// Post-conditions
+		cons.append("\n\npost:\n").append(letString);
+		// Existing objects
+		StringBuilder sb1 = new StringBuilder();
+		int trgDepth = trgRule.genPostCond(sb1, 0);
+		// New objects
+		StringBuilder sb2 = new StringBuilder();
+		int corrDepth = corrRule.genPostCond(sb2, trgDepth);
+		if (sb2.length() == 0)
+			sb2.append("true\n");
+		if (sb1.length() > 2) {
+			if (sb1.charAt(sb1.length() - 2) == '|')
+				sb1.append(sb2);
 			else
-				cons.append(result);
-			// System.out.println("Source cond: " + srcCond);
-			// System.out.println("Target cond: " + trgCond);
-			// System.out.println("Correlation cond: " + corrCond);
-		}
+				sb1.append(" and ").append(sb2);
+		} else
+			sb1.append(sb2);
+		cons.append(sb1);
+		for (int i = 0; i < corrDepth; i++)
+			cons.append(')');
+		cons.append('\n');
 	}
 
 	public void genBackwardTransformation(StringBuilder ops, StringBuilder cons) {
-		System.out.println("Generating backward transformation for " + name);
+		// Operations
 		StringBuilder sb = new StringBuilder();
 		sb.append(name + RTLKeyword.backwardTransform + " (");
 		// matchSL: Tuple (obj1: cls1, obj2: cls2)
 		String sl = srcRule.genMatchLeft();
 		if (!sl.isEmpty())
-			sb.append("\n    matchS: Tuple(").append(sl).append(")");
+			sb.append("\n    matchSL: Tuple(").append(sl).append(")");
 		// matchCL
 		String cl = corrRule.genMatchLeft();
 		if (!cl.isEmpty()) {
 			if (!sl.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchC: Tuple(").append(cl).append(")");
+			sb.append("\n    matchCL: Tuple(").append(cl).append(")");
 		}
 		// matchTR
 		String tr = trgRule.genMatchBoth();
 		if (!tr.isEmpty()) {
 			if (!sl.isEmpty() || !cl.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchT: Tuple(").append(tr).append(")");
+			sb.append("\n    matchTR: Tuple(").append(tr).append(")");
 		}
 		sb.append(")\n");
 		ops.append(sb);
-		// TODO:
-		if (!sl.isEmpty() || !cl.isEmpty() || !!tr.isEmpty()) {
-			cons.append("\ncontext RuleCollection::").append(sb).append("pre: ").append(srcRule.genLetLeft("matchS"))
-					.append(corrRule.genLetLeft("matchC")).append(trgRule.genLetBoth("matchT"));
-			String srcCond = srcRule.genPreCondLeft();
-			String trgCond = trgRule.genPreCondBoth();
-			String corrCond = corrRule.genPreCondLeft();
-			String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
-					.collect(Collectors.joining(" and\n"));
-			if (result.isEmpty())
-				cons.append("true\n");
+		String letString = new StringBuilder().append(srcRule.genLetLeft("matchSL"))
+				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		String srcCond = srcRule.genPreCondLeft();
+		String trgCond = trgRule.genPreCondBoth();
+		String corrCond = corrRule.genPreCondLeft();
+		String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
+				.collect(Collectors.joining(" and\n"));
+		if (result.isEmpty())
+			cons.append("true\n");
+		else
+			cons.append(result);
+		// Post-conditions
+		cons.append("\n\npost:\n").append(letString);
+		// Existing objects
+		StringBuilder sb1 = new StringBuilder();
+		int srcDepth = srcRule.genPostCond(sb1, 0);
+		// New objects
+		StringBuilder sb2 = new StringBuilder();
+		int corrDepth = corrRule.genPostCond(sb2, srcDepth);
+		if (sb2.length() == 0)
+			sb2.append("true\n");
+		if (sb1.length() > 2) {
+			if (sb1.charAt(sb1.length() - 2) == '|')
+				sb1.append(sb2);
 			else
-				cons.append(result);
-			// System.out.println("Source cond: " + srcCond);
-			// System.out.println("Target cond: " + trgCond);
-			// System.out.println("Correlation cond: " + corrCond);
-		}
+				sb1.append(" and ").append(sb2);
+		} else
+			sb1.append(sb2);
+		cons.append(sb1);
+		for (int i = 0; i < corrDepth; i++)
+			cons.append(')');
+		cons.append('\n');
 	}
 
 	public void genIntegration(StringBuilder ops, StringBuilder cons) {
-		System.out.println("Generating integration transformation for " + name);
 		StringBuilder sb = new StringBuilder();
 		sb.append(name + RTLKeyword.integration + " (");
 		// matchSL: Tuple (obj1: cls1, obj2: cls2)
 		String sr = srcRule.genMatchBoth();
 		if (!sr.isEmpty())
-			sb.append("\n    matchS: Tuple(").append(sr).append(")");
+			sb.append("\n    matchSR: Tuple(").append(sr).append(")");
 		// matchCL
 		String cl = corrRule.genMatchLeft();
 		if (!cl.isEmpty()) {
 			if (!sr.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchC: Tuple(").append(cl).append(")");
+			sb.append("\n    matchCL: Tuple(").append(cl).append(")");
 		}
 		// matchTR
 		String tr = trgRule.genMatchBoth();
 		if (!tr.isEmpty()) {
 			if (!sr.isEmpty() || !tr.isEmpty())
 				sb.append(',');
-			sb.append("\n    matchT: Tuple(").append(tr).append(")");
+			sb.append("\n    matchTR: Tuple(").append(tr).append(")");
 		}
 		sb.append(")\n");
 		ops.append(sb);
-		// TODO:
-		if (!sr.isEmpty() || !cl.isEmpty() || !!tr.isEmpty()) {
-			cons.append("\ncontext RuleCollection::").append(sb).append("pre: ").append(srcRule.genLetBoth("matchS"))
-					.append(corrRule.genLetLeft("matchC")).append(trgRule.genLetBoth("matchT"));
-			String srcCond = srcRule.genPreCondBoth();
-			String trgCond = trgRule.genPreCondBoth();
-			String corrCond = corrRule.genPreCondLeft();
-			String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
-					.collect(Collectors.joining(" and\n"));
-			if (result.isEmpty())
-				cons.append("true\n");
-			else
-				cons.append(result);
-			// System.out.println("Source cond: " + srcCond);
-			// System.out.println("Target cond: " + trgCond);
-			// System.out.println("Correlation cond: " + corrCond);
-		}
+		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
+				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		String srcCond = srcRule.genPreCondBoth();
+		String trgCond = trgRule.genPreCondBoth();
+		String corrCond = corrRule.genPreCondLeft();
+		String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
+				.collect(Collectors.joining(" and\n"));
+		if (result.isEmpty())
+			cons.append("true\n");
+		else
+			cons.append(result);
+		// Post-conditions
+		cons.append("\n\npost:\n").append(letString);
+		// New objects
+		StringBuilder sb2 = new StringBuilder();
+		int corrDepth = corrRule.genPostCond(sb2, 0);
+		if (sb2.length() == 0)
+			sb2.append("true\n");
+		if (sb2.length() > 2 && sb2.charAt(sb2.length() - 2) == '|')
+			sb2.append("true\n");
+		cons.append(sb2);
+		for (int i = 0; i < corrDepth; i++)
+			cons.append(')');
+		cons.append('\n');
 	}
 }

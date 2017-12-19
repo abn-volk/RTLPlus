@@ -66,8 +66,22 @@ public class MRule {
 			return l + r;
 	}
 
-	public String genPostCondition() {
-		return "";
+	/**
+	 * Generate post-conditions when the right hand side is created during the
+	 * transformation
+	 * 
+	 * @return The number of nested expressions (due to exists(theObjA | ...) )
+	 */
+	public int genPostCond(StringBuilder builder, int depth) {
+		StringBuilder sb = new StringBuilder();
+		lhs.genPostCondExisting(sb);
+		StringBuilder sb2 = new StringBuilder();
+		depth = rhs.genPostCondNew(sb2, depth);
+		if (sb.length() > 0 && sb2.length() > 0)
+			builder.append(sb).append(" and\n").append(sb2);
+		else
+			builder.append(sb).append(sb2);
+		return depth;
 	}
 
 }

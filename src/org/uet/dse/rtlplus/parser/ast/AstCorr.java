@@ -1,7 +1,7 @@
 package org.uet.dse.rtlplus.parser.ast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public class AstCorr {
 	public MPattern gen(Context ctx) throws MInvalidModelException, MSystemException {
 		List<MObject> objs = new ArrayList<>();
 		List<MLink> lnks = new ArrayList<>();
-		Map<String, List<String>> invs = new HashMap<>();
+		Map<String, List<String>> invs = new LinkedHashMap<>();
 		for (AstCorrLink corrLink : linkList) {
 			MCorrLink lnk = corrLink.gen(ctx);
 			objs.add(lnk.getObj());

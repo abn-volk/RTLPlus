@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -32,7 +31,6 @@ import org.tzi.use.main.ChangeListener;
 import org.tzi.use.main.Session;
 import org.tzi.use.parser.use.USECompiler;
 import org.tzi.use.uml.mm.MModel;
-import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
@@ -233,16 +231,11 @@ public class RTLParserParameter extends JDialog {
 		useContent.append(fTggRules.getContext().generateCorrelations());
 		useContent.append(fTggRules.genCorrInvs());
 		useContent.append(genRuleCollection());
-		useContent.append("\n---------- Transformation constraints ----------\n");
-		// Reload models to get RuleCollection's operations
-		// fModel = USECompiler.compileSpecification(useContent.toString(), modelName, fLogWriter, new ModelFactory());
-		//List<MOperation> ops = fModel.getClass("RuleCollection").allOperations();
-//		MOperation operation = null;
 	}
 	
-	private String genRuleCollection() {
+	private StringBuilder genRuleCollection() {
 		StringBuilder ops = new StringBuilder("---------- RuleCollection ----------\nclass RuleCollection\n");
-		StringBuilder cons = new StringBuilder("---------- Transformation constraints ----------\nconstraints");
+		StringBuilder cons = new StringBuilder("\n\n#---------- Transformation constraints ----------\nconstraints");
 		ops.append(RTLKeyword.startOperation);
 		ops.append("\n---------- Forward transformations ----------\n");
 		fTggRules.genForwardTransformation(ops, cons);
@@ -252,96 +245,13 @@ public class RTLParserParameter extends JDialog {
 		fTggRules.genIntegration(ops, cons);
 		ops.append(RTLKeyword.endClass).append('\n');
 		ops.append(cons);
-		return ops.toString();
+		return ops;
 	}
-
-	/**
-	 * Generate class RuleCollection
-	 * 
-	 * @return
-	 */
-//	@SuppressWarnings("unchecked")
-//	private String genRuleCollection() {
-//		String use = "";
-//		use += "class RuleCollection\n";
-//		// operations
-//		use += "------------------------------------------------------------Operations\n";
-//		use += RTLKeyword.startOperation + "\n";
-//		use += "------------------------------Co-Evolution operations\n";
-//		// Co-Evolution transformation
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			use += tgg.buildParamsForCoEvol(2) + "\n";
-//		}
-//		// Forward transformation
-//		use += "------------------------------Forward transformation operation\n";
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			use += tgg.buildParamsForFwdTrafo(2) + "\n";
-//		}
-//		// Integration
-//		use += "------------------------------Integration operation\n";
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			use += tgg.buildParamsForIntegration(2) + "\n";
-//		}
-//		// Integration
-//		use += RTLKeyword.endClass + "\n";
-//		// before generate pre, postcondition, reload model to have class
-//		// RuleCollection and operations
-//		fModel = USECompiler.compileSpecification(useContent + use, modelName, fLogWriter, new ModelFactory());
-//		List<MOperation> ops = fModel.getClass("RuleCollection").allOperations();
-//		MOperation operation = null;
-//		// Pre, Post-condition
-//		use += "------------------------------------------------------------Pre, post-conditions\n";
-//		use += "\nconstraints";
-//		// co-evolution
-//		use += "\n------------------------------Co-Evolution\n";
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
-//				operation = (MOperation) iter1.next();
-//				if (operation.name().equals(tgg.name() + RTLKeyword.coEvolution))
-//					break;
-//			}
-//
-//			use += "\ncontext RuleCollection::" + tgg.buildParamsForCoEvol(0);
-//			use += tgg.buildPreConditionForCoEvol(operation, 2) + "\n";
-//			use += tgg.buildPostConditionForCoEvol(operation, 2) + "\n";
-//		}
-//		// forward transformation
-//		use += "\n" + RTLKeyword.comment(50, '-') + "Forward transformation\n";
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
-//				operation = (MOperation) iter1.next();
-//				if (operation.name().equals(tgg.name() + RTLKeyword.forwardTransform))
-//					break;
-//			}
-//			use += "\ncontext RuleCollection::" + tgg.buildParamsForFwdTrafo(0);
-//			use += tgg.buildPreConditionForFwdTrafo(operation, 2) + "\n";
-//			use += tgg.buildPostConditionForFwdTrafo(operation, 2) + "\n";
-//		}
-//		// Integration
-//		use += "\n" + RTLKeyword.comment(50, '-') + "Integration\n";
-//		for (Iterator iter = fTggRules.getTggRules().iterator(); iter.hasNext();) {
-//			MTggRule tgg = (MTggRule) iter.next();
-//			for (Iterator iter1 = ops.iterator(); iter1.hasNext();) {
-//				operation = (MOperation) iter1.next();
-//				if (operation.name().equals(tgg.name() + RTLKeyword.integration))
-//					break;
-//			}
-//			use += "\ncontext RuleCollection::" + tgg.buildParamsForIntegration(0);
-//			use += tgg.buildPreConditionForIntegration(operation, 2) + "\n";
-//			use += tgg.buildPostConditionForIntegration(operation, 2) + "\n";
-//		}
-//		return use;
-//	}
 
 	/**
 	 * Join source and target model
 	 * 
-	 * @return A string contains two model
+	 * @return A string containing the two models
 	 */
 	private String unionModel() {
 		String result = "";

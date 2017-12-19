@@ -21,6 +21,7 @@ import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.mm.MTggRule;
 
 public class RTLRuleTree extends JPanel implements TreeSelectionListener {
+	private static final long serialVersionUID = -6594017690147608266L;
 	private JEditorPane htmlPane;
 	private JTree tree;
 	private Collection<MTggRule> fTggRules;
