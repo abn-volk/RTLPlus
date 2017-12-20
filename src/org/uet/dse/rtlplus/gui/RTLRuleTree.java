@@ -1,10 +1,14 @@
 package org.uet.dse.rtlplus.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.Collection;
 
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -17,6 +21,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.tzi.use.gui.main.MainWindow;
+import org.tzi.use.gui.main.ViewFrame;
+import org.uet.dse.rtlplus.diagram.tggdiagram.TggDiagramView;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.mm.MTggRule;
 
@@ -89,9 +95,7 @@ public class RTLRuleTree extends JPanel implements TreeSelectionListener {
 			MTggRule tggRule = (MTggRule) nodeInfo;
 			String specification = readHTMLFile(tggRule);
 			htmlPane.setText(specification);
-
-			// TODO: Fix this
-			/*
+			
 			TggDiagramView tggView = new TggDiagramView(mainWindow, tggRule);
 			tggView.setVisible(true);
 			ViewFrame f = new ViewFrame("Triple rule [" + tggRule.getName() + "]", tggView, "rtl.png");
@@ -105,7 +109,7 @@ public class RTLRuleTree extends JPanel implements TreeSelectionListener {
 			c.add(new JScrollPane(tggView, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
 			mainWindow.addNewViewFrame(f);
-			*/
+			
 		}
 	}
 

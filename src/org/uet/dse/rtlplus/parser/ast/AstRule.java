@@ -3,7 +3,6 @@ package org.uet.dse.rtlplus.parser.ast;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemException;
-import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.mm.MPattern;
 import org.uet.dse.rtlplus.mm.MRule;
 import org.uet.dse.rtlplus.parser.Context;

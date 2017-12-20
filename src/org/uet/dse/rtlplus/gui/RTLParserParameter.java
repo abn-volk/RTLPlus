@@ -34,6 +34,7 @@ import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
+import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.parser.RTLCompiler;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
@@ -56,7 +57,7 @@ public class RTLParserParameter extends JDialog {
 	private MModel fModel;
 	private MRuleCollection fTggRules;
 	private String modelName;
-	private StringBuilder useContent  = new StringBuilder();
+	private StringBuilder useContent = new StringBuilder();
 
 	public RTLParserParameter(Session session, MainWindow parent) {
 		super(parent, "RTL Parser Parameter");
@@ -110,7 +111,6 @@ public class RTLParserParameter extends JDialog {
 			}
 		});
 		JButton btnPath3 = new JButton("Browse...");
-		// btnPath3.setMnemonic('P');
 		btnPath3.addActionListener(new ActionListener() {
 			private JFileChooser fChooser;
 
@@ -195,7 +195,8 @@ public class RTLParserParameter extends JDialog {
 				MModel newModel = null;
 				MSystem system = null;
 				try {
-					newModel = USECompiler.compileSpecification(useContent.toString(), modelName, fLogWriter, new ModelFactory());
+					newModel = USECompiler.compileSpecification(useContent.toString(), modelName, fLogWriter,
+							new ModelFactory());
 					fLogWriter.println("Load model " + modelName + " ...");
 					if (newModel != null) {
 						fLogWriter.println(newModel.getStats());
@@ -206,19 +207,17 @@ public class RTLParserParameter extends JDialog {
 					ex.printStackTrace();
 				}
 				// set new system (may be null if compilation failed)
-				final MSystem system2 = system; // need final variable for Runnable
+				final MSystem system2 = system;
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						fSession.setSystem(system2);
 					}
 				});
-				/*
-				 * Load TGG rules Rules.setMainWindow(fParent); Rules.setRTLRule(fTggRules);
-				 * Rules.setRTLRuleFileName(fTextTgg.getText());
-				 */
-				fLogWriter.println("Compile successfully");
+				Main.setMainWindow(fParent);
+				Main.setRTLRule(fTggRules);
+				fLogWriter.println("Compilation successful");
 			} else {
-				fLogWriter.println("Can not compile source files");
+				fLogWriter.println("Compilation failed");
 			}
 
 		} else {
@@ -232,10 +231,10 @@ public class RTLParserParameter extends JDialog {
 		useContent.append(fTggRules.genCorrInvs());
 		useContent.append(genRuleCollection());
 	}
-	
+
 	private StringBuilder genRuleCollection() {
 		StringBuilder ops = new StringBuilder("---------- RuleCollection ----------\nclass RuleCollection\n");
-		StringBuilder cons = new StringBuilder("\n\n#---------- Transformation constraints ----------\nconstraints");
+		StringBuilder cons = new StringBuilder("\n\n---------- Transformation constraints ----------\nconstraints");
 		ops.append(RTLKeyword.startOperation);
 		ops.append("\n---------- Forward transformations ----------\n");
 		fTggRules.genForwardTransformation(ops, cons);

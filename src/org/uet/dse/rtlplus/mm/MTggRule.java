@@ -1,8 +1,12 @@
 package org.uet.dse.rtlplus.mm;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.tzi.use.uml.sys.MLink;
+import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MTggRule {
@@ -210,4 +214,33 @@ public class MTggRule {
 			cons.append(')');
 		cons.append('\n');
 	}
+
+	public MSystemState getSystemStateLHS() {
+		return srcRule.lhs.getSystemState();
+	}
+	
+	public MSystemState getSystemStateRHS() {
+		return srcRule.rhs.getSystemState();
+	}
+
+	public List<MLink> getNonDeletingLinks() {
+		List<MLink> links = new ArrayList<>();
+		links.addAll(srcRule.getNonDeletingLinks());
+		links.addAll(trgRule.getNonDeletingLinks());
+		links.addAll(corrRule.getNonDeletingLinks());
+		return links;
+	}
+
+	public List<MLink> getNewLinks() {
+		List<MLink> links = new ArrayList<>();
+		links.addAll(srcRule.getNewLinks());
+		links.addAll(trgRule.getNewLinks());
+		links.addAll(corrRule.getNewLinks());
+		return links;
+	}
+	
+	public String toString() {
+		return name;
+	}
+
 }

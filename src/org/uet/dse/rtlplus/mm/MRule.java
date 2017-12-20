@@ -1,7 +1,11 @@
 package org.uet.dse.rtlplus.mm;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 
 public class MRule {
@@ -82,6 +86,43 @@ public class MRule {
 		else
 			builder.append(sb).append(sb2);
 		return depth;
+	}
+
+	public List<MObject> getAllObjects() {
+		List<MObject> objList = new ArrayList<>(lhs.getObjectList());
+		objList.addAll(rhs.getObjectList());
+		return objList;
+	}
+	
+	public List<MObject> getNewObjects() {
+		List<MObject> objList = new ArrayList<>(rhs.getObjectList());
+		objList.removeAll(lhs.getObjectList());
+		return objList;
+	}
+
+	public List<String> getPreconditions() {
+		if (lhs.getConditionList() != null)
+			return lhs.getConditionList();
+		return new ArrayList<>(0);
+	}
+	
+	public List<String> getPostconditions() {
+		if (rhs.getConditionList() != null)
+			return rhs.getConditionList();
+		return new ArrayList<>(0);
+	}
+
+	public List<MObject> getNonDeletingObjects() {
+		List<MObject> objList = new ArrayList<>(lhs.getObjectList());
+		return objList;
+	}
+
+	public Collection<MLink> getNonDeletingLinks() {
+		return lhs.getLinkList();
+	}
+
+	public Collection<? extends MLink> getNewLinks() {
+		return rhs.getLinkList();
 	}
 
 }
