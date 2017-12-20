@@ -73,7 +73,7 @@ public class MTggRule {
 		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetLeft("matchTL")).toString();
 		// Pre-conditions
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.forwardTransform + "_pre: \n").append(letString);
 		String srcPre = srcRule.genPreCondBoth();
 		String trgPre = trgRule.genPreCondLeft();
 		String corrPre = corrRule.genPreCondLeft();
@@ -84,7 +84,7 @@ public class MTggRule {
 		else
 			cons.append(result);
 		// Post-conditions
-		cons.append("\n\npost:\n").append(letString);
+		cons.append("\n\npost " + name + RTLKeyword.forwardTransform + "_post:\n").append(letString);
 		// Existing objects
 		StringBuilder sb1 = new StringBuilder();
 		int trgDepth = trgRule.genPostCond(sb1, 0);
@@ -132,7 +132,7 @@ public class MTggRule {
 		ops.append(sb);
 		String letString = new StringBuilder().append(srcRule.genLetLeft("matchSL"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.backwardTransform + "_pre: \n").append(letString);
 		String srcCond = srcRule.genPreCondLeft();
 		String trgCond = trgRule.genPreCondBoth();
 		String corrCond = corrRule.genPreCondLeft();
@@ -143,7 +143,7 @@ public class MTggRule {
 		else
 			cons.append(result);
 		// Post-conditions
-		cons.append("\n\npost:\n").append(letString);
+		cons.append("\n\npost " + name + RTLKeyword.backwardTransform + "_post:\n").append(letString);
 		// Existing objects
 		StringBuilder sb1 = new StringBuilder();
 		int srcDepth = srcRule.genPostCond(sb1, 0);
@@ -190,7 +190,7 @@ public class MTggRule {
 		ops.append(sb);
 		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre: \n").append(letString);
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.integration + "_pre: \n").append(letString);
 		String srcCond = srcRule.genPreCondBoth();
 		String trgCond = trgRule.genPreCondBoth();
 		String corrCond = corrRule.genPreCondLeft();
@@ -201,7 +201,7 @@ public class MTggRule {
 		else
 			cons.append(result);
 		// Post-conditions
-		cons.append("\n\npost:\n").append(letString);
+		cons.append("\n\npost " + name + RTLKeyword.integration + "_post:\n").append(letString);
 		// New objects
 		StringBuilder sb2 = new StringBuilder();
 		int corrDepth = corrRule.genPostCond(sb2, 0);
