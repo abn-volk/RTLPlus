@@ -15,13 +15,18 @@ public class MTggRule {
 	private MRule srcRule;
 	private MRule trgRule;
 	private MCorrRule corrRule;
+	private List<String> srcLnkCons;
+	private List<String> trgLnkCons;
 	private String html;
 
-	public MTggRule(String _name, MRule _srcRule, MRule _trgRule, MCorrRule _corrRule, String _str) {
+	public MTggRule(String _name, MRule _srcRule, MRule _trgRule, MCorrRule _corrRule, List<String> _srcLnkCons,
+			List<String> _trgLnkCons, String _str) {
 		name = _name;
 		srcRule = _srcRule;
 		trgRule = _trgRule;
 		corrRule = _corrRule;
+		srcLnkCons = _srcLnkCons;
+		trgLnkCons = _trgLnkCons;
 		html = _str;
 	}
 
@@ -73,11 +78,13 @@ public class MTggRule {
 		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetLeft("matchTL")).toString();
 		// Pre-conditions
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.forwardTransform + "_pre: \n").append(letString);
+		cons.append("\ncontext RuleCollection::").append(sb)
+				.append("pre " + name + RTLKeyword.forwardTransform + "_pre: \n").append(letString);
 		String srcPre = srcRule.genPreCondBoth();
 		String trgPre = trgRule.genPreCondLeft();
 		String corrPre = corrRule.genPreCondLeft();
-		String result = Arrays.asList(srcPre, trgPre, corrPre).stream().filter(it -> !it.isEmpty())
+		String srcLnkPre = srcLnkCons.stream().collect(Collectors.joining(" and\n"));
+		String result = Arrays.asList(srcPre, trgPre, corrPre, srcLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");
@@ -132,11 +139,14 @@ public class MTggRule {
 		ops.append(sb);
 		String letString = new StringBuilder().append(srcRule.genLetLeft("matchSL"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.backwardTransform + "_pre: \n").append(letString);
+		// Pre-conditions
+		cons.append("\ncontext RuleCollection::").append(sb)
+				.append("pre " + name + RTLKeyword.backwardTransform + "_pre: \n").append(letString);
 		String srcCond = srcRule.genPreCondLeft();
 		String trgCond = trgRule.genPreCondBoth();
 		String corrCond = corrRule.genPreCondLeft();
-		String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
+		String trgLnkPre = trgLnkCons.stream().collect(Collectors.joining(" and\n"));
+		String result = Arrays.asList(srcCond, trgCond, corrCond, trgLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");
@@ -190,12 +200,16 @@ public class MTggRule {
 		ops.append(sb);
 		String letString = new StringBuilder().append(srcRule.genLetBoth("matchSR"))
 				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetBoth("matchTR")).toString();
-		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.integration + "_pre: \n").append(letString);
+		// Pre-conditions
+		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.integration + "_pre: \n")
+				.append(letString);
 		String srcCond = srcRule.genPreCondBoth();
 		String trgCond = trgRule.genPreCondBoth();
 		String corrCond = corrRule.genPreCondLeft();
-		String result = Arrays.asList(srcCond, trgCond, corrCond).stream().filter(it -> !it.isEmpty())
-				.collect(Collectors.joining(" and\n"));
+		String srcLnkPre = srcLnkCons.stream().collect(Collectors.joining(" and\n"));
+		String trgLnkPre = trgLnkCons.stream().collect(Collectors.joining(" and\n"));
+		String result = Arrays.asList(srcCond, trgCond, corrCond, srcLnkPre, trgLnkPre).stream()
+				.filter(it -> !it.isEmpty()).collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");
 		else
@@ -218,7 +232,7 @@ public class MTggRule {
 	public MSystemState getSystemStateLHS() {
 		return srcRule.lhs.getSystemState();
 	}
-	
+
 	public MSystemState getSystemStateRHS() {
 		return srcRule.rhs.getSystemState();
 	}
@@ -238,7 +252,7 @@ public class MTggRule {
 		links.addAll(corrRule.getNewLinks());
 		return links;
 	}
-	
+
 	public String toString() {
 		return name;
 	}

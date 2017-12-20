@@ -142,8 +142,9 @@ public class AstCorrLink {
 		if (corrObj == null)
 			corrObj = systemState.createObject(corrCls, name);
 		List<MAssociation> assocs = createAssociations(ctx, srcCls, trgCls, corrCls);
-		// Need to create a new system state because the model has changed. 
-		// Using the old system state causes NPEs because the new link/obj map entries are not there.
+		// Need to create a new system state because the model has changed.
+		// Using the old system state causes NPEs because the new link/obj map entries
+		// are not there.
 		MSystem newSystem = new MSystem(model);
 		MSystemState newSS = newSystem.state();
 		for (MObject obj : systemState.allObjects()) {
@@ -166,6 +167,15 @@ public class AstCorrLink {
 			trgAndCorrLink = newSS.linkBetweenObjects(assocs.get(1), trgAndCorr).iterator().next();
 		else
 			trgAndCorrLink = newSS.createLink(assocs.get(1), trgAndCorr, null);
+		// Add link conditions if necessary
+		if (srcLnkCons != null) {
+			if (assocs.get(0).getAssociationEnd(corrCls, corrCls.name().toLowerCase())
+					.multiplicity() == MMultiplicity.ZERO_ONE)
+				srcLnkCons.add(sourceObject + "." + corrCls.name().toLowerCase() + "->size() = 0");
+			if (assocs.get(1).getAssociationEnd(corrCls, corrCls.name().toLowerCase())
+					.multiplicity() == MMultiplicity.ZERO_ONE)
+				trgLnkCons.add(targetObject + "." + corrCls.name().toLowerCase() + "->size() = 0");
+		}
 		ctx.setSystemState(newSS);
 		return new MCorrLink(corrObj, srcAndCorrLink, trgAndCorrLink);
 	}
@@ -173,9 +183,9 @@ public class AstCorrLink {
 	private List<MAssociation> createAssociations(Context ctx, MClass src, MClass trg, MClass corr)
 			throws MInvalidModelException {
 		if (role1 == null)
-			role1 = src.nameAsRolename();
+			role1 = src.name().toLowerCase();
 		if (role2 == null)
-			role2 = trg.nameAsRolename();
+			role2 = trg.name().toLowerCase();
 		Set<MClass> classes = new HashSet<>(2);
 		classes.add(corr);
 		classes.add(src);
@@ -188,7 +198,7 @@ public class AstCorrLink {
 					mf.createAssociationEnd(src, role1, MMultiplicity.ONE, MAggregationKind.NONE, false, null));
 			MMultiplicity mult = multipleSource ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
 			ass.addAssociationEnd(
-					mf.createAssociationEnd(corr, corr.nameAsRolename(), mult, MAggregationKind.NONE, false, null));
+					mf.createAssociationEnd(corr, corr.name().toLowerCase(), mult, MAggregationKind.NONE, false, null));
 			ctx.model().addAssociation(ass);
 			result.add(ass);
 			ctx.addCorrAssociation(ass);
@@ -205,13 +215,24 @@ public class AstCorrLink {
 					mf.createAssociationEnd(trg, role2, MMultiplicity.ONE, MAggregationKind.NONE, false, null));
 			MMultiplicity mult = multipleTarget ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
 			ass.addAssociationEnd(
-					mf.createAssociationEnd(corr, corr.nameAsRolename(), mult, MAggregationKind.NONE, false, null));
+					mf.createAssociationEnd(corr, corr.name().toLowerCase(), mult, MAggregationKind.NONE, false, null));
 			ctx.model().addAssociation(ass);
 			result.add(ass);
 			ctx.addCorrAssociation(ass);
 		} else
 			result.add(assocs.iterator().next());
 		return result;
+	}
+
+	private List<String> srcLnkCons;
+	private List<String> trgLnkCons;
+
+	// Generate correlation link with conditions
+	public MCorrLink gen(Context ctx, List<String> srcLnkCons, List<String> trgLnkCons)
+			throws MInvalidModelException, MSystemException {
+		this.srcLnkCons = srcLnkCons;
+		this.trgLnkCons = trgLnkCons;
+		return gen(ctx);
 	}
 
 }

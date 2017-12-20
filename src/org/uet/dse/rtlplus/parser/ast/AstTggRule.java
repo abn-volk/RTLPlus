@@ -1,5 +1,8 @@
 package org.uet.dse.rtlplus.parser.ast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.tzi.use.uml.mm.MInvalidModelException;
 import org.tzi.use.uml.sys.MSystem;
 import org.tzi.use.uml.sys.MSystemException;
@@ -37,10 +40,12 @@ public class AstTggRule {
 	public MTggRule gen(Context ctx) throws MInvalidModelException, MSystemException {
 		ctx.setLhsState(new MSystem(ctx.model()).state());
 		ctx.setRhsState(new MSystem(ctx.model()).state());
+		List<String> srcLnkCons = new ArrayList<>();
+		List<String> trgLnkCons = new ArrayList<>();
 		MRule srcRule = src.gen(ctx);
 		MRule trgRule = trg.gen(ctx);
-		MCorrRule corrRule = corr.gen(ctx);
-		return new MTggRule(name, srcRule, trgRule, corrRule, toString());
+		MCorrRule corrRule = corr.gen(ctx, srcLnkCons, trgLnkCons);
+		return new MTggRule(name, srcRule, trgRule, corrRule, srcLnkCons, trgLnkCons, toString());
 	}
 
 }

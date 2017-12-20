@@ -52,4 +52,20 @@ public class AstCorr {
 		}
 		return new MPattern(ctx.systemState(), objs, lnks, invs);
 	}
+
+	public MPattern gen(Context ctx, List<String> srcLnkCons, List<String> trgLnkCons) throws MInvalidModelException, MSystemException {
+		List<MObject> objs = new ArrayList<>();
+		List<MLink> lnks = new ArrayList<>();
+		Map<String, List<String>> invs = new LinkedHashMap<>();
+		for (AstCorrLink corrLink : linkList) {
+			MCorrLink lnk = corrLink.gen(ctx, srcLnkCons, trgLnkCons);
+			objs.add(lnk.getObj());
+			lnks.add(lnk.getSrcLink());
+			lnks.add(lnk.getTrgLink());
+		}
+		for (AstInvariantTgg inv : invList) {
+			invs.put(inv.getName(), inv.getConditions());
+		}
+		return new MPattern(ctx.systemState(), objs, lnks, invs);
+	}
 }

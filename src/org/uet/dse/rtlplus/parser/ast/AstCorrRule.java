@@ -1,5 +1,7 @@
 package org.uet.dse.rtlplus.parser.ast;
 
+import java.util.List;
+
 import org.tzi.use.uml.mm.MInvalidModelException;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
@@ -26,7 +28,7 @@ public class AstCorrRule {
 		return sb.toString();
 	}
 
-	public MCorrRule gen(Context ctx) throws MInvalidModelException, MSystemException {
+	public MCorrRule gen(Context ctx, List<String> srcLnkCons, List<String> trgLnkCons) throws MInvalidModelException, MSystemException {
 		ctx.setSystemState(ctx.getLhsState());
 		MPattern left = lhs.gen(ctx);
 		// Copy the LHS state to the RHS state because the rules are non-deleting
@@ -39,7 +41,7 @@ public class AstCorrRule {
 			if (!ctx.getRhsState().hasLink(lnk.association(), lnk.linkedObjects(), null)) 
 				ctx.getRhsState().createLink(lnk.association(), lnk.linkedObjects(), null);
 		}
-		MPattern right = rhs.gen(ctx);
+		MPattern right = rhs.gen(ctx, srcLnkCons, trgLnkCons);
 		return new MCorrRule(left, right);
 	}
 }

@@ -9,16 +9,27 @@ import org.uet.dse.rtlplus.parser.Context;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MRuleCollection {
+	public enum TransformationType {FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION};
+	
 	private String name;
+	private TransformationType type;
 	private List<MTggRule> ruleList = new ArrayList<>();
 	private Context context;
-
+	
+	public MRuleCollection(TransformationType _type) {
+		type = _type;
+	}
+	
 	public List<MTggRule> getRuleList() {
 		return ruleList;
 	}
 
 	public String getName() {
 		return name;
+	}
+	
+	public TransformationType getType() {
+		return type;
 	}
 
 	public void addRule(MTggRule rule) {
