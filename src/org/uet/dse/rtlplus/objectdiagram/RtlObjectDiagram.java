@@ -84,7 +84,6 @@ import org.tzi.use.gui.views.diagrams.elements.edges.LinkEdge;
 import org.tzi.use.gui.views.diagrams.elements.edges.NAryAssociationClassOrObjectEdge;
 import org.tzi.use.gui.views.diagrams.event.ActionLoadLayout;
 import org.tzi.use.gui.views.diagrams.event.ActionSaveLayout;
-import org.tzi.use.gui.views.diagrams.event.DiagramInputHandling;
 import org.tzi.use.gui.views.diagrams.event.HighlightChangeEvent;
 import org.tzi.use.gui.views.diagrams.event.HighlightChangeListener;
 import org.tzi.use.gui.views.diagrams.objectdiagram.ObjDiagramOptions;
@@ -240,7 +239,7 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 
 	private ObjectSelection fSelection;
 
-	private DiagramInputHandling inputHandling;
+	private RtlDiagramInputHandling inputHandling;
 	
 
 	/**
@@ -266,7 +265,7 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 		fActionLoadLayout = new ActionLoadLayout("USE object diagram layout", "olt", this);
 
 		swimlane = new RtlSwimlane(newObjectDiagramView, 0, 300, 600, 900);
-		inputHandling = new DiagramInputHandling(fNodeSelection, fEdgeSelection, this);
+		inputHandling = new RtlDiagramInputHandling(fNodeSelection, fEdgeSelection, this);
 
 		fParent.getModelBrowser().addHighlightChangeListener(this);
 		ModelBrowserSorting.getInstance().addSortChangeListener(this);
@@ -1286,14 +1285,8 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 				String s = (String) transferable.getTransferData(DataFlavor.stringFlavor);
 
 				if (s.startsWith("CLASS-")) {
-					Point p = dtde.getLocation();
-					if (isDoAutoLayout()) {
-						getRandomNextPosition();
-					} else {
-						nextNodePosition.x = p.getX();
-						nextNodePosition.y = p.getY();
-					}
 					String clsName = s.substring(6);
+					swimlane.getRandomNextPosition(nextNodePosition, getWidth(), getHeight(), classMap.get(clsName));
 					fParent.createObject(clsName);
 				}
 			}
