@@ -5,5 +5,7 @@
 	<classpathentry excluding="src/" kind="src" path=""/>
 	<classpathentry kind="lib" path="/home/pnh/Téléchargements/antlr-3.5.2-complete-no-st3.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/use"/>
+	<classpathentry kind="lib" path="/home/pnh/NCKH/use-5.0.0/lib/vtd-xml.jar"/>
+	<classpathentry kind="lib" path="/home/pnh/NCKH/use-5.0.0/lib/guava-20.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

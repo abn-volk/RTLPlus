@@ -1,25 +1,39 @@
 package org.uet.dse.rtlplus.mm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.tzi.use.uml.mm.MClass;
+import org.tzi.use.uml.mm.MModel;
 import org.uet.dse.rtlplus.parser.Context;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MRuleCollection {
-	public enum TransformationType {FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION};
-	
+	public static enum TransformationType {
+		FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION
+	};
+
+	public static enum Side {
+		SOURCE, TARGET, CORRELATION, OTHER
+	};
+
 	private String name;
 	private TransformationType type;
 	private List<MTggRule> ruleList = new ArrayList<>();
 	private Context context;
-	
+	private Map<String, Side> classMap = new HashMap<>();
+
+	public Map<String, Side> getClassMap() {
+		return classMap;
+	}
+
 	public MRuleCollection(TransformationType _type) {
 		type = _type;
 	}
-	
+
 	public List<MTggRule> getRuleList() {
 		return ruleList;
 	}
@@ -27,7 +41,7 @@ public class MRuleCollection {
 	public String getName() {
 		return name;
 	}
-	
+
 	public TransformationType getType() {
 		return type;
 	}
@@ -38,10 +52,26 @@ public class MRuleCollection {
 
 	public void setContext(Context ctx) {
 		context = ctx;
+		for (MClass cls : ctx.getCorrClasses()) {
+			classMap.put(cls.name(), Side.CORRELATION);
+		}
+		classMap.put("RuleCollection", Side.CORRELATION);
 	}
 
 	public Context getContext() {
 		return context;
+	}
+
+	public void setSourceModel(MModel model) {
+		for (MClass cls : model.classes()) {
+			classMap.put(cls.name(), Side.SOURCE);
+		}
+	}
+
+	public void setTargetModel(MModel model) {
+		for (MClass cls : model.classes()) {
+			classMap.put(cls.name(), Side.TARGET);
+		}
 	}
 
 	public String genCorrInvs() {
@@ -83,13 +113,13 @@ public class MRuleCollection {
 			rule.genForwardTransformation(ops, cons);
 		}
 	}
-	
+
 	public void genBackwardTransformation(StringBuilder ops, StringBuilder cons) {
 		for (MTggRule rule : ruleList) {
 			rule.genBackwardTransformation(ops, cons);
 		}
 	}
-	
+
 	public void genIntegration(StringBuilder ops, StringBuilder cons) {
 		for (MTggRule rule : ruleList) {
 			rule.genIntegration(ops, cons);

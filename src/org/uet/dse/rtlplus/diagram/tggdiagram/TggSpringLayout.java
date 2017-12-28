@@ -21,10 +21,10 @@
 
 package org.uet.dse.rtlplus.diagram.tggdiagram;
 
+import java.util.Iterator;
+
 import org.tzi.use.graph.DirectedGraph;
 import org.uet.dse.rtlplus.diagram.NodeBase;
-
-import java.util.Iterator;
 
 /**
  * The layout for TGG view

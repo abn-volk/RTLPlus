@@ -48,7 +48,6 @@ import org.uet.dse.rtlplus.parser.RTLKeyword;
 @SuppressWarnings("serial")
 public class RTLParserParameter extends JDialog {
 	private Session fSession;
-	private MainWindow fParent;
 	private JTextField fTextModel2;
 	private JTextField fTextTgg;
 	private PrintWriter fLogWriter;
@@ -69,7 +68,6 @@ public class RTLParserParameter extends JDialog {
 			}
 		});
 
-		fParent = parent;
 		fLogWriter = parent.logWriter();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -167,7 +165,6 @@ public class RTLParserParameter extends JDialog {
 		getRootPane().setDefaultButton(btnParse);
 		pack();
 		setLocationRelativeTo(parent);
-		// fListClasses.requestFocus();
 
 		// Close dialog on escape key
 		CloseOnEscapeKeyListener ekl = new CloseOnEscapeKeyListener(this);
@@ -213,7 +210,6 @@ public class RTLParserParameter extends JDialog {
 						fSession.setSystem(system2);
 					}
 				});
-				Main.setMainWindow(fParent);
 				Main.setRTLRule(fTggRules);
 				fLogWriter.println("Compilation successful");
 			} else {
@@ -298,6 +294,8 @@ public class RTLParserParameter extends JDialog {
 		fLogWriter.println("Compile TGG rules...");
 		try {
 			fTggRules = RTLCompiler.compileSpecification(fTextTgg.getText(), fLogWriter, fModel);
+			fTggRules.setSourceModel(fModel1);
+			fTggRules.setTargetModel(fModel2);
 		} catch (MSystemException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {

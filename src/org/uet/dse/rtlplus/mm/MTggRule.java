@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MSystemState;
+import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MTggRule {
@@ -251,6 +252,28 @@ public class MTggRule {
 		links.addAll(trgRule.getNewLinks());
 		links.addAll(corrRule.getNewLinks());
 		return links;
+	}
+	
+	public List<String> genCorrCreationCommands(TransformationType type, MSystemState systemState) {
+		List<String> commands;
+		switch(type) {
+		case FORWARD:
+			commands = srcRule.genLetCommandsRight("matchSR");
+			commands.addAll(trgRule.genLetCommandsLeft("matchTL"));
+			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
+			return commands;
+		case BACKWARD:
+			commands = trgRule.genLetCommandsRight("matchTR");
+			commands.addAll(srcRule.genLetCommandsLeft("matchSL"));
+			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
+			return commands;
+		// Integration 
+		default:
+			commands = srcRule.genLetCommandsRight("matchSR");
+			commands.addAll(trgRule.genLetCommandsRight("matchTR"));
+			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
+			return commands;
+		}
 	}
 
 	public String toString() {

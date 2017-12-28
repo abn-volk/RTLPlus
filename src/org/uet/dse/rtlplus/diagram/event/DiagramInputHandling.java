@@ -21,8 +21,23 @@
 
 package org.uet.dse.rtlplus.diagram.event;
 
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.Iterator;
+
 import org.tzi.use.gui.util.Selection;
-import org.tzi.use.gui.views.diagrams.Selectable;
 import org.tzi.use.gui.views.selection.classselection.SelectionClassView;
 import org.uet.dse.rtlplus.diagram.DiagramView;
 import org.uet.dse.rtlplus.diagram.EdgeProperty;
@@ -30,11 +45,6 @@ import org.uet.dse.rtlplus.diagram.PlaceableNode;
 import org.uet.dse.rtlplus.diagram.tggdiagram.ObjectNode;
 import org.uet.dse.rtlplus.diagram.tggdiagram.TggDiagram;
 import org.uet.dse.rtlplus.diagram.tggdiagram.TggSwimlane;
-
-import java.awt.*;
-import java.awt.dnd.*;
-import java.awt.event.*;
-import java.util.Iterator;
 
 /**
  * Handles the mouse movements and keyboard inputs 

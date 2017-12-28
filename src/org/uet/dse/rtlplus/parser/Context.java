@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.antlr.runtime.Token;
 import org.tzi.use.gen.assl.statics.GProcedure;
@@ -262,6 +262,10 @@ public class Context {
 	
 	public void addCorrAssociation(MAssociation assoc) {
 		corrAssociations.add(assoc);
+	}
+	
+	public Set<MClass> getCorrClasses() {
+		return corrClasses;
 	}
 	
 	public String generateCorrelations() {

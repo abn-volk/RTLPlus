@@ -35,5 +35,14 @@
 			toolbaritem="Show rule list" 
 			id="org.uet.dse.rtlplus.actions.ActionShowRuleList">
 		</action>
+		<action label="Show object diagram" 
+			icon="resources/diagram.png" 
+			class="org.uet.dse.rtlplus.actions.ActionShowObjectDiagram" 
+			tooltip="Show object diagram"
+			menu="RTL plugin" 
+			menuitem="Show object diagram"
+			toolbaritem="Show object diagram"
+			id="org.uet.dse.rtlplus.actions.ActionShowObjectDiagram">
+		</action>
 	</actions>
 </plugin>

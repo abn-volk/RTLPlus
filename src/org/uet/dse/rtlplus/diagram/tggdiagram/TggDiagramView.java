@@ -28,7 +28,6 @@ import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -42,7 +41,6 @@ import org.tzi.use.gui.main.ModelBrowserSorting.SortChangeListener;
 import org.tzi.use.gui.views.PrintableView;
 import org.tzi.use.gui.views.View;
 import org.tzi.use.uml.mm.MAssociation;
-import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.uet.dse.rtlplus.mm.MRule;

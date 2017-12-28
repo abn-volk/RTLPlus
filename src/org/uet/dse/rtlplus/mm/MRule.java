@@ -1,12 +1,12 @@
 package org.uet.dse.rtlplus.mm;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
+import org.tzi.use.uml.sys.MSystemState;
 
 public class MRule {
 
@@ -16,6 +16,14 @@ public class MRule {
 	public MRule(MPattern left, MPattern right) {
 		lhs = left;
 		rhs = right;
+	}
+	
+	public MPattern getLhs() {
+		return lhs;
+	}
+	
+	public MPattern getRhs() {
+		return rhs;
 	}
 
 	public String genMatchLeft() {
@@ -116,13 +124,51 @@ public class MRule {
 		List<MObject> objList = new ArrayList<>(lhs.getObjectList());
 		return objList;
 	}
+	
+	public List<MLink> getAllLinks() {
+		List<MLink> linkList = new ArrayList<>(lhs.getLinkList());
+		linkList.addAll(rhs.getLinkList());
+		return linkList;
+	}
 
-	public Collection<MLink> getNonDeletingLinks() {
+	public List<MLink> getNonDeletingLinks() {
 		return lhs.getLinkList();
 	}
 
-	public Collection<? extends MLink> getNewLinks() {
+	public List<? extends MLink> getNewLinks() {
 		return rhs.getLinkList();
+	}
+	
+	public List<String> genLetCommandsLeft(String prefix) {
+		List<String> commands = new ArrayList<String>();
+		for (MObject obj : lhs.getObjectList()) {
+			commands.add("let " + obj.name() + ":" + obj.cls().name() + " = " + prefix + "." + obj.name());
+		}
+		return commands;
+	}
+	
+	public List<String> genLetCommandsRight(String prefix) {
+		List<String> commands = new ArrayList<String>();
+		for (MObject obj : rhs.getObjectList()) {
+			commands.add("let " + obj.name() + ":" + obj.cls().name() + " = " + prefix + "." + obj.name());
+		}
+		return commands;
+	}
+
+	public List<String> genCreationCommands(String prefix, MSystemState systemState) {
+		List<String> commands = genLetCommandsLeft(prefix);
+		// Create objects
+		for (MObject obj : rhs.getObjectList()) {
+			String newObjName = systemState.uniqueObjectNameForClass(obj.cls());
+			commands.add("create " + newObjName + " : " + obj.cls().name());
+			commands.add("let " + obj.name() + " = " + newObjName);
+		}
+		// Create links
+		for (MLink lnk : rhs.getLinkList()) {
+			String insertStr = "(" + lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.joining(", ")) + ") into " + lnk.association().name();
+			commands.add(insertStr);
+		}
+		return commands;
 	}
 
 }
