@@ -53,11 +53,11 @@ public class ForwardMatchManager extends MatchManager {
 			return matches;
 		// Normal
 		for (Map<String, MObject> srcMatch : srcMatches) {
-			Map<String, MObject> objs = new LinkedHashMap<>(srcMatch);
+			Map<String, MObject> objs = new HashMap<>(srcMatch);
 			List<? extends Map<String, MObject>> trgMatches = findTargetMatch(rule, op);
 			if (trgMatches == null) {
 				if (validatePreconditions(op, objs))
-					matches.add(new ForwardMatch(rule, op, objs));
+					matches.add(new ForwardMatch(rule, op, new HashMap<>(objs)));
 			}
 			else if (trgMatches.isEmpty())
 				return matches;
@@ -67,14 +67,15 @@ public class ForwardMatchManager extends MatchManager {
 					List<? extends Map<String, MObject>> corrMatches = findCorrelationMatch(rule, op);
 					if (corrMatches == null) {
 						if (validatePreconditions(op, objs))
-							matches.add(new ForwardMatch(rule, op, objs));
+							matches.add(new ForwardMatch(rule, op, new HashMap<>(objs)));
 					}
 					else if (corrMatches.isEmpty())
 						return matches;
 					else {
 						for (Map<String, MObject> corrMatch : corrMatches) {
 							objs.putAll(corrMatch);
-							matches.add(new ForwardMatch(rule, op, objs));
+							if (validatePreconditions(op, objs))
+								matches.add(new ForwardMatch(rule, op, new HashMap<>(objs)));
 						}
 					}
 				}

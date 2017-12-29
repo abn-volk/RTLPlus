@@ -1,5 +1,6 @@
 package org.uet.dse.rtlplus.matching;
 
+import java.io.PrintWriter;
 import java.util.Map;
 
 import org.tzi.use.uml.mm.MOperation;
@@ -20,7 +21,7 @@ public abstract class Match {
 		this.objectList = objectList;
 	}
 	
-	public abstract void run(MSystemState systemState);
+	public abstract boolean run(MSystemState systemState, PrintWriter logWriter);
 	
 	public String toString() {
 		return operation.name() + ": " + objectList.toString();

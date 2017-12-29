@@ -60,6 +60,8 @@ public abstract class MatchManager {
 	
 
 	protected boolean validatePreconditions(MOperation op, Map<String, MObject> objs) {
+//		System.out.println("========== VALIDATING PRECONDITIONS ============");
+//		System.out.println("Objects: " + objs.toString());
 		VariableEnvironment varEnv = systemState.system().getVariableEnvironment();
 		for (VarDecl varDecl : op.paramList()) {
 			TupleType type = (TupleType) varDecl.type();
@@ -70,20 +72,27 @@ public abstract class MatchManager {
 			TupleValue tuple = new TupleValue(type, parts);
 			varEnv.assign(varDecl.name(), tuple);
 		}
-		System.out.println(varEnv);
+		//System.out.println(varEnv);
 		for (MPrePostCondition pre : op.preConditions()) {
 			Expression ex = pre.expression();
 			Evaluator eval = new Evaluator();
 			try {
 				Value valid = eval.eval(ex, systemState, systemState.system().varBindings());
-				if (valid.isBoolean() && ((BooleanValue) valid).isFalse())
+				if (valid.isBoolean() && ((BooleanValue) valid).isFalse()) {
+					varEnv.clear();
+//					System.out.println("=========== FALSE ==================");
 					return false;
+				}
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+				varEnv.clear();
 				return false;
 			}
 		}
+		varEnv.clear();
+		
+//		System.out.println("=========== TRUE: " + objs.toString());
 		return true;
 	}
 

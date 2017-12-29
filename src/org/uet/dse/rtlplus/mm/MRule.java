@@ -165,7 +165,7 @@ public class MRule {
 		}
 		// Create links
 		for (MLink lnk : rhs.getLinkList()) {
-			String insertStr = "(" + lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.joining(", ")) + ") into " + lnk.association().name();
+			String insertStr = "insert (" + lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.joining(", ")) + ") into " + lnk.association().name();
 			commands.add(insertStr);
 		}
 		return commands;

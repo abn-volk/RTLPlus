@@ -28,7 +28,7 @@ public class MatchFinder {
 		this.systemState = systemState;
 		this.operation = operation;
 		this.ruleObjects = ruleObjects;
-		System.out.println("Rule objects: " + ruleObjects.toString());
+		//System.out.println("Rule objects: " + ruleObjects.toString());
 		this.objs = new LinkedHashMap<>();
 		this.matches = new ArrayList<Map<String, MObject>>();
 	}
@@ -57,9 +57,11 @@ public class MatchFinder {
 			MClass cls = ruleObjects.get(position).cls();
 			for (MObject obj : systemState.objectsOfClassAndSubClasses(cls)) {
 				String varName = ruleObjects.get(position).name();
-				objs.put(varName, obj);
-				findMatchAtPosition(objs, position + 1);
-				objs.remove(varName);
+				if (!objs.containsValue(obj)) {
+					objs.put(varName, obj);
+					findMatchAtPosition(objs, position + 1);
+					objs.remove(varName);
+				}
 			}
 		}
 	}

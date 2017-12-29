@@ -17,7 +17,12 @@ public class ActionFindMatches implements IPluginActionDelegate {
 				pluginAction.getParent().logWriter(), false);
 		List<Match> matches = manager.findMatchForRules(Main.getTggRuleCollection().getRuleList());
 		for (Match match : matches) {
-			match.run(pluginAction.getSession().system().state());
+			// System.out.println(match.toString());
+			boolean success = match.run(pluginAction.getSession().system().state(), pluginAction.getParent().logWriter());
+			if (!success) {
+				pluginAction.getParent().logWriter().println("Failed to run match");
+			}
+			
 		}
 	}
 
