@@ -13,7 +13,7 @@ public abstract class Match {
 	protected MOperation operation;
 	protected MTggRule rule;
 	protected Map<String, MObject> objectList;
-	
+
 	public Match(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
 		super();
 		this.operation = operation;
@@ -25,6 +25,10 @@ public abstract class Match {
 	
 	public String toString() {
 		return operation.name() + ": " + objectList.toString();
+	}
+	
+	public Map<String, MObject> getObjectList() {
+		return objectList;
 	}
 	
 }

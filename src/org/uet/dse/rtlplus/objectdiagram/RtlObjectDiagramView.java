@@ -22,7 +22,9 @@ package org.uet.dse.rtlplus.objectdiagram;
 import java.awt.BorderLayout;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +79,7 @@ public class RtlObjectDiagramView extends JPanel implements View, PrintableView,
 	private final MSystem fSystem;
 	private final MainWindow fMainWindow;
 	private Map<String, Side> classMap;
+	private Collection<MObject> matchedObjects = new ArrayList<>(0);
 
 	protected RtlObjectDiagram fObjectDiagram;
 	public static int viewcount = 0;
@@ -187,7 +190,7 @@ public class RtlObjectDiagramView extends JPanel implements View, PrintableView,
 	}
 
 	@Subscribe
-	public void onLinkCeated(LinkInsertedEvent e) {
+	public void onLinkCreated(LinkInsertedEvent e) {
 		if (e.getAssociation() instanceof MAssociationClass) {
 			fObjectDiagram.addObject((MLinkObject) e.getLink());
 		}
@@ -202,6 +205,22 @@ public class RtlObjectDiagramView extends JPanel implements View, PrintableView,
 		}
 
 		fObjectDiagram.deleteLink(e.getLink());
+		fObjectDiagram.invalidateContent(true);
+	}
+	
+	@Subscribe
+	public void onMatchSelected(MatchSelectedEvent e) {
+		for (MObject obj : matchedObjects) {
+			ObjectNode node = fObjectDiagram.getObjectNode(obj);
+			if (node != null)
+				node.setMatched(false);
+		}
+		for (MObject obj : e.getMatchedObjects()) {
+			ObjectNode node = fObjectDiagram.getObjectNode(obj);
+			if (node != null)
+				node.setMatched(true);
+		}
+		matchedObjects = e.getMatchedObjects();
 		fObjectDiagram.invalidateContent(true);
 	}
 

@@ -10,26 +10,19 @@ import java.util.Map;
 import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
+import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MTggRule;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class ForwardMatchManager extends MatchManager {
-	
-	private List<? extends Map<String, MObject>> matched = new ArrayList<LinkedHashMap<String, MObject>>();
 
 	public ForwardMatchManager(MSystemState systemState, PrintWriter logWriter, boolean sync) {
 		super(systemState, logWriter, sync);
 	}
-	
-	public ForwardMatchManager(MSystemState systemState, PrintWriter logWriter, boolean sync,
-			Map<String, ? extends HashMap<String, MObject>> matchedObjects) {
-		super(systemState, logWriter, sync, matchedObjects);
-	}
 
 	@Override
 	public List<Match> findMatches() {
-		// TODO Auto-generated method stub
-		return null;
+		return findMatchForRules(Main.getTggRuleCollection().getRuleList());
 	}
 
 	@Override
@@ -58,8 +51,7 @@ public class ForwardMatchManager extends MatchManager {
 			if (trgMatches == null) {
 				if (validatePreconditions(op, objs))
 					matches.add(new ForwardMatch(rule, op, new HashMap<>(objs)));
-			}
-			else if (trgMatches.isEmpty())
+			} else if (trgMatches.isEmpty())
 				return matches;
 			else {
 				for (Map<String, MObject> trgMatch : trgMatches) {
@@ -68,8 +60,7 @@ public class ForwardMatchManager extends MatchManager {
 					if (corrMatches == null) {
 						if (validatePreconditions(op, objs))
 							matches.add(new ForwardMatch(rule, op, new HashMap<>(objs)));
-					}
-					else if (corrMatches.isEmpty())
+					} else if (corrMatches.isEmpty())
 						return matches;
 					else {
 						for (Map<String, MObject> corrMatch : corrMatches) {
@@ -92,24 +83,23 @@ public class ForwardMatchManager extends MatchManager {
 		}
 		return matches;
 	}
-	
+
 	private List<? extends Map<String, MObject>> findSourceMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getSrcRule().getAllObjects();
 		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
 		return finder.run();
 	}
-	
+
 	private List<? extends Map<String, MObject>> findTargetMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getTrgRule().getNonDeletingObjects();
 		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
 		return finder.run();
 	}
-	
+
 	private List<? extends Map<String, MObject>> findCorrelationMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getCorrRule().getNonDeletingObjects();
 		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
 		return finder.run();
 	}
-	
 
 }
