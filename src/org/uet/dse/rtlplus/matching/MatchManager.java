@@ -53,6 +53,8 @@ public abstract class MatchManager {
 		for (VarDecl varDecl : op.paramList()) {
 			TupleType type = (TupleType) varDecl.type();
 			List<Part> parts = new ArrayList<>();
+			// System.out.println(objs.toString());
+			// System.out.println(type.getParts().keySet());
 			for (String key : type.getParts().keySet()) {
 				parts.add(new TupleValue.Part(0, key, new ObjectValue(objs.get(key).cls(), objs.get(key))));
 			}

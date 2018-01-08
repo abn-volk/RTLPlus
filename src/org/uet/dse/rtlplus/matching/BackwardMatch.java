@@ -21,21 +21,21 @@ import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 import org.uet.dse.rtlplus.mm.MTggRule;
 
-public class ForwardMatch extends Match {
+public class BackwardMatch extends Match {
 
-	public ForwardMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
+	public BackwardMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
 		super(rule, operation, objectList);
 	}
 
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
-		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
+		List<String> commands = rule.getTrgRule().genLetCommandsRight("matchTR");
 		// Create new target objects
-		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
+		commands.addAll(rule.getSrcRule().genCreationCommands("matchSL", systemState));
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes
-		commands.addAll(rule.getCorrRule().genAttributeCommands(TransformationType.FORWARD));
+		commands.addAll(rule.getCorrRule().genAttributeCommands(TransformationType.BACKWARD));
 		// Variable assignments
 		VariableEnvironment varEnv = systemState.system().getVariableEnvironment();
 		for (VarDecl varDecl : operation.paramList()) {
@@ -53,6 +53,7 @@ public class ForwardMatch extends Match {
 		commands.add(0, openter);
 		// Execute commands
 		for (String cmd : commands) {
+			// System.out.println(cmd);
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
 			try {

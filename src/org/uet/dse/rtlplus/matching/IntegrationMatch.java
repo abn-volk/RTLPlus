@@ -18,12 +18,11 @@ import org.tzi.use.uml.sys.MSystemException;
 import org.tzi.use.uml.sys.MSystemState;
 import org.tzi.use.uml.sys.soil.MStatement;
 import org.tzi.use.util.soil.VariableEnvironment;
-import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 import org.uet.dse.rtlplus.mm.MTggRule;
 
-public class ForwardMatch extends Match {
+public class IntegrationMatch extends Match {
 
-	public ForwardMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
+	public IntegrationMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
 		super(rule, operation, objectList);
 	}
 
@@ -31,11 +30,10 @@ public class ForwardMatch extends Match {
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
 		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
 		// Create new target objects
-		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
+		commands.addAll(rule.getTrgRule().genLetCommandsRight("matchTR"));
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes
-		commands.addAll(rule.getCorrRule().genAttributeCommands(TransformationType.FORWARD));
 		// Variable assignments
 		VariableEnvironment varEnv = systemState.system().getVariableEnvironment();
 		for (VarDecl varDecl : operation.paramList()) {
@@ -53,6 +51,7 @@ public class ForwardMatch extends Match {
 		commands.add(0, openter);
 		// Execute commands
 		for (String cmd : commands) {
+			// System.out.println(cmd);
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
 			try {
