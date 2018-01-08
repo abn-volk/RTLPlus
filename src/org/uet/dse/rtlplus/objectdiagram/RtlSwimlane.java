@@ -6,7 +6,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.tzi.use.uml.sys.MObject;
 import org.uet.dse.rtlplus.mm.MRuleCollection.Side;
 import org.w3c.dom.Element;
 
@@ -23,6 +22,8 @@ public class RtlSwimlane {
 	private Line2D rightLine;
 	private Line2D rightmostLine;
 	private static final int Y2 = 1000;
+	
+	public static enum SwimlaneLine {NONE, LEFTMOST, LEFT, RIGHT, RIGHTMOST}
 
 	public RtlSwimlane(RtlObjectDiagramView rtlObjectDiagramView, int x1, int x2, int x3, int x4) {
 		diagramView = rtlObjectDiagramView;
@@ -68,16 +69,95 @@ public class RtlSwimlane {
 	 *            The y coordinate
 	 * @return The line corresponding to point (x,y)
 	 */
-	public int getLine(int x, int y) {
+	public SwimlaneLine getLine(int x, int y) {
 		if (leftmostLine.ptLineDist(x, y) <= 5)
-			return 1;
+			return SwimlaneLine.LEFTMOST;
 		if (leftLine.ptLineDist(x, y) <= 5)
-			return 2;
+			return SwimlaneLine.LEFT;
 		if (rightLine.ptLineDist(x, y) <= 5)
-			return 3;
+			return SwimlaneLine.RIGHT;
 		if (rightmostLine.ptLineDist(x, y) <= 5)
-			return 4;
-		return 0;
+			return SwimlaneLine.RIGHTMOST;
+		return SwimlaneLine.NONE;
+	}
+	
+	public void moveSwimlane(SwimlaneLine line, int dx) {
+		if (dx != 0) {
+			switch (line) {
+			case LEFTMOST:
+				if (dx > 0) {
+					Point2D p1 = leftmostLine.getP1();
+					Point2D p2 = leftmostLine.getP2();
+					// Move line
+					p1.setLocation(leftmostLine.getX1() + dx, leftmostLine.getY1());
+					p2.setLocation(leftmostLine.getX2() + dx, leftmostLine.getY2());
+					// Try to move objects
+					List<ObjectNode> nodesToMove1 = diagramView.getDiagram().getSrcObjectNodes();
+					if (!tryMoveLeftRightObjects(nodesToMove1, dx)) {
+						p1.setLocation(leftmostLine.getX1() - dx, leftmostLine.getY1());
+						p2.setLocation(leftmostLine.getX2() - dx, leftmostLine.getY2());
+					}
+					leftmostLine.setLine(p1, p2);
+				} else {
+					leftmostLine.setLine(leftmostLine.getX1() + dx, leftmostLine.getY1(),
+							leftmostLine.getX2() + dx, leftmostLine.getY2());
+				}
+				break;
+			case LEFT: {
+				Point2D p1 = leftLine.getP1();
+				Point2D p2 = leftLine.getP2();
+				// Move line
+				p1.setLocation(leftLine.getX1() + dx, leftLine.getY1());
+				p2.setLocation(leftLine.getX2() + dx, leftLine.getY2());
+				// Try to move objects
+				List<ObjectNode> nodesToMove2 = (dx < 0) ? diagramView.getDiagram().getSrcObjectNodes()
+						: diagramView.getDiagram().getCorObjectNodes();
+				if (!tryMoveLeftRightObjects(nodesToMove2, dx)) {
+					p1.setLocation(leftLine.getX1() - dx, leftLine.getY1());
+					p2.setLocation(leftLine.getX2() - dx, leftLine.getY2());
+				}
+				leftLine.setLine(p1, p2);
+			}
+			break;
+			case RIGHT: {
+				Point2D p1 = rightLine.getP1();
+				Point2D p2 = rightLine.getP2();
+				// Move line
+				p1.setLocation(rightLine.getX1() + dx, rightLine.getY1());
+				p2.setLocation(rightLine.getX2() + dx, rightLine.getY2());
+				// Try to move objects
+				List<ObjectNode> nodesToMove3 = (dx < 0) ? diagramView.getDiagram().getCorObjectNodes()
+						: diagramView.getDiagram().getTrgObjectNodes();
+				if (!tryMoveLeftRightObjects(nodesToMove3, dx)) {
+					p1.setLocation(rightLine.getX1() - dx, rightLine.getY1());
+					p2.setLocation(rightLine.getX2() - dx, rightLine.getY2());
+				}
+				rightLine.setLine(p1, p2);
+			}
+			break;
+			case RIGHTMOST:
+				if (dx < 0) {
+					Point2D p1 = rightmostLine.getP1();
+					Point2D p2 = rightmostLine.getP2();
+					// Move line
+					p1.setLocation(rightmostLine.getX1() + dx, rightmostLine.getY1());
+					p2.setLocation(rightmostLine.getX2() + dx, rightmostLine.getY2());
+					// Try to move objects
+					List<ObjectNode> nodesToMove = diagramView.getDiagram().getTrgObjectNodes();
+					if (!tryMoveLeftRightObjects(nodesToMove, dx)) {
+						p1.setLocation(rightmostLine.getX1() - dx, rightmostLine.getY1());
+						p2.setLocation(rightmostLine.getX2() - dx, rightmostLine.getY2());
+					}
+					rightmostLine.setLine(p1, p2);
+				} else {
+					rightmostLine.setLine(rightmostLine.getX1() + dx, rightmostLine.getY1(),
+							rightmostLine.getX2() + dx, rightmostLine.getY2());
+				}
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	/**
@@ -100,233 +180,13 @@ public class RtlSwimlane {
 		return Side.OTHER;
 	}
 
-	// public void moveSwimlane(int draggingSwimlane, int dx, int dy) {
-	// switch (draggingSwimlane) {
-	// case 1: // fSource_Border;
-	// if (fSource_Border == null)
-	// break;
-	// Point2D p1 = fSource_Border.getP1();
-	// Point2D p2 = fSource_Border.getP2();
-	// if ((0 < p1.getX() + dx) && (p1.getX() + dx < fSource_Corr.getX1())) {
-	// p1.setLocation(p1.getX() + dx, p1.getY());
-	// p2.setLocation(p2.getX() + dx, p2.getY());
-	// if (dx > 0) {
-	// List<MObject> objects =
-	// this.diagramView.getTggRule().getSrcRule().getAllObjects();
-	// boolean ok = tryMoveLeftRightObjects(objects, dx);
-	// if (!ok) {
-	// p1.setLocation(p1.getX() - dx, p1.getY());
-	// p2.setLocation(p2.getX() - dx, p2.getY());
-	// }
-	// }
-	// fSource_Border.setLine(p1, p2);
-	// }
-	//
-	// break;
-	// case 2: // fSource_Corr;
-	// p1 = fSource_Corr.getP1();
-	// p2 = fSource_Corr.getP2();
-	// if ((getMinX() < p1.getX() + dx) && (p1.getX() + dx < fTarget_Corr.getX1()))
-	// {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX() + dx, p1.getY());
-	// p2.setLocation(p2.getX() + dx, p2.getY());
-	// List<MObject> objects;
-	// if (dx < 0) {
-	// objects = this.diagramView.getTggRule().getSrcRule().getAllObjects();
-	// } else {
-	// objects = this.diagramView.getTggRule().getCorrRule().getAllObjects();
-	// }
-	// boolean ok = tryMoveLeftRightObjects(objects, dx);
-	// if (!ok) {
-	// p1.setLocation(p1.getX() - dx, p1.getY());
-	// p2.setLocation(p2.getX() - dx, p2.getY());
-	// }
-	// fSource_Corr.setLine(p1, p2);
-	// }
-	// break;
-	// case 3: // fTarget_Corr;
-	// p1 = fTarget_Corr.getP1();
-	// p2 = fTarget_Corr.getP2();
-	// if ((fSource_Corr.getX1() < p1.getX() + dx) && (p1.getX() + dx <
-	// fTarget_Border.getX1())) {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX() + dx, p1.getY());
-	// p2.setLocation(p2.getX() + dx, p2.getY());
-	// List<MObject> objects;
-	// if (dx < 0) {
-	// objects = this.diagramView.getTggRule().getCorrRule().getAllObjects();
-	// } else {
-	// objects = this.diagramView.getTggRule().getTrgRule().getAllObjects();
-	// }
-	// boolean ok = tryMoveLeftRightObjects(objects, dx);
-	// if (!ok) {
-	// p1.setLocation(p1.getX() - dx, p1.getY());
-	// p2.setLocation(p2.getX() - dx, p2.getY());
-	// }
-	// fTarget_Corr.setLine(p1, p2);
-	// }
-	// break;
-	// case 4: // fTarget_Border;
-	// p1 = fTarget_Border.getP1();
-	// p2 = fTarget_Border.getP2();
-	// if (fTarget_Corr.getX1() < p1.getX() + dx) {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX() + dx, p1.getY());
-	// p2.setLocation(p2.getX() + dx, p2.getY());
-	// boolean ok = true;
-	// if (dx < 0) {
-	// List<MObject> objects =
-	// this.diagramView.getTggRule().getTrgRule().getAllObjects();
-	// ok = tryMoveLeftRightObjects(objects, dx);
-	// if (!ok) {
-	// p1.setLocation(p1.getX() - dx, p1.getY());
-	// p2.setLocation(p2.getX() - dx, p2.getY());
-	// }
-	// }
-	// fTarget_Border.setLine(p1, p2);
-	// if (ok) {
-	// if (fTopTggLine != null) {
-	// fTopTggLine.setLine(fTopTggLine.getX1(), fTopTggLine.getY1(),
-	// fTopTggLine.getX2() + dx,
-	// fTopTggLine.getY2());
-	// }
-	// fMiddleTggLine.setLine(fMiddleTggLine.getX1(), fMiddleTggLine.getY1(),
-	// fMiddleTggLine.getX2() + dx,
-	// fMiddleTggLine.getY2());
-	// fBottomTggLine.setLine(fBottomTggLine.getX1(), fBottomTggLine.getY1(),
-	// fBottomTggLine.getX2() + dx,
-	// fBottomTggLine.getY2());
-	// if (fBottomLine != null) {
-	// fBottomLine.setLine(fBottomLine.getX1(), fBottomLine.getY1(),
-	// fBottomLine.getX2() + dx,
-	// fBottomLine.getY2());
-	// }
-	// }
-	// }
-	// break;
-	// case 10: // fTopTggLine;
-	// if (fTopTggLine == null)
-	// break;
-	// p1 = fTopTggLine.getP1();
-	// p2 = fTopTggLine.getP2();
-	// if ((0 < p1.getY() + dy) && (p1.getY() + dy < fMiddleTggLine.getY1())) {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX(), p1.getY() + dy);
-	// p2.setLocation(p2.getX(), p2.getY() + dy);
-	// Set<MObject> objects =
-	// this.diagramView.getTggRule().getSystemStateLHS().allObjects();
-	// boolean ok = tryMoveUpDownObjects(objects, dy);
-	// if (!ok) {
-	// p1.setLocation(p1.getX(), p1.getY() - dy);
-	// p2.setLocation(p2.getX(), p2.getY() - dy);
-	// }
-	// fTopTggLine.setLine(p1, p2);
-	// }
-	// break;
-	// case 20: // fMiddleTggLine;
-	// p1 = fMiddleTggLine.getP1();
-	// p2 = fMiddleTggLine.getP2();
-	// if ((getMinY(draggingSwimlane) < p1.getY() + dy) && (p1.getY() + dy <
-	// fBottomTggLine.getY1())) {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX(), p1.getY() + dy);
-	// p2.setLocation(p2.getX(), p2.getY() + dy);
-	// Set<MObject> objects;
-	// if (dy < 0) {
-	// objects = this.diagramView.getTggRule().getSystemStateLHS().allObjects();
-	// } else {
-	// objects = this.diagramView.getTggRule().getSystemStateRHS().allObjects();
-	// }
-	// boolean ok = tryMoveUpDownObjects(objects, dy);
-	// if (!ok) {
-	// p1.setLocation(p1.getX(), p1.getY() - dy);
-	// p2.setLocation(p2.getX(), p2.getY() - dy);
-	// }
-	// fMiddleTggLine.setLine(p1, p2);
-	// }
-	// break;
-	// case 30: // fBottomTggLine;
-	// p1 = fBottomTggLine.getP1();
-	// p2 = fBottomTggLine.getP2();
-	// if ((fMiddleTggLine.getY1() < p1.getY() + dy) && (p1.getY() + dy <
-	// getMaxY())) {
-	// // try to move the swimlane, move objects, and rollback in case an error
-	// occurs
-	// p1.setLocation(p1.getX(), p1.getY() + dy);
-	// p2.setLocation(p2.getX(), p2.getY() + dy);
-	// boolean ok = true;
-	// if (dy < 0) {
-	// Set<MObject> objects =
-	// this.diagramView.getTggRule().getSystemStateRHS().allObjects();
-	// ok = tryMoveUpDownObjects(objects, dy);
-	// if (!ok) {
-	// p1.setLocation(p1.getX(), p1.getY() - dy);
-	// p2.setLocation(p2.getX(), p2.getY() - dy);
-	// }
-	// }
-	// fBottomTggLine.setLine(p1, p2);
-	// if (ok && (fBottomLine == null)) {
-	// if (fSource_Border != null) {
-	// fSource_Border.setLine(fSource_Border.getX1(), fSource_Border.getY1(),
-	// fSource_Border.getX2(),
-	// fSource_Border.getY2() + dy);
-	// }
-	// fSource_Corr.setLine(fSource_Corr.getX1(), fSource_Corr.getY1(),
-	// fSource_Corr.getX2(),
-	// fSource_Corr.getY2() + dy);
-	// fTarget_Corr.setLine(fTarget_Corr.getX1(), fTarget_Corr.getY1(),
-	// fTarget_Corr.getX2(),
-	// fTarget_Corr.getY2() + dy);
-	// fTarget_Border.setLine(fTarget_Border.getX1(), fTarget_Border.getY1(),
-	// fTarget_Border.getX2(),
-	// fTarget_Border.getY2() + dy);
-	// }
-	// }
-	// break;
-	// case 40: // fBottomLine;
-	// if (fBottomLine == null)
-	// break;
-	// p1 = fBottomLine.getP1();
-	// p2 = fBottomLine.getP2();
-	// if (fBottomTggLine.getY1() < p1.getY() + dy) {
-	// p1.setLocation(p1.getX(), p1.getY() + dy);
-	// p2.setLocation(p2.getX(), p2.getY() + dy);
-	// fBottomLine.setLine(p1, p2);
-	// if (fSource_Border != null) {
-	// fSource_Border.setLine(fSource_Border.getX1(), fSource_Border.getY1(),
-	// fSource_Border.getX2(),
-	// fSource_Border.getY2() + dy);
-	// }
-	// fSource_Corr.setLine(fSource_Corr.getX1(), fSource_Corr.getY1(),
-	// fSource_Corr.getX2(),
-	// fSource_Corr.getY2() + dy);
-	// fTarget_Corr.setLine(fTarget_Corr.getX1(), fTarget_Corr.getY1(),
-	// fTarget_Corr.getX2(),
-	// fTarget_Corr.getY2() + dy);
-	// fTarget_Border.setLine(fTarget_Border.getX1(), fTarget_Border.getY1(),
-	// fTarget_Border.getX2(),
-	// fTarget_Border.getY2() + dy);
-	// }
-	// break;
-	// default:
-	// }
-	//
-	// }
-
-	public boolean tryMoveLeftRightObjects(List<MObject> objects, int dx) {
+	public boolean tryMoveLeftRightObjects(List<ObjectNode> nodes, int dx) {
 		boolean res = true;
 		List<ObjectNode> movedObjects = new ArrayList<>();
-		for (MObject obj : objects) {
-			ObjectNode node = diagramView.getDiagram().getObjectNode(obj);
+		for (ObjectNode node : nodes) {
 			int gap = dx > 0 ? 10 : -10;
-			if (!node.checkNewPositition(node.getX() - gap)) {
-				if (node.checkNewPositition(node.getX() + dx + gap)) {
+			if (!node.checkNewPositition(node.getX() - gap, node.getX() + node.getWidth() - gap)) {
+				if (node.checkNewPositition(node.getX() + dx + gap, node.getX() + node.getWidth() + gap)) {
 					node.setPosition(node.getX() + dx, node.getY());
 					movedObjects.add(node);
 				} else {
@@ -375,13 +235,13 @@ public class RtlSwimlane {
 	public void getRandomNextPosition(Point2D.Double pos, int w, int h, Side side) {
 		switch (side) {
 		case SOURCE:
-			pos.x = leftmostLine.getX1() + Math.random() * (leftLine.getX1() - leftmostLine.getX1());
+			pos.x = leftmostLine.getX1() + Math.random() * (leftLine.getX1() - leftmostLine.getX1() - 100);
 			break;
 		case CORRELATION:
-			pos.x = leftLine.getX1() + Math.random() * (rightLine.getX1() - leftLine.getX1());
+			pos.x = leftLine.getX1() + Math.random() * (rightLine.getX1() - leftLine.getX1() - 100);
 			break;
 		case TARGET:
-			pos.x = rightLine.getX1() + Math.random() * (rightmostLine.getX1() - rightLine.getX1());
+			pos.x = rightLine.getX1() + Math.random() * (rightmostLine.getX1() - rightLine.getX1() - 100);
 			break;
 		default:
 			pos.x = Math.random() * Math.max(100, w - 100);

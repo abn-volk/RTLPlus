@@ -313,7 +313,8 @@ public class ObjectNode extends PlaceableNode implements SortChangeListener, Obj
 		this.fOpt.removeOptionChangedListener(fOptChaneListener);
 	}
 
-	public boolean checkNewPositition(double d) {
-		return (fParent.getDiagram().getSwimlane().getSide(d) == side);
+	public boolean checkNewPositition(double d1, double d2) {
+		return ((fParent.getDiagram().getSwimlane().getSide(d1) == side) 
+				&& (fParent.getDiagram().getSwimlane().getSide(d2) == side));
 	}
 }

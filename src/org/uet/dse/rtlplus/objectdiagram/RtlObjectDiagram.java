@@ -106,6 +106,7 @@ import org.tzi.use.uml.sys.MObjectState;
 import org.tzi.use.util.StringUtil;
 import org.tzi.use.util.StringUtil.IElementFormatter;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
+import org.uet.dse.rtlplus.mm.MRuleCollection.Side;
 import org.w3c.dom.Element;
 
 import com.ximpleware.AutoPilot;
@@ -150,7 +151,8 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 		 * 
 		 */
 		public Map<MLinkObject, EdgeBase> fLinkObjectToNodeEdge;
-
+		
+		
 		/**
 		 * 
 		 */
@@ -228,6 +230,21 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 	private RtlObjectDiagramView fParent;
 		
 	private Map<String, MRuleCollection.Side> classMap;
+	public List<ObjectNode> srcObjectNodes;
+	public List<ObjectNode> trgObjectNodes;
+	public List<ObjectNode> corObjectNodes;
+	
+	public List<ObjectNode> getSrcObjectNodes() {
+		return srcObjectNodes;
+	}
+
+	public List<ObjectNode> getTrgObjectNodes() {
+		return trgObjectNodes;
+	}
+
+	public List<ObjectNode> getCorObjectNodes() {
+		return corObjectNodes;
+	}
 
 	/**
 	 * The position of the next object node. This is either set to a random value or
@@ -255,7 +272,9 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 
 		fParent = newObjectDiagramView;
 		this.classMap = classMap;
-		// FIXME: Handle fonts!
+		srcObjectNodes = new ArrayList<>();
+		trgObjectNodes = new ArrayList<>();
+		corObjectNodes = new ArrayList<>();
 		newObjectDiagramView.setFont(getFont());
 
 		fSelection = new ObjectSelection(this, newObjectDiagramView.system());
@@ -265,7 +284,7 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 		fActionLoadLayout = new ActionLoadLayout("USE object diagram layout", "olt", this);
 
 		swimlane = new RtlSwimlane(newObjectDiagramView, 0, 300, 600, 900);
-		inputHandling = new RtlDiagramInputHandling(fNodeSelection, fEdgeSelection, this);
+		inputHandling = new RtlDiagramInputHandling(fNodeSelection, fEdgeSelection, this, swimlane);
 
 		fParent.getModelBrowser().addHighlightChangeListener(this);
 		ModelBrowserSorting.getInstance().addSortChangeListener(this);
@@ -401,7 +420,8 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 	 * Adds an object to the diagram.
 	 */
 	public void addObject(MObject obj) {
-		swimlane.getRandomNextPosition(nextNodePosition, getWidth(), getHeight(), classMap.get(obj.cls().toString()));
+		Side side = classMap.get(obj.cls().toString());
+		swimlane.getRandomNextPosition(nextNodePosition, getWidth(), getHeight(), side);
 		ObjectNode n = new ObjectNode(obj, classMap.get(obj.cls().name()), fParent, getOptions());
 		n.setPosition(nextNodePosition);
 		n.setMinWidth(minClassNodeWidth);
@@ -411,6 +431,19 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 		
 		fGraph.add(n);
 		visibleData.fObjectToNodeMap.put(obj, n);
+		switch(side) {
+		case SOURCE:
+			srcObjectNodes.add(n);
+			break;
+		case TARGET:
+			trgObjectNodes.add(n);
+			break;
+		case CORRELATION:
+			corObjectNodes.add(n);
+			break;
+		default:
+			break;
+		}
 		fLayouter = null;
 	}
 
@@ -545,6 +578,21 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 				hiddenData.fObjectToNodeMap.remove(obj);
 			}
 			n.dispose();
+		}
+		
+		Side side = classMap.get(obj.cls().toString());
+		switch(side) {
+		case SOURCE:
+			srcObjectNodes.remove(n);
+			break;
+		case TARGET:
+			trgObjectNodes.remove(n);
+			break;
+		case CORRELATION:
+			corObjectNodes.remove(n);
+			break;
+		default:
+			break;
 		}
 	}
 

@@ -14,7 +14,6 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 
 	@Override
 	public void performAction(IPluginAction pluginAction) {
-		// TODO: Detect transformation type here
 		ForwardMatchManager manager = new ForwardMatchManager(pluginAction.getSession().system().state(),
 				pluginAction.getParent().logWriter(), false);
 		int i = 0;
