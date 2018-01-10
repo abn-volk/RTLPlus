@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.main.ViewFrame;
 import org.tzi.use.main.Session;
+import org.tzi.use.main.shell.Shell;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 import org.tzi.use.uml.sys.events.AttributeAssignedEvent;
@@ -53,12 +54,19 @@ public class SyncWorker extends JPanel {
 	private MSystemState state;
 	private PrintWriter logWriter;
 	private EventBus eventBus;
-	// Needed for deletion
+	// Needed for attribute assignment
+	private Map<String, Set<String>> corrObjsForSrc;
+	private Map<String, Set<String>> corrObjsForTrg;
+	private Map<String, Set<String>> forwardCmdsForCorr;
+	private Map<String, Set<String>> backwardCmdsForCorr;
+	// Fixing attributes
+	private boolean fixing = false;
 
 	public SyncWorker(MainWindow parent, Session session) {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-		JLabel label1 = new JLabel("<html>Keep this window open to track incremental changes and update the model accordingly.</html>");
+		JLabel label1 = new JLabel(
+				"<html>Keep this window open to track incremental changes and update the model accordingly.</html>");
 		add(label1);
 		mainWindow = parent;
 		classMap = Main.getTggRuleCollection().getClassMap();
@@ -67,7 +75,10 @@ public class SyncWorker extends JPanel {
 		eventBus = session.system().getEventBus();
 		rulesForSrcClass = Main.getSyncData().getRulesForSrcClass();
 		rulesForTrgClass = Main.getSyncData().getRulesForTrgClass();
-		
+		corrObjsForSrc = Main.getSyncData().getCorrObjsForSrc();
+		corrObjsForTrg = Main.getSyncData().getCorrObjsForTrg();
+		forwardCmdsForCorr = Main.getSyncData().getForwardCmdsForCorr();
+		backwardCmdsForCorr = Main.getSyncData().getBackwardCmdsForCorr();
 		// Listen to changes
 		eventBus.register(this);
 		System.out.println("Subscribed to EventBus");
@@ -92,10 +103,9 @@ public class SyncWorker extends JPanel {
 	@Subscribe
 	public void onObjectCreated(ObjectCreatedEvent e) {
 		MObject obj = e.getCreatedObject();
-		System.out.println("Object created: " + obj.name()); 
+		System.out.println("Object created: " + obj.name());
 		if (running) {
-		}
-		else {
+		} else {
 			switch (classMap.get(obj.cls().name())) {
 			case SOURCE:
 				// Find forward matches
@@ -136,19 +146,30 @@ public class SyncWorker extends JPanel {
 	@Subscribe
 	public void onObjectDestroyed(ObjectDestroyedEvent e) {
 		MObject obj = e.getDestroyedObject();
-		System.out.println("Object destroyed: " + obj.name()); 
+		System.out.println("Object destroyed: " + obj.name());
 		if (running) {
 
 		} else {
-			
+
 		}
 	}
 
 	@Subscribe
 	public void onLinkInserted(LinkInsertedEvent e) {
 		if (running) {
-		}
-		else {
+			// Link between src/trg and correlation
+			List<MObject> objs = e.getParticipants();
+			if (objs.size() == 2) {
+				Side s1 = classMap.get(objs.get(0).cls().name());
+				Side s2 = classMap.get(objs.get(1).cls().name());
+				if (s1 == Side.SOURCE && s2 == Side.CORRELATION) {
+					Main.getSyncData().addSrcCorrLink(objs.get(0).name(), objs.get(1).name());
+				}
+				if (s1 == Side.TARGET && s2 == Side.CORRELATION) {
+					Main.getSyncData().addTrgCorrLink(objs.get(0).name(), objs.get(1).name());
+				}
+			}
+		} else {
 			List<MObject> objects = e.getLink().linkedObjects();
 			Side side = classMap.get(objects.get(0).cls().name());
 			Set<MTggRule> ruleList = new HashSet<>();
@@ -164,7 +185,7 @@ public class SyncWorker extends JPanel {
 					ruleList.addAll(rulesForTrgClass.get(obj.cls().name()));
 			}
 			if (sameSide) {
-				switch(side) {
+				switch (side) {
 				case SOURCE:
 					MatchManager fManager = new ForwardMatchManager(state, true);
 					List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
@@ -216,10 +237,52 @@ public class SyncWorker extends JPanel {
 		if (running) {
 
 		} else {
-
+			eventBus.unregister(this);
+			System.out.println("Attribute assignment");
+			switch (classMap.get(e.getObject().cls().name())) {
+			case SOURCE:
+				Set<String> corrObjs = corrObjsForSrc.get(e.getObject().name());
+				if (corrObjs != null) {
+					System.out.println(corrObjs);
+					for (String corr : corrObjs) {
+						MObject corrObj = state.objectByName(corr);
+						if (corrObj != null) {
+							Set<String> strs = forwardCmdsForCorr.get(corrObj.cls().name());
+							if (strs != null) {
+								System.out.println("Strs = " + strs.toString());
+								for (String str : strs) {
+									String line = str.replace("self", corr);
+									Shell.getInstance().processLineSafely("! set " + line);
+								}
+							}
+						}
+					}
+				}
+				break;
+			case TARGET:
+				Set<String> cObjs = corrObjsForTrg.get(e.getObject().name());
+				if (cObjs != null) {
+					for (String corr : cObjs) {
+						MObject corrObj = state.objectByName(corr);
+						if (corrObj != null) {
+							Set<String> strs = backwardCmdsForCorr.get(corrObj.cls().name());
+							if (strs != null) {
+								for (String str : strs) {
+									String line = str.replace("self", corr);
+									Shell.getInstance().processLineSafely("! set " + line);
+								}
+							}
+						}
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			eventBus.register(this);
 		}
 	}
-	
+
 	public void unsubscribe() {
 		eventBus.unregister(this);
 	}
