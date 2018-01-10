@@ -49,9 +49,7 @@ public class IntegrationMatch extends Match {
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
 		commands.add(0, openter);
-		// Execute commands
 		for (String cmd : commands) {
-			// System.out.println(cmd);
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
 			try {
@@ -59,18 +57,22 @@ public class IntegrationMatch extends Match {
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
+				doOpExit(systemState, logWriter);
 				varEnv.clear();
 				return false;
 			}
 		}
 		// Opexit
+		doOpExit(systemState, logWriter);
+		varEnv.clear();
+		return true;
+	}
+	
+	private void doOpExit(MSystemState systemState, PrintWriter logWriter) {
 		try {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
 					systemState, systemState.system().getVariableEnvironment(), "opexit", "<input>", logWriter, false));
 		} catch (Exception ignored) {
 		}
-		varEnv.clear();
-		return true;
 	}
-
 }

@@ -60,18 +60,23 @@ public class ForwardMatch extends Match {
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
+				doOpExit(systemState, logWriter);
 				varEnv.clear();
 				return false;
 			}
 		}
 		// Opexit
+		doOpExit(systemState, logWriter);
+		varEnv.clear();
+		return true;
+	}
+	
+	private void doOpExit(MSystemState systemState, PrintWriter logWriter) {
 		try {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
 					systemState, systemState.system().getVariableEnvironment(), "opexit", "<input>", logWriter, false));
 		} catch (Exception ignored) {
 		}
-		varEnv.clear();
-		return true;
 	}
 
 }

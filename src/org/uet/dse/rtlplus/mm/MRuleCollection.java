@@ -2,12 +2,15 @@ package org.uet.dse.rtlplus.mm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MModel;
+import org.tzi.use.uml.sys.MObject;
 import org.uet.dse.rtlplus.parser.Context;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
@@ -25,7 +28,7 @@ public class MRuleCollection {
 	private List<MTggRule> ruleList = new ArrayList<>();
 	private Context context;
 	private Map<String, Side> classMap = new HashMap<>();
-
+	
 	public Map<String, Side> getClassMap() {
 		return classMap;
 	}

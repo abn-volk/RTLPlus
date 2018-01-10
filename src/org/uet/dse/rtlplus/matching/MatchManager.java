@@ -1,9 +1,7 @@
 package org.uet.dse.rtlplus.matching;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,17 +20,16 @@ import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 import org.tzi.use.util.soil.VariableEnvironment;
+import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MTggRule;
 
 public abstract class MatchManager {
 	protected MSystemState systemState;
-	protected PrintWriter logWriter;
 	protected boolean sync;
 
-	public MatchManager(MSystemState systemState, PrintWriter logWriter, boolean sync) {
+	public MatchManager(MSystemState systemState, boolean sync) {
 		super();
 		this.systemState = systemState;
-		this.logWriter = logWriter;
 		this.sync = sync;
 	}
 
@@ -40,7 +37,6 @@ public abstract class MatchManager {
 		MClass rc = systemState.system().model().getClass("RuleCollection");
 		MOperation op = rc.operation(ruleName + suffix, false);
 		if (op == null) {
-			logWriter.println("Operation not found: " + ruleName + suffix);
 			return null;
 		}
 		return op;
@@ -84,11 +80,32 @@ public abstract class MatchManager {
 		return true;
 	}
 
-	public abstract List<Match> findMatches();
+	public List<Match> findMatches() {
+		return findMatchesForRules(Main.getTggRuleCollection().getRuleList());
+	}
 
-	public abstract List<Match> findMatchForObjects(List<MObject> objects);
+	public List<Match> findMatchesForObjects(List<MObject> objects) {
+		return findMatchesForRulesAndObjects(Main.getTggRuleCollection().getRuleList(), objects);
+	}	
+	public abstract List<Match> findMatchesForRuleAndObjects(MTggRule rule, List<MObject> objects);
+	
+	public List<Match> findMatchesForRulesAndObjects(Collection<MTggRule> ruleList, List<MObject> objects) {
+		List<Match> matches = new ArrayList<>();
+		for (MTggRule rule : ruleList) {
+			List<Match> currentMatches = findMatchesForRuleAndObjects(rule, objects);
+			if (currentMatches != null) matches.addAll(currentMatches);
+		}
+		return matches;
+	}
 
 	public abstract List<Match> findMatchForRule(MTggRule rule);
 
-	public abstract List<Match> findMatchForRules(List<MTggRule> ruleList);
+	public List<Match> findMatchesForRules(List<MTggRule> ruleList) {
+		List<Match> matches = new ArrayList<>();
+		for (MTggRule rule : ruleList) {
+			List<Match> currentMatches = findMatchForRule(rule);
+			if (currentMatches != null) matches.addAll(currentMatches);
+		}
+		return matches;
+	}
 }

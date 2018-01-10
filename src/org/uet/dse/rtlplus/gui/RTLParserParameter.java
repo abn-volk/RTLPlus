@@ -48,6 +48,7 @@ import org.uet.dse.rtlplus.parser.RTLKeyword;
 @SuppressWarnings("serial")
 public class RTLParserParameter extends JDialog {
 	private Session fSession;
+	private MainWindow mainWindow;
 	private JTextField fTextModel2;
 	private JTextField fTextTgg;
 	private PrintWriter fLogWriter;
@@ -60,6 +61,7 @@ public class RTLParserParameter extends JDialog {
 
 	public RTLParserParameter(Session session, MainWindow parent) {
 		super(parent, "RTL Parser Parameter");
+		mainWindow = parent;
 		fSession = session;
 		fSession.addChangeListener(new ChangeListener() {
 			@Override

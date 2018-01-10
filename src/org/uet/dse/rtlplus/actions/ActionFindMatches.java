@@ -19,6 +19,7 @@ import org.uet.dse.rtlplus.matching.ForwardMatchManager;
 import org.uet.dse.rtlplus.matching.IntegrationMatchManager;
 import org.uet.dse.rtlplus.matching.Match;
 import org.uet.dse.rtlplus.matching.MatchManager;
+import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 
 import com.google.common.eventbus.EventBus;
 
@@ -35,17 +36,17 @@ public class ActionFindMatches implements IPluginActionDelegate {
 		switch (Main.getTggRuleCollection().getType()) {
 		case FORWARD:
 		case SYNCHRONIZATION:
-			manager = new ForwardMatchManager(state, logWriter, false);
+			manager = new ForwardMatchManager(state, (Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION));
 			break;
 		case BACKWARD:
-			manager = new BackwardMatchManager(state, logWriter, false);
+			manager = new BackwardMatchManager(state, false);
 			break;
 		case INTEGRATION:
-			manager = new IntegrationMatchManager(state, logWriter, false);
+			manager = new IntegrationMatchManager(state, false);
 			break;
 		}
 		if (manager != null) {
-			List<Match> matches = manager.findMatchForRules(Main.getTggRuleCollection().getRuleList());
+			List<Match> matches = manager.findMatchesForRules(Main.getTggRuleCollection().getRuleList());
 			if (matches.isEmpty())
 				JOptionPane.showMessageDialog(mainWindow, "No matches were found.");
 			else {

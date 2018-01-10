@@ -1,6 +1,5 @@
 package org.uet.dse.rtlplus.matching;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,23 +8,17 @@ import java.util.Map;
 import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
-import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MTggRule;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class IntegrationMatchManager extends MatchManager {
 
-	public IntegrationMatchManager(MSystemState systemState, PrintWriter logWriter, boolean sync) {
-		super(systemState, logWriter, sync);
+	public IntegrationMatchManager(MSystemState systemState, boolean sync) {
+		super(systemState, sync);
 	}
 
 	@Override
-	public List<Match> findMatches() {
-		return findMatchForRules(Main.getTggRuleCollection().getRuleList());
-	}
-
-	@Override
-	public List<Match> findMatchForObjects(List<MObject> objects) {
+	public List<Match> findMatchesForObjects(List<MObject> objects) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -74,15 +67,6 @@ public class IntegrationMatchManager extends MatchManager {
 		return matches;
 	}
 
-	@Override
-	public List<Match> findMatchForRules(List<MTggRule> ruleList) {
-		List<Match> matches = new ArrayList<>();
-		for (MTggRule rule : ruleList) {
-			matches.addAll(findMatchForRule(rule));
-		}
-		return matches;
-	}
-
 	private List<? extends Map<String, MObject>> findSourceMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getSrcRule().getAllObjects();
 		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
@@ -99,6 +83,11 @@ public class IntegrationMatchManager extends MatchManager {
 		List<MObject> ruleObjects = rule.getCorrRule().getNonDeletingObjects();
 		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
 		return finder.run();
+	}
+
+	@Override
+	public List<Match> findMatchesForRuleAndObjects(MTggRule rules, List<MObject> objects) {
+		return new ArrayList<>(0);
 	}
 
 }

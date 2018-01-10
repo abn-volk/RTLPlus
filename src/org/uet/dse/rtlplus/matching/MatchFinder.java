@@ -20,7 +20,6 @@ public class MatchFinder {
 	private MSystemState systemState;
 	private MOperation operation;
 	private List<MObject> ruleObjects;
-	private Map<String, MObject> objs;
 	private List<Map<String, MObject>> matches;
 
 	public MatchFinder(MSystemState systemState, MOperation operation, List<MObject> ruleObjects) {
@@ -28,8 +27,6 @@ public class MatchFinder {
 		this.systemState = systemState;
 		this.operation = operation;
 		this.ruleObjects = ruleObjects;
-		//System.out.println("Rule objects: " + ruleObjects.toString());
-		this.objs = new LinkedHashMap<>();
 		this.matches = new ArrayList<Map<String, MObject>>();
 	}
 
@@ -37,11 +34,44 @@ public class MatchFinder {
 	public List<? extends Map<String, MObject>> run() {
 		if (ruleObjects.isEmpty())
 			return null;
-		findMatchAtPosition(objs, 0);
+		findMatchAtPosition(new LinkedHashMap<String, MObject>(), 0);
 		// TODO: this is empty when a match fails because findMatchAtPosition is not
-		// called recursively anymore, but not empty when there is actually 0 objects to
+		// called recursively anymore, but not empty when there are actually 0 objects to
 		// match because if (...) returns true. Hm.
 		return matches;
+	}
+	
+	public List<? extends Map<String, MObject>> run(List<MObject> objs) {
+		if (ruleObjects.isEmpty())
+			return null;
+		findMatchAtPosition(new LinkedHashMap<String, MObject>(), 0, objs);
+		return matches;
+	}
+
+	private void findMatchAtPosition(Map<String, MObject> objs, int position, List<MObject> objects) {
+		// TODO: What to do when there are no objects of a class X?
+		// TODO: Improve this by checking for links/conditions
+		// TODO: CorrRule?
+		// TODO: Filter by object?
+		if (position >= ruleObjects.size()) {
+			for (MObject object : objects) {
+				if (objs.containsValue(object)) {
+					Map<String, MObject> objMap = new LinkedHashMap<String, MObject>(objs);
+					matches.add(objMap);
+				}
+			}
+			// System.out.println(matches);
+		} else {
+			MClass cls = ruleObjects.get(position).cls();
+			for (MObject obj : systemState.objectsOfClassAndSubClasses(cls)) {
+				String varName = ruleObjects.get(position).name();
+				if (!objs.containsValue(obj)) {
+					objs.put(varName, obj);
+					findMatchAtPosition(objs, position + 1);
+					objs.remove(varName);
+				}
+			}
+		}
 	}
 
 	private void findMatchAtPosition(Map<String, MObject> objs, int position) {
@@ -65,5 +95,4 @@ public class MatchFinder {
 			}
 		}
 	}
-
 }

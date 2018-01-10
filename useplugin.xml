@@ -44,5 +44,14 @@
 			toolbaritem="Show object diagram"
 			id="org.uet.dse.rtlplus.actions.ActionShowObjectDiagram">
 		</action>
+		<action label="Incremental update" 
+			icon="resources/delta.png" 
+			class="org.uet.dse.rtlplus.actions.ActionIncrementalUpdate" 
+			tooltip="Model incremental update"
+			menu="RTL plugin" 
+			menuitem="Model incremental update"
+			toolbaritem="Model incremental update"
+			id="org.uet.dse.rtlplus.actions.ActionIncrementalUpdate">
+		</action>
 	</actions>
 </plugin>

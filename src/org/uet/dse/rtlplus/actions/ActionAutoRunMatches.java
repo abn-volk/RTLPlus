@@ -14,11 +14,10 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 
 	@Override
 	public void performAction(IPluginAction pluginAction) {
-		ForwardMatchManager manager = new ForwardMatchManager(pluginAction.getSession().system().state(),
-				pluginAction.getParent().logWriter(), false);
+		ForwardMatchManager manager = new ForwardMatchManager(pluginAction.getSession().system().state(), false);
 		int i = 0;
 		while (true) {
-			List<Match> matches = manager.findMatchForRules(Main.getTggRuleCollection().getRuleList());
+			List<Match> matches = manager.findMatchesForRules(Main.getTggRuleCollection().getRuleList());
 			if (matches.isEmpty())
 				break;
 			for (Match match : matches) {
