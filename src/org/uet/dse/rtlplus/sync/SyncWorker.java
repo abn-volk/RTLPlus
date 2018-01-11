@@ -3,6 +3,7 @@ package org.uet.dse.rtlplus.sync;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.tzi.use.gui.main.MainWindow;
@@ -59,8 +59,6 @@ public class SyncWorker extends JPanel {
 	private Map<String, Set<String>> corrObjsForTrg;
 	private Map<String, Set<String>> forwardCmdsForCorr;
 	private Map<String, Set<String>> backwardCmdsForCorr;
-	// Fixing attributes
-	private boolean fixing = false;
 
 	public SyncWorker(MainWindow parent, Session session) {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -109,33 +107,11 @@ public class SyncWorker extends JPanel {
 			switch (classMap.get(obj.cls().name())) {
 			case SOURCE:
 				// Find forward matches
-				MatchManager fManager = new ForwardMatchManager(state, true);
-				List<Match> fMatches = fManager.findMatchesForRulesAndObjects(rulesForSrcClass.get(obj.cls().name()),
-						Arrays.asList(obj));
-				if (!fMatches.isEmpty()) {
-					URL url = Main.class.getResource("/resources/list.png");
-					ViewFrame vf = new ViewFrame("Match list", null, "");
-					vf.setFrameIcon(new ImageIcon(url));
-					MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter);
-					vf.setContentPane(dialog);
-					vf.pack();
-					mainWindow.addNewViewFrame(vf);
-				}
+				findForwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj));
 				break;
 			case TARGET:
 				// Find backward matches
-				MatchManager bManager = new BackwardMatchManager(state, true);
-				List<Match> bMatches = bManager.findMatchesForRulesAndObjects(rulesForTrgClass.get(obj.cls().name()),
-						Arrays.asList(obj));
-				if (!bMatches.isEmpty()) {
-					URL url = Main.class.getResource("/resources/list.png");
-					ViewFrame vf = new ViewFrame("Match list", null, "");
-					vf.setFrameIcon(new ImageIcon(url));
-					MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter);
-					vf.setContentPane(dialog);
-					vf.pack();
-					mainWindow.addNewViewFrame(vf);
-				}
+				findBackwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj));
 				break;
 			default:
 				break;
@@ -187,34 +163,10 @@ public class SyncWorker extends JPanel {
 			if (sameSide) {
 				switch (side) {
 				case SOURCE:
-					MatchManager fManager = new ForwardMatchManager(state, true);
-					List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
-					if (fMatches.isEmpty())
-						JOptionPane.showMessageDialog(mainWindow, "No matches were found.");
-					else {
-						URL url = Main.class.getResource("/resources/list.png");
-						ViewFrame vf = new ViewFrame("Match list", null, "");
-						vf.setFrameIcon(new ImageIcon(url));
-						MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter);
-						vf.setContentPane(dialog);
-						vf.pack();
-						mainWindow.addNewViewFrame(vf);
-					}
+					findForwardMatches(ruleList, objects);
 					break;
 				case TARGET:
-					MatchManager bManager = new BackwardMatchManager(state, true);
-					List<Match> bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
-					if (bMatches.isEmpty())
-						JOptionPane.showMessageDialog(mainWindow, "No matches were found.");
-					else {
-						URL url = Main.class.getResource("/resources/list.png");
-						ViewFrame vf = new ViewFrame("Match list", null, "");
-						vf.setFrameIcon(new ImageIcon(url));
-						MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter);
-						vf.setContentPane(dialog);
-						vf.pack();
-						mainWindow.addNewViewFrame(vf);
-					}
+					findBackwardMatches(ruleList, objects);
 					break;
 				default:
 					break;
@@ -228,7 +180,7 @@ public class SyncWorker extends JPanel {
 		if (running) {
 
 		} else {
-
+			
 		}
 	}
 
@@ -258,6 +210,7 @@ public class SyncWorker extends JPanel {
 						}
 					}
 				}
+				findForwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()));
 				break;
 			case TARGET:
 				Set<String> cObjs = corrObjsForTrg.get(e.getObject().name());
@@ -275,11 +228,40 @@ public class SyncWorker extends JPanel {
 						}
 					}
 				}
+				findBackwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()));
 				break;
 			default:
 				break;
 			}
 			eventBus.register(this);
+		}
+	}
+
+	private void findForwardMatches(Collection<MTggRule> ruleList, List<MObject> objects) {
+		MatchManager fManager = new ForwardMatchManager(state, true);
+		List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
+		if (!fMatches.isEmpty()) {
+			URL url = Main.class.getResource("/resources/list.png");
+			ViewFrame vf = new ViewFrame("New matches found!", null, "");
+			vf.setFrameIcon(new ImageIcon(url));
+			MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter);
+			vf.setContentPane(dialog);
+			vf.pack();
+			mainWindow.addNewViewFrame(vf);
+		}
+	}
+
+	private void findBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects) {
+		MatchManager bManager = new BackwardMatchManager(state, true);
+		List<Match> bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
+		if (bMatches.isEmpty()) {
+			URL url = Main.class.getResource("/resources/list.png");
+			ViewFrame vf = new ViewFrame("New matches found!", null, "");
+			vf.setFrameIcon(new ImageIcon(url));
+			MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter);
+			vf.setContentPane(dialog);
+			vf.pack();
+			mainWindow.addNewViewFrame(vf);
 		}
 	}
 
