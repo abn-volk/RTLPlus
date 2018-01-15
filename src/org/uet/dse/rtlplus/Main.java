@@ -20,6 +20,7 @@ public class Main implements IPlugin {
 	private static MRuleCollection fTggRules = new MRuleCollection(TransformationType.FORWARD);
 	private static UniqueNameGenerator fUniqueNameGenerator;
 	private static SyncData syncData;
+	public static boolean syncWindowOpened = false;
 
 	public static MRuleCollection getTggRuleCollection() {
 		return fTggRules;

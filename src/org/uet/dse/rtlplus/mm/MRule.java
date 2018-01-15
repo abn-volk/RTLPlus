@@ -1,27 +1,31 @@
 package org.uet.dse.rtlplus.mm;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
+import org.uet.dse.rtlplus.sync.CachedLink;
 
 public class MRule {
 
 	protected MPattern lhs;
 	protected MPattern rhs;
+	protected Map<String, String> objectsToCreate;
 
 	public MRule(MPattern left, MPattern right) {
 		lhs = left;
 		rhs = right;
 	}
-	
+
 	public MPattern getLhs() {
 		return lhs;
 	}
-	
+
 	public MPattern getRhs() {
 		return rhs;
 	}
@@ -101,7 +105,7 @@ public class MRule {
 		objList.addAll(rhs.getObjectList());
 		return objList;
 	}
-	
+
 	public List<MObject> getNewObjects() {
 		List<MObject> objList = new ArrayList<>(rhs.getObjectList());
 		objList.removeAll(lhs.getObjectList());
@@ -113,7 +117,7 @@ public class MRule {
 			return lhs.getConditionList();
 		return new ArrayList<>(0);
 	}
-	
+
 	public List<String> getPostconditions() {
 		if (rhs.getConditionList() != null)
 			return rhs.getConditionList();
@@ -124,7 +128,7 @@ public class MRule {
 		List<MObject> objList = new ArrayList<>(lhs.getObjectList());
 		return objList;
 	}
-	
+
 	public List<MLink> getAllLinks() {
 		List<MLink> linkList = new ArrayList<>(lhs.getLinkList());
 		linkList.addAll(rhs.getLinkList());
@@ -138,7 +142,7 @@ public class MRule {
 	public List<? extends MLink> getNewLinks() {
 		return rhs.getLinkList();
 	}
-	
+
 	public List<String> genLetCommandsLeft(String prefix) {
 		List<String> commands = new ArrayList<String>();
 		for (MObject obj : lhs.getObjectList()) {
@@ -146,7 +150,7 @@ public class MRule {
 		}
 		return commands;
 	}
-	
+
 	public List<String> genLetCommandsRight(String prefix) {
 		List<String> commands = new ArrayList<String>();
 		for (MObject obj : rhs.getObjectList()) {
@@ -157,18 +161,40 @@ public class MRule {
 
 	public List<String> genCreationCommands(String prefix, MSystemState systemState) {
 		List<String> commands = genLetCommandsLeft(prefix);
+		objectsToCreate = new LinkedHashMap<>();
 		// Create objects
 		for (MObject obj : rhs.getObjectList()) {
 			String newObjName = systemState.uniqueObjectNameForClass(obj.cls());
+			objectsToCreate.put(obj.name(), newObjName);
 			commands.add("create " + newObjName + " : " + obj.cls().name());
 			commands.add("let " + obj.name() + " = " + newObjName);
 		}
 		// Create links
 		for (MLink lnk : rhs.getLinkList()) {
-			String insertStr = "insert (" + lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.joining(", ")) + ") into " + lnk.association().name();
+			String insertStr = "insert ("
+					+ lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.joining(", ")) + ") into "
+					+ lnk.association().name();
 			commands.add(insertStr);
 		}
 		return commands;
+	}
+
+	public Map<String, String> getObjectsToCreate() {
+		return objectsToCreate;
+	}
+
+	public List<CachedLink> getLinksToCreate() {
+		List<CachedLink> result = new ArrayList<>();
+		for (MLink lnk : rhs.getLinkList()) {
+			MObject[] objArray = lnk.linkedObjectsAsArray();
+			int len = objArray.length;
+			String[] objs = new String[len];
+			for (int i=0; i<len; i++) {
+				objs[i] = objArray[i].name();
+			}
+			result.add(new CachedLink(lnk.association().name(), objs));
+		}
+		return result;
 	}
 
 }

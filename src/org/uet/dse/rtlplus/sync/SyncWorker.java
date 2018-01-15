@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -15,6 +16,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.tzi.use.api.UseApiException;
+import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.main.ViewFrame;
 import org.tzi.use.main.Session;
@@ -26,8 +29,6 @@ import org.tzi.use.uml.sys.events.LinkDeletedEvent;
 import org.tzi.use.uml.sys.events.LinkInsertedEvent;
 import org.tzi.use.uml.sys.events.ObjectCreatedEvent;
 import org.tzi.use.uml.sys.events.ObjectDestroyedEvent;
-import org.tzi.use.uml.sys.events.OperationEnteredEvent;
-import org.tzi.use.uml.sys.events.OperationExitedEvent;
 import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.gui.MatchListDialog;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
@@ -54,11 +55,19 @@ public class SyncWorker extends JPanel {
 	private MSystemState state;
 	private PrintWriter logWriter;
 	private EventBus eventBus;
+	private UseSystemApi api;
 	// Needed for attribute assignment
 	private Map<String, Set<String>> corrObjsForSrc;
 	private Map<String, Set<String>> corrObjsForTrg;
 	private Map<String, Set<String>> forwardCmdsForCorr;
 	private Map<String, Set<String>> backwardCmdsForCorr;
+	// Correlation object dependencies
+	private Map<String, Set<String>> corrObjDependencies;
+	private Map<String, Set<String>> corrObjReverseDependencies;
+	private Map<String, OperationEnterEvent> pastTransformations;
+	private Map<String, String> transformationForCorrObj;
+	// Cache for current transformation
+	private OperationEnterEvent event;
 
 	public SyncWorker(MainWindow parent, Session session) {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -67,6 +76,7 @@ public class SyncWorker extends JPanel {
 				"<html>Keep this window open to track incremental changes and update the model accordingly.</html>");
 		add(label1);
 		mainWindow = parent;
+		api = UseSystemApi.create(session);
 		classMap = Main.getTggRuleCollection().getClassMap();
 		state = session.system().state();
 		logWriter = parent.logWriter();
@@ -77,34 +87,68 @@ public class SyncWorker extends JPanel {
 		corrObjsForTrg = Main.getSyncData().getCorrObjsForTrg();
 		forwardCmdsForCorr = Main.getSyncData().getForwardCmdsForCorr();
 		backwardCmdsForCorr = Main.getSyncData().getBackwardCmdsForCorr();
+		corrObjDependencies = Main.getSyncData().getCorrObjDependencies();
+		corrObjReverseDependencies = Main.getSyncData().getCorrObjReverseDependencies();
+		pastTransformations = Main.getSyncData().getPastTransformations();
+		transformationForCorrObj = Main.getSyncData().getTransformationForCorrObj();
 		// Listen to changes
 		eventBus.register(this);
 		System.out.println("Subscribed to EventBus");
 	}
 
-	@Subscribe
-	public void onOperationEntered(OperationEnteredEvent e) {
-		System.out.println("Entered operation: " + e.getOperationCall().toString());
-		if (e.getOperationCall().getOperation().cls().name().equals("RuleCollection")) {
-			running = true;
-		}
-	}
+	
+	// TODO: Delete this, use custom event instead
+//	@Subscribe
+//	public void onOperationEntered(OperationEnteredEvent e) {
+//		System.out.println("Entered operation: " + e.getOperationCall().toString());
+//		if (e.getOperationCall().getOperation().cls().name().equals("RuleCollection")) {
+//			running = true;
+//			String opName = e.getOperationCall().getOperation().name();
+//			LinkedHashMap<String, Value> args = e.getOperationCall().getArgumentsAsNamesAndValues();
+//			Value matchCL = args.get("matchCL");
+//			if (matchCL instanceof TupleValue) {
+//				
+//			}
+//			System.out.println(args.toString());
+//			// Initialise cache
+//			createdObjects = new HashSet<>();
+//			createdCorrObjs = new HashSet<>();
+//			createdLinks = new HashSet<>();
+//		}
+//	}
 
+	// TODO: Delete this, use custom event instead
+//	@Subscribe
+//	public void onOperationExited(OperationExitedEvent e) {
+//		System.out.println("Exited operation: " + e.getOperationCall().toString());
+//		if (e.getOperationCall().getOperation().cls().name().equals("RuleCollection")) {
+//			running = false;
+//			String transName = Main.getUniqueNameGenerator().generate(e.getOperationCall().getOperation().name());
+//			
+//		}
+//	}
+	
 	@Subscribe
-	public void onOperationExited(OperationExitedEvent e) {
-		System.out.println("Exited operation: " + e.getOperationCall().toString());
-		if (e.getOperationCall().getOperation().cls().name().equals("RuleCollection")) {
-			running = false;
-		}
+	public void onOperationEntered(OperationEnterEvent e) {
+		running = true;
+		// Initialise cache
+		event = e;
+	}
+	
+	@Subscribe
+	public void onOperationExited(OperationExitEvent e) {
+		String transName = Main.getUniqueNameGenerator().generate(e.getOpName());
+		Main.getSyncData().addTransformation(transName, event);
+		running = false;
 	}
 
 	@Subscribe
 	public void onObjectCreated(ObjectCreatedEvent e) {
 		MObject obj = e.getCreatedObject();
 		System.out.println("Object created: " + obj.name());
-		if (running) {
-		} else {
-			switch (classMap.get(obj.cls().name())) {
+		Side side = classMap.get(obj.cls().name());
+		if (!running) {
+			switch (side) {
 			case SOURCE:
 				// Find forward matches
 				findForwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj));
@@ -121,13 +165,76 @@ public class SyncWorker extends JPanel {
 
 	@Subscribe
 	public void onObjectDestroyed(ObjectDestroyedEvent e) {
-		MObject obj = e.getDestroyedObject();
-		System.out.println("Object destroyed: " + obj.name());
-		if (running) {
-
-		} else {
-
+		String objName = e.getDestroyedObject().name();
+		System.out.println("Object destroyed: " + objName);
+		if (!running) {
+			eventBus.unregister(this);
+			Set<String> corrs = corrObjsForSrc.getOrDefault(objName, new HashSet<>());
+			System.out.println("Corrs = " + corrs.toString());
+			System.out.println(corrObjDependencies);
+			Set<String> allCorrs = findAllDependencies(corrs, new HashSet<>(corrs));
+			System.out.println("All corrs: " + allCorrs.toString());
+			Set<String> transToUndo = new HashSet<>();
+			for (String corr : allCorrs) {
+				String tran = transformationForCorrObj.get(corr);
+				if (tran != null)
+					transToUndo.add(tran);
+			}
+			System.out.println("Trans to undo: " + transToUndo.toString());
+			// Undo transformations
+			for (String tran : transToUndo) {
+				OperationEnterEvent event = pastTransformations.get(tran);
+				if (event != null) {
+					undoTransformation(event);
+					pastTransformations.remove(tran);
+				}
+			}
+			eventBus.register(this);
 		}
+	}
+	
+	private void undoTransformation(OperationEnterEvent event) {
+		System.out.println("Undoing: " + event.getOpName());
+		// Delete links
+		for (CachedLink lnk : event.getLinksToCreate()) {
+			try {
+				api.deleteLink(lnk.getAssociation(), lnk.getLinkedObjects());
+			}
+			catch (UseApiException ignored) {}
+		}
+		// Delete objects
+		for (String objName : event.getObjectsToCreate().values()) {
+			System.out.println("Deleting object: " + objName);
+			try {
+				api.deleteObject(objName);
+			} catch (UseApiException ignored) {}
+		}
+		// Delete correlation objects
+		for (String objName : event.getCorrObjsToCreate().values()) {
+			System.out.println("Deleting object: " + objName);
+			try {
+				api.deleteObject(objName);
+			} catch (UseApiException ignored) {}
+		}
+	}
+	
+	private Set<String> findAllDependencies(Set<String> corrObjs, Set<String> allDeps) {
+		System.out.println("Corr objs: " + corrObjs.toString());
+		System.out.println("All deps: " + allDeps.toString());
+		Set<String> nextDeps = new HashSet<>();
+		for (String corrObj : corrObjs) {
+			Set<String> deps = corrObjDependencies.get(corrObj);
+			if (deps != null) {
+				for (String dep : deps) {
+					if (allDeps.add(dep))
+						nextDeps.add(dep);
+				}
+			}
+		}
+		if (!nextDeps.isEmpty()) {
+			findAllDependencies(nextDeps, allDeps);
+		}
+		return allDeps;
 	}
 
 	@Subscribe
@@ -135,8 +242,8 @@ public class SyncWorker extends JPanel {
 		if (running) {
 			// Link between src/trg and correlation
 			List<MObject> objs = e.getParticipants();
+			Side s1 = classMap.get(objs.get(0).cls().name());
 			if (objs.size() == 2) {
-				Side s1 = classMap.get(objs.get(0).cls().name());
 				Side s2 = classMap.get(objs.get(1).cls().name());
 				if (s1 == Side.SOURCE && s2 == Side.CORRELATION) {
 					Main.getSyncData().addSrcCorrLink(objs.get(0).name(), objs.get(1).name());
@@ -177,9 +284,9 @@ public class SyncWorker extends JPanel {
 
 	@Subscribe
 	public void onLinkDeleted(LinkDeletedEvent e) {
-		if (running) {
-
-		} else {
+		if (!running) {
+			List<String> objs = e.getLink().linkedObjects().stream().map(it -> it.name()).collect(Collectors.toList());
+			
 			
 		}
 	}
@@ -263,6 +370,10 @@ public class SyncWorker extends JPanel {
 			vf.pack();
 			mainWindow.addNewViewFrame(vf);
 		}
+	}
+	
+	private void checkConsistency(List<String> changedObjects) {
+		// check each transformation's conditions, undo if not satisfied 
 	}
 
 	public void unsubscribe() {

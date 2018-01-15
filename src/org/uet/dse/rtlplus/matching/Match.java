@@ -13,12 +13,14 @@ public abstract class Match {
 	protected MOperation operation;
 	protected MTggRule rule;
 	protected Map<String, MObject> objectList;
+	protected boolean sync;
 
-	public Match(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
+	public Match(MTggRule rule, MOperation operation, Map<String, MObject> objectList, boolean sync) {
 		super();
 		this.operation = operation;
 		this.rule = rule;
 		this.objectList = objectList;
+		this.sync = sync;
 	}
 	
 	public abstract boolean run(MSystemState systemState, PrintWriter logWriter);

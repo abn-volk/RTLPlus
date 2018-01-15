@@ -1,9 +1,12 @@
 package org.uet.dse.rtlplus.actions;
 
+import java.beans.PropertyVetoException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.main.ViewFrame;
@@ -24,6 +27,34 @@ public class ActionShowObjectDiagram implements IPluginActionDelegate {
 			URL url = Main.class.getResource("/resources/diagram.png");
 			ViewFrame vf = new ViewFrame("RTL object diagram", null, "");
 			vf.setFrameIcon(new ImageIcon(url));
+			vf.addInternalFrameListener(new InternalFrameListener() {
+				@Override
+				public void internalFrameActivated(InternalFrameEvent arg0) {
+				}
+				@Override
+				public void internalFrameClosed(InternalFrameEvent arg0) {					
+				}
+				@Override
+				public void internalFrameClosing(InternalFrameEvent arg0) {					
+				}
+				@Override
+				public void internalFrameDeactivated(InternalFrameEvent arg0) {					
+				}
+				@Override
+				public void internalFrameDeiconified(InternalFrameEvent arg0) {					
+				}
+				@Override
+				public void internalFrameIconified(InternalFrameEvent arg0) {					
+				}
+				@Override
+				public void internalFrameOpened(InternalFrameEvent arg0) {
+					try {
+						arg0.getInternalFrame().setMaximum(true);
+					} catch (PropertyVetoException e) {
+					} 					
+				}
+				
+			});
 			RtlObjectDiagramView odv = new RtlObjectDiagramView(mainWindow, Main.getTggRuleCollection().getClassMap(), pluginAction.getSession().system());
 			vf.setContentPane(odv);
 			vf.pack();

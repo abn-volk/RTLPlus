@@ -2,6 +2,7 @@ package org.uet.dse.rtlplus.sync;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +18,11 @@ public class SyncData {
 	private Map<String, Set<String>> backwardCmdsForCorr;
 	private Map<String, Set<String>> corrObjsForSrc;
 	private Map<String, Set<String>> corrObjsForTrg;
-
+	private Map<String, Set<String>> corrObjDependencies;
+	private Map<String, Set<String>> corrObjReverseDependencies;
+	private Map<String, OperationEnterEvent> pastTransformations;
+	private Map<String, String> transformationForCorrObj;
+	
 	public SyncData(MRuleCollection rules) {
 		rulesForSrcClass = new HashMap<>();
 		rulesForTrgClass = new HashMap<>();
@@ -25,6 +30,10 @@ public class SyncData {
 		backwardCmdsForCorr = new HashMap<>();
 		corrObjsForSrc = new HashMap<>();
 		corrObjsForTrg = new HashMap<>();
+		corrObjDependencies = new HashMap<>();
+		corrObjReverseDependencies = new HashMap<>();
+		pastTransformations = new LinkedHashMap<>();
+		transformationForCorrObj = new HashMap<>();
 		for (MTggRule tggRule : rules.getRuleList()) {
 			for (MObject obj : tggRule.getSrcRule().getNewObjects()) {
 				Set<MTggRule> tggRules = rulesForSrcClass.get(obj.cls().name());
@@ -110,6 +119,38 @@ public class SyncData {
 	public Map<String, Set<String>> getCorrObjsForTrg() {
 		return corrObjsForTrg;
 	}
-	
 
+	public Map<String, Set<String>> getCorrObjDependencies() {
+		return corrObjDependencies;
+	}
+
+	public Map<String, Set<String>> getCorrObjReverseDependencies() {
+		return corrObjReverseDependencies;
+	}
+
+	public void addTransformation(String transName, OperationEnterEvent event) {
+		pastTransformations.put(transName, event);
+		for (String matchedCorrObj : event.getMatchedCorrObjs()) {
+			Set<String> ds = corrObjDependencies.get(matchedCorrObj);
+			if (ds == null) {
+				ds = new HashSet<>();
+				corrObjDependencies.put(matchedCorrObj, ds);
+			}
+			ds.addAll(event.getCorrObjsToCreate().values());
+		}
+		for (String obj : event.getCorrObjsToCreate().values()) {
+			transformationForCorrObj.put(obj, transName);
+		}
+	}
+
+	public Map<String, OperationEnterEvent> getPastTransformations() {
+		return pastTransformations;
+	}
+
+	public Map<String, String> getTransformationForCorrObj() {
+		return transformationForCorrObj;
+	}
+	
+	
+	
 }

@@ -36,7 +36,7 @@ public class BackwardMatchManager extends MatchManager {
 			List<? extends Map<String, MObject>> srcMatches = findSourceMatch(rule, op);
 			if (srcMatches == null) {
 				if (validatePreconditions(op, objs))
-					matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+					matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 			} else if (srcMatches.isEmpty())
 				return matches;
 			else {
@@ -45,14 +45,14 @@ public class BackwardMatchManager extends MatchManager {
 					List<? extends Map<String, MObject>> corrMatches = findCorrelationMatch(rule, op);
 					if (corrMatches == null) {
 						if (validatePreconditions(op, objs))
-							matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+							matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 					} else if (corrMatches.isEmpty())
 						return matches;
 					else {
 						for (Map<String, MObject> corrMatch : corrMatches) {
 							objs.putAll(corrMatch);
 							if (validatePreconditions(op, objs))
-								matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+								matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 						}
 					}
 				}
@@ -104,7 +104,7 @@ public class BackwardMatchManager extends MatchManager {
 			List<? extends Map<String, MObject>> srcMatches = findSourceMatch(rule, op);
 			if (srcMatches == null) {
 				if (validatePreconditions(op, objs))
-					matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+					matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 			} else if (srcMatches.isEmpty())
 				return matches;
 			else {
@@ -113,14 +113,14 @@ public class BackwardMatchManager extends MatchManager {
 					List<? extends Map<String, MObject>> corrMatches = findCorrelationMatch(rule, op);
 					if (corrMatches == null) {
 						if (validatePreconditions(op, objs))
-							matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+							matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 					} else if (corrMatches.isEmpty())
 						return matches;
 					else {
 						for (Map<String, MObject> corrMatch : corrMatches) {
 							objs.putAll(corrMatch);
 							if (validatePreconditions(op, objs))
-								matches.add(new BackwardMatch(rule, op, new HashMap<>(objs)));
+								matches.add(new BackwardMatch(rule, op, new HashMap<>(objs), sync));
 						}
 					}
 				}

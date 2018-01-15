@@ -21,7 +21,7 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 	@Override
 	public void performAction(IPluginAction pluginAction) {
 		MainWindow mainWindow = pluginAction.getParent();
-		if (Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION) {
+		if (Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION && !Main.syncWindowOpened) {
 			Session session = pluginAction.getSession();
 			SyncWorker syncWorker = new SyncWorker(mainWindow, session);
 			URL url = Main.class.getResource("/resources/delta.png");
@@ -34,11 +34,13 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 
 				@Override
 				public void internalFrameClosed(InternalFrameEvent arg0) {
-					syncWorker.unsubscribe();
 				}
 
 				@Override
 				public void internalFrameClosing(InternalFrameEvent arg0) {
+					System.out.println("Unsubscribed from EventBus");
+					syncWorker.unsubscribe();
+					Main.syncWindowOpened = false;
 				}
 
 				@Override
@@ -55,6 +57,7 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 
 				@Override
 				public void internalFrameOpened(InternalFrameEvent arg0) {
+					Main.syncWindowOpened = true;
 				}
 			});
 			vf.setContentPane(syncWorker);

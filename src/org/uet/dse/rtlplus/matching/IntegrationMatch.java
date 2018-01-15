@@ -22,8 +22,8 @@ import org.uet.dse.rtlplus.mm.MTggRule;
 
 public class IntegrationMatch extends Match {
 
-	public IntegrationMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList) {
-		super(rule, operation, objectList);
+	public IntegrationMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList, boolean sync) {
+		super(rule, operation, objectList, sync);
 	}
 
 	@Override

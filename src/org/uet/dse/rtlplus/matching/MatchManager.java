@@ -91,16 +91,18 @@ public abstract class MatchManager {
 	
 	public List<Match> findMatchesForRulesAndObjects(Collection<MTggRule> ruleList, List<MObject> objects) {
 		List<Match> matches = new ArrayList<>();
-		for (MTggRule rule : ruleList) {
-			List<Match> currentMatches = findMatchesForRuleAndObjects(rule, objects);
-			if (currentMatches != null) matches.addAll(currentMatches);
+		if (ruleList != null) {
+			for (MTggRule rule : ruleList) {
+				List<Match> currentMatches = findMatchesForRuleAndObjects(rule, objects);
+				if (currentMatches != null) matches.addAll(currentMatches);
+			}
 		}
 		return matches;
 	}
 
 	public abstract List<Match> findMatchForRule(MTggRule rule);
 
-	public List<Match> findMatchesForRules(List<MTggRule> ruleList) {
+	public List<Match> findMatchesForRules(Collection<MTggRule> ruleList) {
 		List<Match> matches = new ArrayList<>();
 		for (MTggRule rule : ruleList) {
 			List<Match> currentMatches = findMatchForRule(rule);
