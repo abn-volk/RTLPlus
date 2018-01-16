@@ -72,7 +72,7 @@ public class MPattern {
 		}
 	}
 
-	public String genPreCondition() {
+	public String genPreCondition(boolean hasLineBreaks) {
 		List<String> conditions = new ArrayList<>();
 		// Links exist
 		for (MLink lnk : linkList) {
@@ -90,7 +90,7 @@ public class MPattern {
 		// Conditions satisfied
 		if (conditionList != null)
 			conditions.addAll(conditionList);
-		return conditions.stream().collect(Collectors.joining(" and \n"));
+		return conditions.stream().collect(Collectors.joining(hasLineBreaks? " and \n" : " and "));
 	}
 
 	public void genPostCondExisting(StringBuilder builder) {

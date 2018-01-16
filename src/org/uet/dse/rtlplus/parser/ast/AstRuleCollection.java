@@ -55,8 +55,15 @@ public class AstRuleCollection {
 		case "integration":
 			collection = new MRuleCollection(TransformationType.INTEGRATION);
 			break;
+		case "synchronization":
+		case "syncrhonization_forward":
+			collection = new MRuleCollection(TransformationType.SYNCHRONIZATION_FORWARD);
+			break;
+		case "synchronization_backward":
+			collection = new MRuleCollection(TransformationType.BACKWARD);
+			break;
 		default:
-			collection = new MRuleCollection(TransformationType.SYNCHRONIZATION);
+			collection = new MRuleCollection(TransformationType.FORWARD);
 			break;
 		}
 		for (AstTggRule rule : ruleList) {

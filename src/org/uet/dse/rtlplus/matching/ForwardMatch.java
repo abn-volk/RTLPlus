@@ -81,8 +81,9 @@ public class ForwardMatch extends Match {
 		}
 		// Opexit
 		doOpExit(systemState, logWriter);
-		systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 		varEnv.clear();
+		if (sync)
+			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 		return true;
 	}
 

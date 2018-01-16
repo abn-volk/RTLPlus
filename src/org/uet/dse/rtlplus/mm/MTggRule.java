@@ -81,9 +81,9 @@ public class MTggRule {
 		// Pre-conditions
 		cons.append("\ncontext RuleCollection::").append(sb)
 				.append("pre " + name + RTLKeyword.forwardTransform + "_pre: \n").append(letString);
-		String srcPre = srcRule.genPreCondBoth();
-		String trgPre = trgRule.genPreCondLeft();
-		String corrPre = corrRule.genPreCondLeft();
+		String srcPre = srcRule.genPreCondBoth(true);
+		String trgPre = trgRule.genPreCondLeft(true);
+		String corrPre = corrRule.genPreCondLeft(true);
 		String srcLnkPre = srcLnkCons.stream().collect(Collectors.joining(" and\n"));
 		String result = Arrays.asList(srcPre, trgPre, corrPre, srcLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
@@ -143,9 +143,9 @@ public class MTggRule {
 		// Pre-conditions
 		cons.append("\ncontext RuleCollection::").append(sb)
 				.append("pre " + name + RTLKeyword.backwardTransform + "_pre: \n").append(letString);
-		String srcCond = srcRule.genPreCondLeft();
-		String trgCond = trgRule.genPreCondBoth();
-		String corrCond = corrRule.genPreCondLeft();
+		String srcCond = srcRule.genPreCondLeft(true);
+		String trgCond = trgRule.genPreCondBoth(true);
+		String corrCond = corrRule.genPreCondLeft(true);
 		String trgLnkPre = trgLnkCons.stream().collect(Collectors.joining(" and\n"));
 		String result = Arrays.asList(srcCond, trgCond, corrCond, trgLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
@@ -204,9 +204,9 @@ public class MTggRule {
 		// Pre-conditions
 		cons.append("\ncontext RuleCollection::").append(sb).append("pre " + name + RTLKeyword.integration + "_pre: \n")
 				.append(letString);
-		String srcCond = srcRule.genPreCondBoth();
-		String trgCond = trgRule.genPreCondBoth();
-		String corrCond = corrRule.genPreCondLeft();
+		String srcCond = srcRule.genPreCondBoth(true);
+		String trgCond = trgRule.genPreCondBoth(true);
+		String corrCond = corrRule.genPreCondLeft(true);
 		String srcLnkPre = srcLnkCons.stream().collect(Collectors.joining(" and\n"));
 		String trgLnkPre = trgLnkCons.stream().collect(Collectors.joining(" and\n"));
 		String result = Arrays.asList(srcCond, trgCond, corrCond, srcLnkPre, trgLnkPre).stream()

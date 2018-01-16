@@ -69,15 +69,15 @@ public class MRule {
 		return genLetLeft(prefix) + genLetRight(prefix);
 	}
 
-	public String genPreCondLeft() {
-		return lhs.genPreCondition();
+	public String genPreCondLeft(boolean hasLineBreaks) {
+		return lhs.genPreCondition(hasLineBreaks);
 	}
 
-	public String genPreCondBoth() {
-		String l = lhs.genPreCondition();
-		String r = rhs.genPreCondition();
+	public String genPreCondBoth(boolean hasLineBreaks) {
+		String l = lhs.genPreCondition(hasLineBreaks);
+		String r = rhs.genPreCondition(hasLineBreaks);
 		if (!l.isEmpty() && !r.isEmpty())
-			return l + " and\n" + r;
+			return l + (hasLineBreaks? " and\n" : " and ") + r;
 		else
 			return l + r;
 	}

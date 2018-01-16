@@ -40,7 +40,7 @@ import org.tzi.use.parser.ParseErrorHandler;
 tggRuleCollection returns [AstRuleCollection n]
 	:	
 		'transformation' name=IDENT { $n = new AstRuleCollection($name.text); }  
-		'direction' direction=('forward'|'backward'|'integration'|'co-evolution'|'synchronization') { $n.setDirection($direction.text); }
+		'direction' direction=('forward'|'backward'|'integration'|'co-evolution'|'synchronization_forward'|'synchronization_backward'|'synchronization') { $n.setDirection($direction.text); }
 		(rule=tggRuleDefinition { $n.addRuleDefinition($rule.n); } )+
 		EOF
 	;

@@ -63,6 +63,10 @@ public class OperationEnterEvent {
 
 	public List<CachedLink> getLinksToCreate() {
 		return linksToCreate;
+	}
+
+	public String getRuleName() {
+		return ruleName;
 	}	
 	
 }

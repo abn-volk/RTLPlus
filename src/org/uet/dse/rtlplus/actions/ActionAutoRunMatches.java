@@ -28,10 +28,11 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 		case INTEGRATION:
 			manager = new IntegrationMatchManager(pluginAction.getSession().system().state(), false);
 			break;
-		case SYNCHRONIZATION:
+		case SYNCHRONIZATION_FORWARD:
 			manager = new ForwardMatchManager(pluginAction.getSession().system().state(), true);
 			break;
-		default:
+		case SYNCHRONIZATION_BACKWARD:
+			manager = new BackwardMatchManager(pluginAction.getSession().system().state(), true);
 			break;
 		}
 		int i = 0;

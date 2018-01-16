@@ -21,7 +21,9 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 	@Override
 	public void performAction(IPluginAction pluginAction) {
 		MainWindow mainWindow = pluginAction.getParent();
-		if (Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION && !Main.syncWindowOpened) {
+		if ((Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION_FORWARD
+				|| Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION_BACKWARD)
+				&& !Main.syncWindowOpened) {
 			Session session = pluginAction.getSession();
 			SyncWorker syncWorker = new SyncWorker(mainWindow, session);
 			URL url = Main.class.getResource("/resources/delta.png");

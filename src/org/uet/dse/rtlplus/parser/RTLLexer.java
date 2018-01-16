@@ -1,4 +1,4 @@
-// $ANTLR 3.5.1 /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g 2017-12-17 22:39:37
+// $ANTLR 3.5.1 /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g 2018-01-16 18:23:40
 
 package org.uet.dse.rtlplus.parser;
 
@@ -29,6 +29,8 @@ public class RTLLexer extends Lexer {
 	public static final int T__57=57;
 	public static final int T__58=58;
 	public static final int T__59=59;
+	public static final int T__60=60;
+	public static final int T__61=61;
 	public static final int ARROW=4;
 	public static final int AT=5;
 	public static final int BAR=6;
@@ -380,8 +382,50 @@ public class RTLLexer extends Lexer {
 		try {
 			int _type = T__59;
 			int _channel = DEFAULT_TOKEN_CHANNEL;
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:36:7: ( 'transformation' )
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:36:9: 'transformation'
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:36:7: ( 'synchronization_backward' )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:36:9: 'synchronization_backward'
+			{
+			match("synchronization_backward"); if (state.failed) return;
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally {
+			// do for sure before leaving
+		}
+	}
+	// $ANTLR end "T__59"
+
+	// $ANTLR start "T__60"
+	public final void mT__60() throws RecognitionException {
+		try {
+			int _type = T__60;
+			int _channel = DEFAULT_TOKEN_CHANNEL;
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:37:7: ( 'synchronization_forward' )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:37:9: 'synchronization_forward'
+			{
+			match("synchronization_forward"); if (state.failed) return;
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally {
+			// do for sure before leaving
+		}
+	}
+	// $ANTLR end "T__60"
+
+	// $ANTLR start "T__61"
+	public final void mT__61() throws RecognitionException {
+		try {
+			int _type = T__61;
+			int _channel = DEFAULT_TOKEN_CHANNEL;
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:38:7: ( 'transformation' )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:38:9: 'transformation'
 			{
 			match("transformation"); if (state.failed) return;
 
@@ -394,7 +438,7 @@ public class RTLLexer extends Lexer {
 			// do for sure before leaving
 		}
 	}
-	// $ANTLR end "T__59"
+	// $ANTLR end "T__61"
 
 	// $ANTLR start "WS"
 	public final void mWS() throws RecognitionException {
@@ -2094,8 +2138,8 @@ public class RTLLexer extends Lexer {
 
 	@Override
 	public void mTokens() throws RecognitionException {
-		// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:8: ( T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | WS | SL_COMMENT | ML_COMMENT | ARROW | AT | BAR | COLON | COLON_COLON | COLON_EQUAL | COMMA | DOT | DOTDOT | EQUAL | GREATER | GREATER_EQUAL | HASH | LBRACE | LBRACK | LESS | LESS_EQUAL | LPAREN | MINUS | NOT_EQUAL | PLUS | RBRACE | RBRACK | RPAREN | SEMI | SLASH | STAR | RANGE_OR_INT | STRING | NON_OCL_STRING | IDENT | EQUAL_COND_EXPR | COND_EXPR )
-		int alt22=50;
+		// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:8: ( T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | WS | SL_COMMENT | ML_COMMENT | ARROW | AT | BAR | COLON | COLON_COLON | COLON_EQUAL | COMMA | DOT | DOTDOT | EQUAL | GREATER | GREATER_EQUAL | HASH | LBRACE | LBRACK | LESS | LESS_EQUAL | LPAREN | MINUS | NOT_EQUAL | PLUS | RBRACE | RBRACK | RPAREN | SEMI | SLASH | STAR | RANGE_OR_INT | STRING | NON_OCL_STRING | IDENT | EQUAL_COND_EXPR | COND_EXPR )
+		int alt22=52;
 		alt22 = dfa22.predict(input);
 		switch (alt22) {
 			case 1 :
@@ -2197,252 +2241,266 @@ public class RTLLexer extends Lexer {
 				}
 				break;
 			case 15 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:94: WS
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:94: T__60
+				{
+				mT__60(); if (state.failed) return;
+
+				}
+				break;
+			case 16 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:100: T__61
+				{
+				mT__61(); if (state.failed) return;
+
+				}
+				break;
+			case 17 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:106: WS
 				{
 				mWS(); if (state.failed) return;
 
 				}
 				break;
-			case 16 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:97: SL_COMMENT
+			case 18 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:109: SL_COMMENT
 				{
 				mSL_COMMENT(); if (state.failed) return;
 
 				}
 				break;
-			case 17 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:108: ML_COMMENT
+			case 19 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:120: ML_COMMENT
 				{
 				mML_COMMENT(); if (state.failed) return;
 
 				}
 				break;
-			case 18 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:119: ARROW
+			case 20 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:131: ARROW
 				{
 				mARROW(); if (state.failed) return;
 
 				}
 				break;
-			case 19 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:125: AT
+			case 21 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:137: AT
 				{
 				mAT(); if (state.failed) return;
 
 				}
 				break;
-			case 20 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:128: BAR
+			case 22 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:140: BAR
 				{
 				mBAR(); if (state.failed) return;
 
 				}
 				break;
-			case 21 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:132: COLON
+			case 23 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:144: COLON
 				{
 				mCOLON(); if (state.failed) return;
 
 				}
 				break;
-			case 22 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:138: COLON_COLON
+			case 24 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:150: COLON_COLON
 				{
 				mCOLON_COLON(); if (state.failed) return;
 
 				}
 				break;
-			case 23 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:150: COLON_EQUAL
+			case 25 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:162: COLON_EQUAL
 				{
 				mCOLON_EQUAL(); if (state.failed) return;
 
 				}
 				break;
-			case 24 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:162: COMMA
+			case 26 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:174: COMMA
 				{
 				mCOMMA(); if (state.failed) return;
 
 				}
 				break;
-			case 25 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:168: DOT
+			case 27 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:180: DOT
 				{
 				mDOT(); if (state.failed) return;
 
 				}
 				break;
-			case 26 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:172: DOTDOT
+			case 28 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:184: DOTDOT
 				{
 				mDOTDOT(); if (state.failed) return;
 
 				}
 				break;
-			case 27 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:179: EQUAL
+			case 29 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:191: EQUAL
 				{
 				mEQUAL(); if (state.failed) return;
 
 				}
 				break;
-			case 28 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:185: GREATER
+			case 30 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:197: GREATER
 				{
 				mGREATER(); if (state.failed) return;
 
 				}
 				break;
-			case 29 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:193: GREATER_EQUAL
+			case 31 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:205: GREATER_EQUAL
 				{
 				mGREATER_EQUAL(); if (state.failed) return;
 
 				}
 				break;
-			case 30 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:207: HASH
+			case 32 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:219: HASH
 				{
 				mHASH(); if (state.failed) return;
 
 				}
 				break;
-			case 31 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:212: LBRACE
+			case 33 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:224: LBRACE
 				{
 				mLBRACE(); if (state.failed) return;
 
 				}
 				break;
-			case 32 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:219: LBRACK
+			case 34 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:231: LBRACK
 				{
 				mLBRACK(); if (state.failed) return;
 
 				}
 				break;
-			case 33 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:226: LESS
+			case 35 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:238: LESS
 				{
 				mLESS(); if (state.failed) return;
 
 				}
 				break;
-			case 34 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:231: LESS_EQUAL
+			case 36 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:243: LESS_EQUAL
 				{
 				mLESS_EQUAL(); if (state.failed) return;
 
 				}
 				break;
-			case 35 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:242: LPAREN
+			case 37 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:254: LPAREN
 				{
 				mLPAREN(); if (state.failed) return;
 
 				}
 				break;
-			case 36 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:249: MINUS
+			case 38 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:261: MINUS
 				{
 				mMINUS(); if (state.failed) return;
 
 				}
 				break;
-			case 37 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:255: NOT_EQUAL
+			case 39 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:267: NOT_EQUAL
 				{
 				mNOT_EQUAL(); if (state.failed) return;
 
 				}
 				break;
-			case 38 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:265: PLUS
+			case 40 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:277: PLUS
 				{
 				mPLUS(); if (state.failed) return;
 
 				}
 				break;
-			case 39 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:270: RBRACE
+			case 41 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:282: RBRACE
 				{
 				mRBRACE(); if (state.failed) return;
 
 				}
 				break;
-			case 40 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:277: RBRACK
+			case 42 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:289: RBRACK
 				{
 				mRBRACK(); if (state.failed) return;
 
 				}
 				break;
-			case 41 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:284: RPAREN
+			case 43 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:296: RPAREN
 				{
 				mRPAREN(); if (state.failed) return;
 
 				}
 				break;
-			case 42 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:291: SEMI
+			case 44 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:303: SEMI
 				{
 				mSEMI(); if (state.failed) return;
 
 				}
 				break;
-			case 43 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:296: SLASH
+			case 45 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:308: SLASH
 				{
 				mSLASH(); if (state.failed) return;
 
 				}
 				break;
-			case 44 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:302: STAR
+			case 46 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:314: STAR
 				{
 				mSTAR(); if (state.failed) return;
 
 				}
 				break;
-			case 45 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:307: RANGE_OR_INT
+			case 47 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:319: RANGE_OR_INT
 				{
 				mRANGE_OR_INT(); if (state.failed) return;
 
 				}
 				break;
-			case 46 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:320: STRING
+			case 48 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:332: STRING
 				{
 				mSTRING(); if (state.failed) return;
 
 				}
 				break;
-			case 47 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:327: NON_OCL_STRING
+			case 49 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:339: NON_OCL_STRING
 				{
 				mNON_OCL_STRING(); if (state.failed) return;
 
 				}
 				break;
-			case 48 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:342: IDENT
+			case 50 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:354: IDENT
 				{
 				mIDENT(); if (state.failed) return;
 
 				}
 				break;
-			case 49 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:348: EQUAL_COND_EXPR
+			case 51 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:360: EQUAL_COND_EXPR
 				{
 				mEQUAL_COND_EXPR(); if (state.failed) return;
 
 				}
 				break;
-			case 50 :
-				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:364: COND_EXPR
+			case 52 :
+				// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:1:376: COND_EXPR
 				{
 				mCOND_EXPR(); if (state.failed) return;
 
@@ -2515,9 +2573,10 @@ public class RTLLexer extends Lexer {
 		"\1\43\1\123\2\43\1\uffff\3\43\2\uffff\3\43\1\uffff\2\43\1\137\2\43\1\uffff"+
 		"\5\43\1\uffff\20\43\1\171\3\43\1\175\4\43\1\uffff\3\43\1\uffff\1\u0085"+
 		"\2\43\1\u0088\3\43\1\uffff\2\43\1\uffff\3\43\1\u0091\1\u0092\1\u0093\2"+
-		"\43\3\uffff\5\43\1\u009b\1\u009c\2\uffff";
+		"\43\3\uffff\5\43\1\u009b\1\u009d\1\uffff\1\43\1\uffff\15\43\1\u00ad\1"+
+		"\u00ae\2\uffff";
 	static final String DFA22_eofS =
-		"\u009d\uffff";
+		"\u00af\uffff";
 	static final String DFA22_minS =
 		"\1\11\1\163\1\141\1\150\1\151\1\156\1\157\1\156\1\165\1\171\1\162\1\uffff"+
 		"\1\52\1\55\2\uffff\1\72\1\uffff\1\56\1\uffff\1\75\2\uffff\1\0\1\75\13"+
@@ -2528,7 +2587,9 @@ public class RTLLexer extends Lexer {
 		"\162\2\157\1\141\1\151\1\144\1\141\2\157\1\144\1\162\1\165\1\162\1\157"+
 		"\1\60\1\164\1\156\1\162\1\60\2\162\1\147\1\156\1\uffff\2\151\1\155\1\uffff"+
 		"\1\60\1\143\1\145\1\60\1\157\1\172\1\141\1\uffff\1\145\1\164\1\uffff\1"+
-		"\156\1\141\1\164\3\60\1\164\1\151\3\uffff\1\151\2\157\2\156\2\60\2\uffff";
+		"\156\1\141\1\164\3\60\1\164\1\151\3\uffff\1\151\2\157\2\156\2\60\1\uffff"+
+		"\1\142\1\uffff\1\141\1\157\1\143\1\162\1\153\2\167\2\141\2\162\2\144\2"+
+		"\60\2\uffff";
 	static final String DFA22_maxS =
 		"\1\175\1\163\1\141\1\157\1\151\1\156\1\157\1\156\1\165\1\171\1\162\1\uffff"+
 		"\1\57\1\76\2\uffff\1\75\1\uffff\1\56\1\uffff\1\75\2\uffff\1\uffff\1\76"+
@@ -2540,16 +2601,18 @@ public class RTLLexer extends Lexer {
 		"\1\162\1\157\1\172\1\164\1\156\1\162\1\172\2\162\1\147\1\156\1\uffff\2"+
 		"\151\1\155\1\uffff\1\172\1\143\1\145\1\172\1\157\1\172\1\141\1\uffff\1"+
 		"\145\1\164\1\uffff\1\156\1\141\1\164\3\172\1\164\1\151\3\uffff\1\151\2"+
-		"\157\2\156\2\172\2\uffff";
+		"\157\2\156\2\172\1\uffff\1\146\1\uffff\1\141\1\157\1\143\1\162\1\153\2"+
+		"\167\2\141\2\162\2\144\2\172\2\uffff";
 	static final String DFA22_acceptS =
-		"\13\uffff\1\17\2\uffff\1\23\1\24\1\uffff\1\30\1\uffff\1\33\1\uffff\1\36"+
-		"\1\37\2\uffff\1\43\1\46\1\47\1\50\1\51\1\52\1\54\1\55\1\56\1\57\1\60\13"+
-		"\uffff\1\20\1\21\1\53\1\22\1\44\1\26\1\27\1\25\1\32\1\31\1\35\1\34\1\40"+
-		"\2\uffff\1\62\1\42\1\45\1\41\1\1\2\uffff\1\6\4\uffff\1\12\4\uffff\1\61"+
-		"\3\uffff\1\10\5\uffff\1\61\5\uffff\1\14\31\uffff\1\11\3\uffff\1\2\7\uffff"+
-		"\1\3\2\uffff\1\7\10\uffff\1\4\1\5\1\13\7\uffff\1\16\1\15";
+		"\13\uffff\1\21\2\uffff\1\25\1\26\1\uffff\1\32\1\uffff\1\35\1\uffff\1\40"+
+		"\1\41\2\uffff\1\45\1\50\1\51\1\52\1\53\1\54\1\56\1\57\1\60\1\61\1\62\13"+
+		"\uffff\1\22\1\23\1\55\1\24\1\46\1\30\1\31\1\27\1\34\1\33\1\37\1\36\1\42"+
+		"\2\uffff\1\64\1\44\1\47\1\43\1\1\2\uffff\1\6\4\uffff\1\12\4\uffff\1\63"+
+		"\3\uffff\1\10\5\uffff\1\63\5\uffff\1\14\31\uffff\1\11\3\uffff\1\2\7\uffff"+
+		"\1\3\2\uffff\1\7\10\uffff\1\4\1\5\1\13\7\uffff\1\20\1\uffff\1\15\17\uffff"+
+		"\1\17\1\16";
 	static final String DFA22_specialS =
-		"\27\uffff\1\3\44\uffff\1\0\1\2\20\uffff\1\1\116\uffff}>";
+		"\27\uffff\1\2\44\uffff\1\3\1\0\20\uffff\1\1\140\uffff}>";
 	static final String[] DFA22_transitionS = {
 			"\2\13\1\uffff\2\13\22\uffff\1\13\1\uffff\1\42\1\25\1\43\2\uffff\1\41"+
 			"\1\31\1\35\1\37\1\32\1\21\1\15\1\22\1\14\12\40\1\20\1\36\1\30\1\23\1"+
@@ -2708,6 +2771,24 @@ public class RTLLexer extends Lexer {
 			"\1\u0099",
 			"\1\u009a",
 			"\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff\32\43",
+			"\12\43\7\uffff\32\43\4\uffff\1\u009c\1\uffff\32\43",
+			"",
+			"\1\u009e\3\uffff\1\u009f",
+			"",
+			"\1\u00a0",
+			"\1\u00a1",
+			"\1\u00a2",
+			"\1\u00a3",
+			"\1\u00a4",
+			"\1\u00a5",
+			"\1\u00a6",
+			"\1\u00a7",
+			"\1\u00a8",
+			"\1\u00a9",
+			"\1\u00aa",
+			"\1\u00ab",
+			"\1\u00ac",
+			"\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff\32\43",
 			"\12\43\7\uffff\32\43\4\uffff\1\43\1\uffff\32\43",
 			"",
 			""
@@ -2744,7 +2825,7 @@ public class RTLLexer extends Lexer {
 		}
 		@Override
 		public String getDescription() {
-			return "1:1: Tokens : ( T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | WS | SL_COMMENT | ML_COMMENT | ARROW | AT | BAR | COLON | COLON_COLON | COLON_EQUAL | COMMA | DOT | DOTDOT | EQUAL | GREATER | GREATER_EQUAL | HASH | LBRACE | LBRACK | LESS | LESS_EQUAL | LPAREN | MINUS | NOT_EQUAL | PLUS | RBRACE | RBRACK | RPAREN | SEMI | SLASH | STAR | RANGE_OR_INT | STRING | NON_OCL_STRING | IDENT | EQUAL_COND_EXPR | COND_EXPR );";
+			return "1:1: Tokens : ( T__46 | T__47 | T__48 | T__49 | T__50 | T__51 | T__52 | T__53 | T__54 | T__55 | T__56 | T__57 | T__58 | T__59 | T__60 | T__61 | WS | SL_COMMENT | ML_COMMENT | ARROW | AT | BAR | COLON | COLON_COLON | COLON_EQUAL | COMMA | DOT | DOTDOT | EQUAL | GREATER | GREATER_EQUAL | HASH | LBRACE | LBRACK | LESS | LESS_EQUAL | LPAREN | MINUS | NOT_EQUAL | PLUS | RBRACE | RBRACK | RPAREN | SEMI | SLASH | STAR | RANGE_OR_INT | STRING | NON_OCL_STRING | IDENT | EQUAL_COND_EXPR | COND_EXPR );";
 		}
 		@Override
 		public int specialStateTransition(int s, IntStream _input) throws NoViableAltException {
@@ -2752,11 +2833,11 @@ public class RTLLexer extends Lexer {
 			int _s = s;
 			switch ( s ) {
 					case 0 : 
-						int LA22_60 = input.LA(1);
+						int LA22_61 = input.LA(1);
 						s = -1;
-						if ( (LA22_60=='=') ) {s = 61;}
-						else if ( ((LA22_60 >= '\u0000' && LA22_60 <= '<')||(LA22_60 >= '>' && LA22_60 <= '\\')||(LA22_60 >= '^' && LA22_60 <= '\uFFFF')) ) {s = 60;}
-						else if ( (LA22_60==']') ) {s = 62;}
+						if ( ((LA22_61 >= '\u0000' && LA22_61 <= '<')||(LA22_61 >= '>' && LA22_61 <= '\\')||(LA22_61 >= '^' && LA22_61 <= '\uFFFF')) ) {s = 78;}
+						else if ( (LA22_61==']') ) {s = 79;}
+						else if ( (LA22_61=='=') ) {s = 62;}
 						if ( s>=0 ) return s;
 						break;
 
@@ -2770,21 +2851,21 @@ public class RTLLexer extends Lexer {
 						break;
 
 					case 2 : 
-						int LA22_61 = input.LA(1);
-						s = -1;
-						if ( ((LA22_61 >= '\u0000' && LA22_61 <= '<')||(LA22_61 >= '>' && LA22_61 <= '\\')||(LA22_61 >= '^' && LA22_61 <= '\uFFFF')) ) {s = 78;}
-						else if ( (LA22_61==']') ) {s = 79;}
-						else if ( (LA22_61=='=') ) {s = 62;}
-						if ( s>=0 ) return s;
-						break;
-
-					case 3 : 
 						int LA22_23 = input.LA(1);
 						s = -1;
 						if ( ((LA22_23 >= '\u0000' && LA22_23 <= '<')||(LA22_23 >= '>' && LA22_23 <= '\\')||(LA22_23 >= '^' && LA22_23 <= '\uFFFF')) ) {s = 60;}
 						else if ( (LA22_23=='=') ) {s = 61;}
 						else if ( (LA22_23==']') ) {s = 62;}
 						else s = 59;
+						if ( s>=0 ) return s;
+						break;
+
+					case 3 : 
+						int LA22_60 = input.LA(1);
+						s = -1;
+						if ( (LA22_60=='=') ) {s = 61;}
+						else if ( ((LA22_60 >= '\u0000' && LA22_60 <= '<')||(LA22_60 >= '>' && LA22_60 <= '\\')||(LA22_60 >= '^' && LA22_60 <= '\uFFFF')) ) {s = 60;}
+						else if ( (LA22_60==']') ) {s = 62;}
 						if ( s>=0 ) return s;
 						break;
 			}
