@@ -3,6 +3,7 @@ package org.uet.dse.rtlplus.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,10 @@ public class MatchListDialog extends JPanel {
 	private ViewFrame viewFrame;
 
 	public MatchListDialog(ViewFrame vf, List<Match> matches, EventBus eventBus, MSystemState state,
-			PrintWriter logWriter) {
+			PrintWriter logWriter, MatchListDialogResult res) {
 		super();
 		DefaultListModel<Match> model = new DefaultListModel<>();
+		res.setResult(false);
 		this.matches = matches;
 		this.eventBus = eventBus;
 		viewFrame = vf;
@@ -54,6 +56,7 @@ public class MatchListDialog extends JPanel {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				res.setResult(true);
 				selectedMatch.run(state, logWriter);
 				eventBus.post(new MatchRunEvent());
 				eventBus.post(new MatchSelectedEvent(new ArrayList<MObject>(0)));
@@ -76,7 +79,10 @@ public class MatchListDialog extends JPanel {
 
 	@Subscribe
 	public void onMatchRun(MatchRunEvent e) {
-		viewFrame.dispose();
+		try {
+			viewFrame.setClosed(true);
+		} catch (PropertyVetoException e1) {
+		}
 	}
 	
 	@Override

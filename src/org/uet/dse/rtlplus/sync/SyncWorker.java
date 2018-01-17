@@ -35,6 +35,7 @@ import org.tzi.use.uml.sys.events.ObjectDestroyedEvent;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.gui.MatchListDialog;
+import org.uet.dse.rtlplus.gui.MatchListDialogResult;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
 import org.uet.dse.rtlplus.matching.ForwardMatchManager;
 import org.uet.dse.rtlplus.matching.Match;
@@ -355,30 +356,40 @@ public class SyncWorker extends JPanel {
 	}
 
 	private void findForwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		MatchManager fManager = new ForwardMatchManager(state, sync);
-		List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
-		if (!fMatches.isEmpty()) {
-			URL url = Main.class.getResource("/resources/list.png");
-			ViewFrame vf = new ViewFrame("New matches found!", null, "");
-			vf.setFrameIcon(new ImageIcon(url));
-			MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter);
-			vf.setContentPane(dialog);
-			vf.pack();
-			mainWindow.addNewViewFrame(vf);
+		MatchListDialogResult res = new MatchListDialogResult();
+		while (res.isResult()) {
+			MatchManager fManager = new ForwardMatchManager(state, sync);
+			List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
+			if (fMatches.isEmpty()) {
+				logWriter.println("No forward matches available.");
+			} else {
+				URL url = Main.class.getResource("/resources/list.png");
+				ViewFrame vf = new ViewFrame("New matches found!", null, "");
+				vf.setFrameIcon(new ImageIcon(url));
+				MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter, res);
+				vf.setContentPane(dialog);
+				vf.pack();
+				mainWindow.addNewViewFrame(vf);
+			}
 		}
 	}
 
 	private void findBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		MatchManager bManager = new BackwardMatchManager(state, sync);
-		List<Match> bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
-		if (!bMatches.isEmpty()) {
-			URL url = Main.class.getResource("/resources/list.png");
-			ViewFrame vf = new ViewFrame("New matches found!", null, "");
-			vf.setFrameIcon(new ImageIcon(url));
-			MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter);
-			vf.setContentPane(dialog);
-			vf.pack();
-			mainWindow.addNewViewFrame(vf);
+		MatchListDialogResult res = new MatchListDialogResult();
+		while (res.isResult()) {
+			MatchManager bManager = new BackwardMatchManager(state, sync);
+			List<Match> bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
+			if (bMatches.isEmpty()) {
+				logWriter.println("No backward matches available.");
+			} else {
+				URL url = Main.class.getResource("/resources/list.png");
+				ViewFrame vf = new ViewFrame("New matches found!", null, "");
+				vf.setFrameIcon(new ImageIcon(url));
+				MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter, res);
+				vf.setContentPane(dialog);
+				vf.pack();
+				mainWindow.addNewViewFrame(vf);
+			}
 		}
 	}
 
