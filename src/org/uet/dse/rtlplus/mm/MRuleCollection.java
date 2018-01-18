@@ -14,7 +14,7 @@ import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MRuleCollection {
 	public static enum TransformationType {
-		FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION_FORWARD, SYNCHRONIZATION_BACKWARD
+		FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION
 	};
 
 	public static enum Side {

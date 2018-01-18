@@ -20,37 +20,34 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 		MatchManager manager = null;
 		switch (Main.getTggRuleCollection().getType()) {
 		case FORWARD:
-			manager = new ForwardMatchManager(pluginAction.getSession().system().state(), false);
-			break;
-		case BACKWARD:
-			manager = new BackwardMatchManager(pluginAction.getSession().system().state(), false);
-			break;
-		case INTEGRATION:
-			manager = new IntegrationMatchManager(pluginAction.getSession().system().state(), false);
-			break;
-		case SYNCHRONIZATION_FORWARD:
 			manager = new ForwardMatchManager(pluginAction.getSession().system().state(), true);
 			break;
-		case SYNCHRONIZATION_BACKWARD:
+		case BACKWARD:
 			manager = new BackwardMatchManager(pluginAction.getSession().system().state(), true);
+			break;
+		default:
+			manager = new IntegrationMatchManager(pluginAction.getSession().system().state(), false);
 			break;
 		}
 		int i = 0;
 		while (true) {
-			List<Match> matches = manager.findMatchesForRules(Main.getTggRuleCollection().getRuleList());
+			List<Match> matches = manager.findMatches();
 			if (matches.isEmpty())
 				break;
+			boolean success = false;
 			for (Match match : matches) {
 				// System.out.println(match.toString());
-				boolean success = match.run(pluginAction.getSession().system().state(),
+				success = match.run(pluginAction.getSession().system().state(),
 						pluginAction.getParent().logWriter());
 				if (!success) {
 					pluginAction.getParent().logWriter().println("Failed to run match");
 				} else {
 					i++;
+					break;
 				}
-
 			}
+			if (!success)
+				break;
 		}
 		JOptionPane.showMessageDialog(pluginAction.getParent(), String.format("Completed %d match(es).", i));
 	}

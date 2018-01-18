@@ -56,11 +56,7 @@ public class AstRuleCollection {
 			collection = new MRuleCollection(TransformationType.INTEGRATION);
 			break;
 		case "synchronization":
-		case "syncrhonization_forward":
-			collection = new MRuleCollection(TransformationType.SYNCHRONIZATION_FORWARD);
-			break;
-		case "synchronization_backward":
-			collection = new MRuleCollection(TransformationType.BACKWARD);
+			collection = new MRuleCollection(TransformationType.SYNCHRONIZATION);
 			break;
 		default:
 			collection = new MRuleCollection(TransformationType.FORWARD);

@@ -87,7 +87,7 @@ public class SyncWorker extends JPanel {
 		state = session.system().state();
 		logWriter = parent.logWriter();
 		eventBus = session.system().getEventBus();
-		syncForward = Main.getTggRuleCollection().getType() == TransformationType.SYNCHRONIZATION_FORWARD;
+		syncForward = Main.getTggRuleCollection().getType() == TransformationType.FORWARD;
 		rulesForSrcClass = Main.getSyncData().getRulesForSrcClass();
 		rulesForTrgClass = Main.getSyncData().getRulesForTrgClass();
 		corrObjsForSrc = Main.getSyncData().getCorrObjsForSrc();
@@ -111,8 +111,10 @@ public class SyncWorker extends JPanel {
 	
 	@Subscribe
 	public void onOperationExited(OperationExitEvent e) {
-		String transName = Main.getUniqueNameGenerator().generate(e.getOpName());
-		Main.getSyncData().addTransformation(transName, event);
+		if (e.isSuccess()) {
+			String transName = Main.getUniqueNameGenerator().generate(e.getOpName());
+			Main.getSyncData().addTransformation(transName, event);
+		}
 		running = false;
 	}
 

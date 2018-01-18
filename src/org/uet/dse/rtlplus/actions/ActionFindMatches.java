@@ -35,19 +35,13 @@ public class ActionFindMatches implements IPluginActionDelegate {
 		MatchManager manager = null;
 		switch (Main.getTggRuleCollection().getType()) {
 		case FORWARD:
-			manager = new ForwardMatchManager(state, false);
-			break;
-		case BACKWARD:
-			manager = new BackwardMatchManager(state, false);
-			break;
-		case INTEGRATION:
-			manager = new IntegrationMatchManager(state, false);
-			break;
-		case SYNCHRONIZATION_FORWARD:
 			manager = new ForwardMatchManager(state, true);
 			break;
-		case SYNCHRONIZATION_BACKWARD:
+		case BACKWARD:
 			manager = new BackwardMatchManager(state, true);
+			break;
+		default:
+			manager = new IntegrationMatchManager(state, false);
 			break;
 		}
 		if (manager != null) {

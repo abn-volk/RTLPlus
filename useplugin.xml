@@ -47,11 +47,20 @@
 		<action label="Incremental update" 
 			icon="resources/delta.png" 
 			class="org.uet.dse.rtlplus.actions.ActionIncrementalUpdate" 
-			tooltip="Model incremental update"
+			tooltip="Incremental update"
 			menu="RTL plugin" 
-			menuitem="Model incremental update"
-			toolbaritem="Model incremental update"
+			menuitem="Incremental update"
+			toolbaritem="Incremental update"
 			id="org.uet.dse.rtlplus.actions.ActionIncrementalUpdate">
+		</action>
+		<action label="Integration check" 
+			icon="resources/check.png" 
+			class="org.uet.dse.rtlplus.actions.ActionIntegrationCheck" 
+			tooltip="Integration check"
+			menu="RTL plugin" 
+			menuitem="Integration check"
+			toolbaritem="Integration check"
+			id="org.uet.dse.rtlplus.actions.ActionIntegrationCheck">
 		</action>
 	</actions>
 </plugin>

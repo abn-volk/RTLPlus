@@ -16,9 +16,11 @@ import org.tzi.use.uml.ocl.value.TupleValue.Part;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemException;
 import org.tzi.use.uml.sys.MSystemState;
+import org.tzi.use.uml.sys.StatementEvaluationResult;
 import org.tzi.use.uml.sys.soil.MStatement;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.mm.MTggRule;
+import org.uet.dse.rtlplus.sync.OperationExitEvent;
 
 public class IntegrationMatch extends Match {
 
@@ -45,34 +47,57 @@ public class IntegrationMatch extends Match {
 			TupleValue tuple = new TupleValue(type, parts);
 			varEnv.assign(varDecl.name(), tuple);
 		}
-		// Openter and opexit
+		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
 		commands.add(0, openter);
+		// Execute commands
 		for (String cmd : commands) {
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
 			try {
 				systemState.system().execute(statement);
+				count++;
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
-				doOpExit(systemState, logWriter);
+				for (int i = 0; i < count; i++) {
+					try {
+						systemState.system().undoLastStatement();
+					} catch (MSystemException e1) {
+						logWriter.println(e1.getMessage());
+					}
+				}
 				varEnv.clear();
+				if (sync)
+					systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 				return false;
 			}
 		}
 		// Opexit
-		doOpExit(systemState, logWriter);
+		boolean res = doOpExit(systemState, logWriter, count);
 		varEnv.clear();
-		return true;
+		return res;
 	}
-	
-	private void doOpExit(MSystemState systemState, PrintWriter logWriter) {
+
+	private boolean doOpExit(MSystemState systemState, PrintWriter logWriter, int count) {
 		try {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
 					systemState, systemState.system().getVariableEnvironment(), "opexit", "<input>", logWriter, false));
-		} catch (Exception ignored) {
+			return true;
+		} catch (MSystemException e) {
+			if (e.getMessage().contains("postcondition false")) {
+				for (int i = 0; i < count; i++) {
+					try {
+						systemState.system().undoLastStatement();
+					} catch (MSystemException e1) {
+						logWriter.println(e1.getMessage());
+					}
+				}
+			} else
+				logWriter.println(e.getMessage());
+			return false;
 		}
+
 	}
 }

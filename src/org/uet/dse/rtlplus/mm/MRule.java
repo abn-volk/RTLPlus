@@ -178,6 +178,19 @@ public class MRule {
 		}
 		return commands;
 	}
+	
+	public List<String> genSetCommands() {
+		List<String> commands = new ArrayList<>();
+		List<String> cons = rhs.getConditionList();
+		if (cons != null) {
+			for (String con : cons) {
+				String rep = con.replace("=", ":=");
+				if (rep != con)
+					commands.add("set " + rep);
+			}
+		}
+		return commands;
+	}
 
 	public Map<String, String> getObjectsToCreate() {
 		return objectsToCreate;

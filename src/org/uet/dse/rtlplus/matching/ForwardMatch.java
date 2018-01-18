@@ -36,6 +36,8 @@ public class ForwardMatch extends Match {
 		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
 		// Create new target objects
 		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
+		// Set attributes for target objects
+		commands.addAll(rule.getTrgRule().genSetCommands());
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes
@@ -60,6 +62,7 @@ public class ForwardMatch extends Match {
 					.post(new OperationEnterEvent(TransformationType.FORWARD, objectList,
 							rule.getTrgRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
 							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
+		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
 		commands.add(0, openter);
@@ -69,10 +72,17 @@ public class ForwardMatch extends Match {
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
 			try {
 				systemState.system().execute(statement);
+				count++;
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
-				doOpExit(systemState, logWriter);
+				for (int i=0; i<count; i++) {
+					try {
+						systemState.system().undoLastStatement();
+					} catch (MSystemException e1) {
+						doOpExit(systemState, logWriter);
+					}
+				}
 				varEnv.clear();
 				if (sync)
 					systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));

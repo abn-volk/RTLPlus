@@ -32,5 +32,39 @@ public abstract class Match {
 	public Map<String, MObject> getObjectList() {
 		return objectList;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((objectList == null) ? 0 : objectList.hashCode());
+		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
+		result = prime * result + (sync ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Match other = (Match) obj;
+		if (objectList == null) {
+			if (other.objectList != null)
+				return false;
+		} else if (!objectList.equals(other.objectList))
+			return false;
+		if (operation == null) {
+			if (other.operation != null)
+				return false;
+		} else if (!operation.equals(other.operation))
+			return false;
+		if (sync != other.sync)
+			return false;
+		return true;
+	}
 	
 }

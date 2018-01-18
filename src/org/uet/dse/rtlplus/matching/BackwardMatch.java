@@ -34,8 +34,10 @@ public class BackwardMatch extends Match {
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
 		List<String> commands = rule.getTrgRule().genLetCommandsRight("matchTR");
-		// Create new target objects
+		// Create new source objects
 		commands.addAll(rule.getSrcRule().genCreationCommands("matchSL", systemState));
+		// Set attributes for source objects
+		commands.addAll(rule.getSrcRule().genSetCommands());
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes
@@ -60,6 +62,7 @@ public class BackwardMatch extends Match {
 					.post(new OperationEnterEvent(TransformationType.FORWARD, objectList,
 							rule.getTrgRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
 							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
+		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
 		commands.add(0, openter);
@@ -67,12 +70,20 @@ public class BackwardMatch extends Match {
 		for (String cmd : commands) {
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
+			if (statement == null) logWriter.println("Statement is null ");
 			try {
 				systemState.system().execute(statement);
+				count++;
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
-				doOpExit(systemState, logWriter);
+				for (int i=0; i<count; i++) {
+					try {
+						systemState.system().undoLastStatement();
+					} catch (MSystemException e1) {
+						doOpExit(systemState, logWriter);
+					}
+				}
 				varEnv.clear();
 				if (sync)
 					systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
