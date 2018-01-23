@@ -229,6 +229,80 @@ public class MTggRule {
 			cons.append(')');
 		cons.append('\n');
 	}
+	
+	public void genCoevolution(StringBuilder ops, StringBuilder cons) {
+		// Operations
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + RTLKeyword.coEvolution + " (");
+		// matchSL: Tuple (obj1: cls1, obj2: cls2)
+		String sl = srcRule.genMatchLeft();
+		if (!sl.isEmpty())
+			sb.append("\n    matchSL: Tuple(").append(sl).append(")");
+		// matchCL
+		String cl = corrRule.genMatchLeft();
+		if (!cl.isEmpty()) {
+			if (!sl.isEmpty())
+				sb.append(',');
+			sb.append("\n    matchCL: Tuple(").append(cl).append(")");
+		}
+		// matchTL
+		String tl = trgRule.genMatchLeft();
+		if (!tl.isEmpty()) {
+			if (!sl.isEmpty() || !cl.isEmpty())
+				sb.append(',');
+			sb.append("\n    matchTL: Tuple(").append(tl).append(")");
+		}
+		sb.append(")\n");
+		ops.append(sb);
+		// Constraints
+		String letString = new StringBuilder().append(srcRule.genLetLeft("matchSL"))
+				.append(corrRule.genLetLeft("matchCL")).append(trgRule.genLetLeft("matchTL")).toString();
+		// Pre-conditions
+		cons.append("\ncontext RuleCollection::").append(sb)
+				.append("pre " + name + RTLKeyword.coEvolution + "_pre: \n").append(letString);
+		String srcPre = srcRule.genPreCondLeft(true);
+		String trgPre = trgRule.genPreCondLeft(true);
+		String corrPre = corrRule.genPreCondLeft(true);
+		String result = Arrays.asList(srcPre, trgPre, corrPre).stream().filter(it -> !it.isEmpty())
+				.collect(Collectors.joining(" and\n"));
+		if (result.isEmpty())
+			cons.append("true\n");
+		else
+			cons.append(result);
+		// Post-conditions
+		cons.append("\n\npost " + name + RTLKeyword.coEvolution + "_post:\n").append(letString);
+		// Existing objects - left
+		StringBuilder sb1 = new StringBuilder();
+		int trgDepth = srcRule.genPostCond(sb1, 0);
+		// Existing objects - right
+		StringBuilder sb3 = new StringBuilder();
+		int srcDepth = trgRule.genPostCond(sb3, trgDepth);
+		if (sb3.length() == 0)
+			sb3.append("true\n");
+		if (sb1.length() > 2) {
+			if (sb1.charAt(sb1.length() - 2) == '|')
+				sb1.append(sb3);
+			else
+				sb1.append(" and ").append(sb3);
+		} else
+			sb1.append(sb3);
+		// New objects
+		StringBuilder sb2 = new StringBuilder();
+		int corrDepth = corrRule.genPostCond(sb2, srcDepth);
+		if (sb2.length() == 0)
+			sb2.append("true\n");
+		if (sb1.length() > 2) {
+			if (sb1.charAt(sb1.length() - 2) == '|')
+				sb1.append(sb2);
+			else
+				sb1.append(" and ").append(sb2);
+		} else
+			sb1.append(sb2);
+		cons.append(sb1);
+		for (int i = 0; i < corrDepth; i++)
+			cons.append(')');
+		cons.append('\n');
+	}
 
 	public MSystemState getSystemStateLHS() {
 		return srcRule.lhs.getSystemState();
@@ -267,10 +341,15 @@ public class MTggRule {
 			commands.addAll(srcRule.genLetCommandsLeft("matchSL"));
 			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
 			return commands;
-		// Integration 
-		default:
+		case INTEGRATION:
 			commands = srcRule.genLetCommandsRight("matchSR");
 			commands.addAll(trgRule.genLetCommandsRight("matchTR"));
+			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
+			return commands;
+		// co-evolution
+		default:
+			commands = srcRule.genLetCommandsLeft("matchSL");
+			commands.addAll(srcRule.genLetCommandsLeft("matchSL"));
 			commands.addAll(corrRule.genCreationCommands("matchCL", systemState));
 			return commands;
 		}

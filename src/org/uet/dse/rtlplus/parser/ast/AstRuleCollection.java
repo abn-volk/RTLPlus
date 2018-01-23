@@ -59,7 +59,7 @@ public class AstRuleCollection {
 			collection = new MRuleCollection(TransformationType.SYNCHRONIZATION);
 			break;
 		default:
-			collection = new MRuleCollection(TransformationType.FORWARD);
+			collection = new MRuleCollection(TransformationType.COEVOLUTION);
 			break;
 		}
 		for (AstTggRule rule : ruleList) {

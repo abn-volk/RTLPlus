@@ -240,6 +240,8 @@ public class RTLParserParameter extends JDialog {
 		fTggRules.genBackwardTransformation(ops, cons);
 		ops.append("\n---------- Integration transformations ----------\n");
 		fTggRules.genIntegration(ops, cons);
+		ops.append("\n---------- Co-evolution transformations ----------\n");
+		fTggRules.genCoevolution(ops, cons);
 		ops.append(RTLKeyword.endClass).append('\n');
 		ops.append(cons);
 		return ops;

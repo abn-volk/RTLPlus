@@ -14,7 +14,7 @@ import org.uet.dse.rtlplus.parser.RTLKeyword;
 
 public class MRuleCollection {
 	public static enum TransformationType {
-		FORWARD, BACKWARD, INTEGRATION, SYNCHRONIZATION
+		FORWARD, BACKWARD, INTEGRATION, COEVOLUTION, SYNCHRONIZATION
 	};
 
 	public static enum Side {
@@ -127,6 +127,12 @@ public class MRuleCollection {
 	public void genIntegration(StringBuilder ops, StringBuilder cons) {
 		for (MTggRule rule : rules.values()) {
 			rule.genIntegration(ops, cons);
+		}
+	}
+	
+	public void genCoevolution(StringBuilder ops, StringBuilder cons) {
+		for (MTggRule rule : rules.values()) {
+			rule.genCoevolution(ops, cons);
 		}
 	}
 }
