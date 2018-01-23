@@ -25,7 +25,7 @@ public class BackwardMatchManager extends MatchManager {
 			return matches;
 		// System.out.println("Finding matches for " + rule.getName());
 		// TODO: How to interpret empty result?
-		// NULL => No objects, not valid for forward transformation
+		// NULL => No objects, not valid for backward transformation
 		// Empty => No matches
 		List<? extends Map<String, MObject>> trgMatches = findTargetMatch(rule, op);
 		if (trgMatches == null || trgMatches.isEmpty())

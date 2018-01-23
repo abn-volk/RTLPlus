@@ -25,6 +25,7 @@ public class MCorrRule extends MRule {
 			for (String inv : rhs.getInvariantList().get(obj.cls().name())) {
 				switch (type) {
 				case FORWARD:
+				case COEVOLUTION:
 					commands.add("set " + inv.replace("self.", obj.name() + ".").replace("=", ":="));
 					break;
 				case BACKWARD:

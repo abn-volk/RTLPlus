@@ -98,6 +98,5 @@ public class IntegrationMatch extends Match {
 				logWriter.println(e.getMessage());
 			return false;
 		}
-
 	}
 }

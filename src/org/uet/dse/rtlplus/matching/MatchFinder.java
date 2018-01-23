@@ -31,7 +31,7 @@ public class MatchFinder {
 	}
 
 	/* Start finding a match */
-	public List<? extends Map<String, MObject>> run() {
+	public List<Map<String, MObject>> run() {
 		if (ruleObjects.isEmpty())
 			return null;
 		findMatchAtPosition(new LinkedHashMap<String, MObject>(), 0);
@@ -41,7 +41,7 @@ public class MatchFinder {
 		return matches;
 	}
 	
-	public List<? extends Map<String, MObject>> run(List<MObject> objs) {
+	public List<Map<String, MObject>> run(List<MObject> objs) {
 		if (ruleObjects.isEmpty())
 			return null;
 		findMatchAtPosition(new LinkedHashMap<String, MObject>(), 0, objs);

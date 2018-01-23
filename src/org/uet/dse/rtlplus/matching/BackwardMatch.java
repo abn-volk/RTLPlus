@@ -81,7 +81,7 @@ public class BackwardMatch extends Match {
 					try {
 						systemState.system().undoLastStatement();
 					} catch (MSystemException e1) {
-						doOpExit(systemState, logWriter);
+						doOpExit(systemState, logWriter, count);
 					}
 				}
 				varEnv.clear();
@@ -91,18 +91,30 @@ public class BackwardMatch extends Match {
 			}
 		}
 		// Opexit
-		doOpExit(systemState, logWriter);
+		doOpExit(systemState, logWriter, count);
 		varEnv.clear();
 		if (sync)
 			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 		return true;
 	}
 	
-	private void doOpExit(MSystemState systemState, PrintWriter logWriter) {
+	private boolean doOpExit(MSystemState systemState, PrintWriter logWriter, int count) {
 		try {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
 					systemState, systemState.system().getVariableEnvironment(), "opexit", "<input>", logWriter, false));
-		} catch (Exception ignored) {
+			return true;
+		} catch (MSystemException e) {
+			if (e.getMessage().contains("postcondition false")) {
+				for (int i = 0; i < count; i++) {
+					try {
+						systemState.system().undoLastStatement();
+					} catch (MSystemException e1) {
+						logWriter.println(e1.getMessage());
+					}
+				}
+			} else
+				logWriter.println(e.getMessage());
+			return false;
 		}
 	}
 }

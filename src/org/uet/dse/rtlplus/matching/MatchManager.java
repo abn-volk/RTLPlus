@@ -12,6 +12,7 @@ import org.tzi.use.uml.ocl.expr.Evaluator;
 import org.tzi.use.uml.ocl.expr.Expression;
 import org.tzi.use.uml.ocl.expr.VarDecl;
 import org.tzi.use.uml.ocl.type.TupleType;
+import org.tzi.use.uml.ocl.type.Type.VoidHandling;
 import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.ocl.value.ObjectValue;
 import org.tzi.use.uml.ocl.value.TupleValue;
@@ -47,15 +48,17 @@ public abstract class MatchManager {
 		// System.out.println("Objects: " + objs.toString());
 		VariableEnvironment varEnv = systemState.system().getVariableEnvironment();
 		for (VarDecl varDecl : op.paramList()) {
-			TupleType type = (TupleType) varDecl.type();
-			List<Part> parts = new ArrayList<>();
-			// System.out.println(objs.toString());
-			// System.out.println(type.getParts().keySet());
-			for (String key : type.getParts().keySet()) {
-				parts.add(new TupleValue.Part(0, key, new ObjectValue(objs.get(key).cls(), objs.get(key))));
+			if (varDecl.type().isKindOfTupleType(VoidHandling.EXCLUDE_VOID)) {
+				TupleType type = (TupleType) varDecl.type();
+				List<Part> parts = new ArrayList<>();
+				// System.out.println(objs.toString());
+				// System.out.println(type.getParts().keySet());
+				for (String key : type.getParts().keySet()) {
+					parts.add(new TupleValue.Part(0, key, new ObjectValue(objs.get(key).cls(), objs.get(key))));
+				}
+				TupleValue tuple = new TupleValue(type, parts);
+				varEnv.assign(varDecl.name(), tuple);
 			}
-			TupleValue tuple = new TupleValue(type, parts);
-			varEnv.assign(varDecl.name(), tuple);
 		}
 		// System.out.println(varEnv);
 		for (MPrePostCondition pre : op.preConditions()) {

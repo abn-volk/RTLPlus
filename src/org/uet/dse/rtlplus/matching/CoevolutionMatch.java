@@ -2,10 +2,8 @@ package org.uet.dse.rtlplus.matching;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.tzi.use.parser.shell.ShellCommandCompiler;
@@ -22,18 +20,20 @@ import org.tzi.use.uml.sys.soil.MStatement;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 import org.uet.dse.rtlplus.mm.MTggRule;
-import org.uet.dse.rtlplus.sync.OperationEnterEvent;
-import org.uet.dse.rtlplus.sync.OperationExitEvent;
 
-public class ForwardMatch extends Match {
+public class CoevolutionMatch extends Match {
 
-	public ForwardMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList, boolean sync) {
+	public CoevolutionMatch(MTggRule rule, MOperation operation, Map<String, MObject> objectList, boolean sync) {
 		super(rule, operation, objectList, sync);
 	}
 
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
-		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
+		List<String> commands = rule.getSrcRule().genLetCommandsLeft("matchSL");
+		// Create new source objects
+		commands.addAll(rule.getSrcRule().genCreationCommands("matchSL", systemState));
+		// Set attributes for source objects
+		commands.addAll(rule.getSrcRule().genSetCommands());
 		// Create new target objects
 		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
 		// Set attributes for target objects
@@ -41,15 +41,12 @@ public class ForwardMatch extends Match {
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes
-		commands.addAll(rule.getCorrRule().genAttributeCommands(TransformationType.FORWARD));
+		commands.addAll(rule.getCorrRule().genAttributeCommands(TransformationType.COEVOLUTION));
 		// Variable assignments
-		Set<String> corrParams = new HashSet<>();
 		VariableEnvironment varEnv = systemState.system().getVariableEnvironment();
 		for (VarDecl varDecl : operation.paramList()) {
 			TupleType type = (TupleType) varDecl.type();
 			List<Part> parts = new ArrayList<>();
-			if (sync && varDecl.name().equals("matchCL"))
-				corrParams = type.getParts().keySet();
 			for (String key : type.getParts().keySet()) {
 				parts.add(new TupleValue.Part(0, key, new ObjectValue(objectList.get(key).cls(), objectList.get(key))));
 			}
@@ -57,11 +54,6 @@ public class ForwardMatch extends Match {
 			varEnv.assign(varDecl.name(), tuple);
 		}
 		// Openter and opexit
-		if (sync)
-			systemState.system().getEventBus()
-					.post(new OperationEnterEvent(TransformationType.FORWARD, objectList,
-							rule.getTrgRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
-							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
 		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
@@ -84,16 +76,12 @@ public class ForwardMatch extends Match {
 					}
 				}
 				varEnv.clear();
-				if (sync)
-					systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 				return false;
 			}
 		}
 		// Opexit
 		doOpExit(systemState, logWriter, count);
 		varEnv.clear();
-		if (sync)
-			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
 		return true;
 	}
 

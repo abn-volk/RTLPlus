@@ -25,6 +25,9 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 		case BACKWARD:
 			manager = new BackwardMatchManager(pluginAction.getSession().system().state(), true);
 			break;
+		case COEVOLUTION:
+			JOptionPane.showMessageDialog(pluginAction.getParent(), "Sorry, this feature is not available for co-evolution transformations.", "Feature not available", JOptionPane.ERROR_MESSAGE);
+			return;
 		default:
 			manager = new IntegrationMatchManager(pluginAction.getSession().system().state(), false);
 			break;
@@ -49,7 +52,7 @@ public class ActionAutoRunMatches implements IPluginActionDelegate {
 			if (!success)
 				break;
 		}
-		JOptionPane.showMessageDialog(pluginAction.getParent(), String.format("Completed %d match(es).", i));
+		JOptionPane.showMessageDialog(pluginAction.getParent(), String.format("Completed %d match(es).", i), "Operation completed", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 }

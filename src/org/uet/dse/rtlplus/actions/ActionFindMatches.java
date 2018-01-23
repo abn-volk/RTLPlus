@@ -18,6 +18,7 @@ import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.gui.MatchListDialog;
 import org.uet.dse.rtlplus.gui.MatchListDialogResult;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
+import org.uet.dse.rtlplus.matching.CoevolutionMatchManager;
 import org.uet.dse.rtlplus.matching.ForwardMatchManager;
 import org.uet.dse.rtlplus.matching.IntegrationMatchManager;
 import org.uet.dse.rtlplus.matching.Match;
@@ -40,8 +41,14 @@ public class ActionFindMatches implements IPluginActionDelegate {
 		case BACKWARD:
 			manager = new BackwardMatchManager(state, true);
 			break;
-		default:
+		case INTEGRATION:
 			manager = new IntegrationMatchManager(state, false);
+			break;
+		case COEVOLUTION:
+			manager = new CoevolutionMatchManager(state, false);
+			break;
+		default:
+			manager = null;
 			break;
 		}
 		if (manager != null) {
@@ -86,7 +93,7 @@ public class ActionFindMatches implements IPluginActionDelegate {
 				mainWindow.addNewViewFrame(vf);
 			}
 		}
-		else JOptionPane.showMessageDialog(mainWindow, "This transformation type is unsupported.");
+		else JOptionPane.showMessageDialog(mainWindow, "This transformation type is unsupported.", "Unsupported transformation type", JOptionPane.ERROR_MESSAGE);
 	}
 
 }
