@@ -1,4 +1,4 @@
-package org.uet.dse.rtlplus.parser.ast;
+package org.uet.dse.rtlplus.parser.ast.tgg;
 
 import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;

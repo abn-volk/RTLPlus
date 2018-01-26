@@ -62,5 +62,14 @@
 			toolbaritem="Integration check"
 			id="org.uet.dse.rtlplus.actions.ActionIntegrationCheck">
 		</action>
+		<action label="Execute co-evolution scenario" 
+			icon="resources/scenario.png" 
+			class="org.uet.dse.rtlplus.actions.ActionRunCoevolScenario" 
+			tooltip="Execute co-evolution scenario" 
+			menu="RTL plugin" 
+			menuitem="Execute co-evolution scenario" 
+			toolbaritem="Execute co-evolution scenario" 
+			id="org.uet.dse.rtlplus.actions.ActionRunCoevolScenario">
+		</action>
 	</actions>
 </plugin>

@@ -8,8 +8,16 @@ package org.uet.dse.rtlplus.parser;
 
 import org.tzi.use.parser.base.BaseParser;
 import org.uet.dse.rtlplus.parser.ast.*;
-
-
+import org.uet.dse.rtlplus.parser.ast.tgg.AstCorr;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstCorrLink;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstCorrRule;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstInvariantTgg;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstLink;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstObject;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstPattern;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstRule;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstRuleCollection;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstTggRule;
 import org.antlr.runtime.*;
 import java.util.Stack;
 import java.util.List;

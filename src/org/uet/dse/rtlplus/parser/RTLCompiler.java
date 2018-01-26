@@ -15,7 +15,7 @@ import org.tzi.use.uml.mm.MModel;
 import org.tzi.use.uml.mm.ModelFactory;
 import org.tzi.use.uml.sys.MSystemException;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
-import org.uet.dse.rtlplus.parser.ast.AstRuleCollection;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstRuleCollection;
 
 public class RTLCompiler {
 	private RTLCompiler() {

@@ -1,4 +1,4 @@
-package org.uet.dse.rtlplus.parser.ast;
+package org.uet.dse.rtlplus.parser.ast.tgg;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
