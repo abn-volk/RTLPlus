@@ -10,9 +10,11 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -33,6 +35,7 @@ public class MatchListDialog extends JPanel {
 	private EventBus eventBus;
 	private Match selectedMatch;
 	private ViewFrame viewFrame;
+	private JLabel label;
 
 	public MatchListDialog(ViewFrame vf, List<Match> matches, EventBus eventBus, MSystemState state,
 			PrintWriter logWriter, MatchListDialogResult res) {
@@ -46,7 +49,8 @@ public class MatchListDialog extends JPanel {
 		for (Match match : matches) {
 			model.addElement(match);
 		}
-		setLayout(new BorderLayout());
+		setLayout(new BorderLayout(10, 10));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
 		list = new JList<>(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		add(list, BorderLayout.CENTER);
@@ -63,6 +67,8 @@ public class MatchListDialog extends JPanel {
 			}
 		});
 		add(btn, BorderLayout.PAGE_END);
+		label = new JLabel(String.format("<html>Found %d match(es). Click on a match to view matched objects, then click Run to execute the match.</html>", matches.size()));
+		add(label, BorderLayout.PAGE_START);
 		list.addListSelectionListener(new SelectionHandler());
 	}
 
@@ -71,6 +77,7 @@ public class MatchListDialog extends JPanel {
 		public void valueChanged(ListSelectionEvent arg0) {
 			if (!arg0.getValueIsAdjusting()) {
 				selectedMatch = matches.get(arg0.getLastIndex());
+				label.setText(String.format("<html>Number of objects to create: %d<br>Number of links to create: %d<br>Number of correlation objects to create: %d</html>", selectedMatch.getNewObjectsNum(), selectedMatch.getNewLinksNum(), selectedMatch.getNewCorrsNum()));
 				eventBus.post(new MatchSelectedEvent(selectedMatch.getObjectList().values()));
 				btn.setEnabled(true);
 			}

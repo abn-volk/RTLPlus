@@ -117,4 +117,19 @@ public class BackwardMatch extends Match {
 			return false;
 		}
 	}
+
+	@Override
+	public int getNewObjectsNum() {
+		return rule.getSrcRule().getNewObjects().size();
+	}
+
+	@Override
+	public int getNewLinksNum() {
+		return rule.getSrcRule().getNewLinks().size();
+	}
+	
+	@Override
+	public int getNewCorrsNum() {
+		return rule.getCorrRule().getNewObjects().size();
+	}
 }

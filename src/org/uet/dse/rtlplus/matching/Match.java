@@ -25,6 +25,10 @@ public abstract class Match {
 	
 	public abstract boolean run(MSystemState systemState, PrintWriter logWriter);
 	
+	public abstract int getNewObjectsNum();
+	public abstract int getNewLinksNum();
+	public abstract int getNewCorrsNum();
+	
 	public String toString() {
 		return operation.name() + ": " + objectList.toString();
 	}

@@ -99,4 +99,19 @@ public class IntegrationMatch extends Match {
 			return false;
 		}
 	}
+
+	@Override
+	public int getNewObjectsNum() {
+		return 0;
+	}
+
+	@Override
+	public int getNewLinksNum() {
+		return 0;
+	}
+
+	@Override
+	public int getNewCorrsNum() {
+		return rule.getCorrRule().getNewObjects().size();
+	}
 }
