@@ -21,6 +21,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.tzi.use.api.UseApiException;
+import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.config.Options;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.util.CloseOnEscapeKeyListener;
@@ -210,6 +212,11 @@ public class RTLParserParameter extends JDialog {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						fSession.setSystem(system2);
+						try {
+							UseSystemApi.create(fSession).createObject("RuleCollection", "rc");
+						} catch (UseApiException e) {
+							e.printStackTrace();
+						}
 					}
 				});
 				Main.setRTLRule(fTggRules);
