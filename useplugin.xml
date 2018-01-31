@@ -71,5 +71,14 @@
 			toolbaritem="Execute co-evolution scenario" 
 			id="org.uet.dse.rtlplus.actions.ActionRunCoevolScenario">
 		</action>
+		<action label="Export model" 
+			icon="resources/export.png" 
+			class="org.uet.dse.rtlplus.actions.ActionExportModel" 
+			tooltip="Export model" 
+			menu="RTL plugin" 
+			menuitem="Export model" 
+			toolbaritem="Export model" 
+			id="org.uet.dse.rtlplus.actions.ActionExportModel">
+		</action>
 	</actions>
 </plugin>

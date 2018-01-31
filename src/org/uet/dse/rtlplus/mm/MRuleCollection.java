@@ -26,6 +26,8 @@ public class MRuleCollection {
 	private Map<String, MTggRule> rules = new LinkedHashMap<>();
 	private Context context;
 	private Map<String, Side> classMap = new HashMap<>();
+	private MModel sourceModel;
+	private MModel targetModel;
 	public Map<String, Side> getClassMap() {
 		return classMap;
 	}
@@ -67,15 +69,27 @@ public class MRuleCollection {
 	}
 
 	public void setSourceModel(MModel model) {
+		sourceModel = model;
 		for (MClass cls : model.classes()) {
 			classMap.put(cls.name(), Side.SOURCE);
 		}
 	}
 
 	public void setTargetModel(MModel model) {
+		targetModel = model;
 		for (MClass cls : model.classes()) {
 			classMap.put(cls.name(), Side.TARGET);
 		}
+	}
+	
+	
+
+	public MModel getSourceModel() {
+		return sourceModel;
+	}
+
+	public MModel getTargetModel() {
+		return targetModel;
 	}
 
 	public String genCorrInvs() {
