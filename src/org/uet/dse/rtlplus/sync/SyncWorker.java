@@ -1,7 +1,7 @@
 package org.uet.dse.rtlplus.sync;
 
 import java.io.PrintWriter;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,16 +10,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
-import org.tzi.use.gui.main.MainWindow;
-import org.tzi.use.gui.main.ViewFrame;
 import org.tzi.use.main.Session;
 import org.tzi.use.main.shell.Shell;
 import org.tzi.use.uml.ocl.value.BooleanValue;
@@ -34,8 +26,6 @@ import org.tzi.use.uml.sys.events.ObjectCreatedEvent;
 import org.tzi.use.uml.sys.events.ObjectDestroyedEvent;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.Main;
-import org.uet.dse.rtlplus.gui.MatchListDialog;
-import org.uet.dse.rtlplus.gui.MatchListDialogResult;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
 import org.uet.dse.rtlplus.matching.ForwardMatchManager;
 import org.uet.dse.rtlplus.matching.Match;
@@ -47,9 +37,7 @@ import org.uet.dse.rtlplus.mm.MTggRule;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-@SuppressWarnings("serial")
-public class SyncWorker extends JPanel {
-
+public class SyncWorker {
 	// Search for matches when an object is created
 	private Map<String, Set<MTggRule>> rulesForSrcClass;
 	private Map<String, Set<MTggRule>> rulesForTrgClass;
@@ -57,7 +45,6 @@ public class SyncWorker extends JPanel {
 	// Collect info when transformations are run
 	private boolean running = false;
 	// Needed to find matches
-	private MainWindow mainWindow;
 	private MSystemState state;
 	private PrintWriter logWriter;
 	private EventBus eventBus;
@@ -74,18 +61,15 @@ public class SyncWorker extends JPanel {
 	private Map<String, String> transformationForCorrObj;
 	// Cache for current transformation
 	private OperationEnterEvent event;
-
-	public SyncWorker(MainWindow parent, Session session) {
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-		JLabel label1 = new JLabel(
-				"<html>Keep this window open to track incremental changes and update the model accordingly.</html>");
-		add(label1);
-		mainWindow = parent;
+	// GUI
+	private SyncWorkerDialog dialog;
+	
+	public SyncWorker(SyncWorkerDialog dialog, PrintWriter logWriter, Session session) {
+		this.dialog = dialog;
 		api = UseSystemApi.create(session);
 		classMap = Main.getTggRuleCollection().getClassMap();
 		state = session.system().state();
-		logWriter = parent.logWriter();
+		this.logWriter = logWriter;
 		eventBus = session.system().getEventBus();
 		syncForward = Main.getTggRuleCollection().getType() == TransformationType.FORWARD;
 		rulesForSrcClass = Main.getSyncData().getRulesForSrcClass();
@@ -97,9 +81,6 @@ public class SyncWorker extends JPanel {
 		corrObjDependencies = Main.getSyncData().getCorrObjDependencies();
 		pastTransformations = Main.getSyncData().getPastTransformations();
 		transformationForCorrObj = Main.getSyncData().getTransformationForCorrObj();
-		// Listen to changes
-		eventBus.register(this);
-		System.out.println("Subscribed to EventBus");
 	}
 	
 	@Subscribe
@@ -127,11 +108,17 @@ public class SyncWorker extends JPanel {
 			switch (side) {
 			case SOURCE:
 				// Find forward matches
-				findForwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), syncForward);
+				if (dialog != null)
+					dialog.findForwardMatches(state, rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), syncForward);
+				else 
+					runForwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), syncForward);
 				break;
 			case TARGET:
 				// Find backward matches
-				findBackwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), !syncForward);
+				if (dialog != null)
+					dialog.findBackwardMatches(state, rulesForTrgClass.get(obj.cls().name()), Arrays.asList(obj), !syncForward);
+				else
+					runBackwardMatches(rulesForTrgClass.get(obj.cls().name()), Arrays.asList(obj), !syncForward);
 				break;
 			default:
 				break;
@@ -142,25 +129,32 @@ public class SyncWorker extends JPanel {
 	@Subscribe
 	public void onObjectDestroyed(ObjectDestroyedEvent e) {
 		String objName = e.getDestroyedObject().name();
+		MObject obj = e.getDestroyedObject();
 		if (!running) {
 			eventBus.unregister(this);
-			Set<String> corrs = corrObjsForSrc.getOrDefault(objName, new HashSet<>());
-			Set<String> allCorrs = findAllDependencies(corrs, new HashSet<>(corrs));
-			Set<String> transToUndo = new HashSet<>();
-			for (String corr : allCorrs) {
-				String tran = transformationForCorrObj.get(corr);
-				if (tran != null)
-					transToUndo.add(tran);
-			}
-			// Undo transformations
-			for (String tran : transToUndo) {
-				OperationEnterEvent event = pastTransformations.get(tran);
-				if (event != null) {
-					undoTransformation(event);
-					pastTransformations.remove(tran);
+			Set<String> corrs = null;
+			if (classMap.get(obj.cls().name()) == Side.SOURCE && syncForward)
+				corrs = corrObjsForSrc.getOrDefault(objName, new HashSet<>());
+			else if (classMap.get(obj.cls().name()) == Side.TARGET && !syncForward)
+				corrs = corrObjsForTrg.getOrDefault(objName, new HashSet<>());
+			if (corrs != null) {
+				Set<String> allCorrs = findAllDependencies(corrs, new HashSet<>(corrs));
+				Set<String> transToUndo = new HashSet<>();
+				for (String corr : allCorrs) {
+					String tran = transformationForCorrObj.get(corr);
+					if (tran != null)
+						transToUndo.add(tran);
 				}
+				// Undo transformations
+				for (String tran : transToUndo) {
+					OperationEnterEvent event = pastTransformations.get(tran);
+					if (event != null) {
+						undoTransformation(event);
+						pastTransformations.remove(tran);
+					}
+				}
+				eventBus.register(this);
 			}
-			eventBus.register(this);
 		}
 	}
 	
@@ -237,10 +231,16 @@ public class SyncWorker extends JPanel {
 			if (sameSide) {
 				switch (side) {
 				case SOURCE:
-					findForwardMatches(ruleList, objects, syncForward);
+					if (dialog != null)
+						dialog.findForwardMatches(state, ruleList, objects, syncForward);
+					else
+						runForwardMatches(ruleList, objects, syncForward);
 					break;
 				case TARGET:
-					findBackwardMatches(ruleList, objects, !syncForward);
+					if (dialog != null)
+						dialog.findBackwardMatches(state, ruleList, objects, !syncForward);
+					else
+						runBackwardMatches(ruleList, objects, !syncForward);
 					break;
 				default:
 					break;
@@ -284,7 +284,10 @@ public class SyncWorker extends JPanel {
 					}
 				}
 				checkConsistencyAndUndo(Arrays.asList(e.getObject().name()));
-				findForwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), syncForward);
+				if (dialog != null)
+					dialog.findForwardMatches(state, rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), syncForward);
+				else
+					runForwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), syncForward);
 				break;
 			case TARGET:
 				Set<String> cObjs = corrObjsForTrg.get(e.getObject().name());
@@ -303,7 +306,10 @@ public class SyncWorker extends JPanel {
 					}
 				}
 				checkConsistencyAndUndo(Arrays.asList(e.getObject().name()));
-				findBackwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), !syncForward);
+				if (dialog != null)
+					dialog.findBackwardMatches(state, rulesForTrgClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), !syncForward);
+				else
+					runBackwardMatches(rulesForTrgClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), !syncForward);
 				break;
 			default:
 				break;
@@ -357,46 +363,32 @@ public class SyncWorker extends JPanel {
 		}
 	}
 
-	private void findForwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		MatchListDialogResult res = new MatchListDialogResult();
-		while (res.isResult()) {
+	private void runForwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
+		List<Match> fMatches = new ArrayList<>();
+		do {
 			MatchManager fManager = new ForwardMatchManager(state, sync);
-			List<Match> fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
-			if (fMatches.isEmpty()) {
-				logWriter.println("No forward matches available.");
-			} else {
-				URL url = Main.class.getResource("/resources/list.png");
-				ViewFrame vf = new ViewFrame("New matches found!", null, "");
-				vf.setFrameIcon(new ImageIcon(url));
-				MatchListDialog dialog = new MatchListDialog(vf, fMatches, eventBus, state, logWriter, res);
-				vf.setContentPane(dialog);
-				vf.pack();
-				mainWindow.addNewViewFrame(vf);
+			fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
+			for (Match match : fMatches) {
+				boolean res = match.run(state, logWriter);
+				if (res)
+					break;
 			}
 		}
+		while (fMatches.size() > 0);
 	}
-
-	private void findBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		MatchListDialogResult res = new MatchListDialogResult();
-		while (res.isResult()) {
+	
+	private void runBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
+		List<Match> bMatches = new ArrayList<>();
+		do {
 			MatchManager bManager = new BackwardMatchManager(state, sync);
-			List<Match> bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
-			if (bMatches.isEmpty()) {
-				logWriter.println("No backward matches available.");
-			} else {
-				URL url = Main.class.getResource("/resources/list.png");
-				ViewFrame vf = new ViewFrame("New matches found!", null, "");
-				vf.setFrameIcon(new ImageIcon(url));
-				MatchListDialog dialog = new MatchListDialog(vf, bMatches, eventBus, state, logWriter, res);
-				vf.setContentPane(dialog);
-				vf.pack();
-				mainWindow.addNewViewFrame(vf);
+			bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
+			for (Match match : bMatches) {
+				boolean res = match.run(state, logWriter);
+				if (res)
+					break;
 			}
 		}
-	}
-
-	public void unsubscribe() {
-		eventBus.unregister(this);
+		while (bMatches.size() > 0);
 	}
 
 }

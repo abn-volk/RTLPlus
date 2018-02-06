@@ -14,7 +14,7 @@ import org.tzi.use.runtime.gui.IPluginAction;
 import org.tzi.use.runtime.gui.IPluginActionDelegate;
 import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
-import org.uet.dse.rtlplus.sync.SyncWorker;
+import org.uet.dse.rtlplus.sync.SyncWorkerDialog;
 
 public class ActionIncrementalUpdate implements IPluginActionDelegate {
 
@@ -25,7 +25,7 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 				|| Main.getTggRuleCollection().getType() == TransformationType.BACKWARD)
 				&& !Main.syncWindowOpened) {
 			Session session = pluginAction.getSession();
-			SyncWorker syncWorker = new SyncWorker(mainWindow, session);
+			SyncWorkerDialog syncWorker = new SyncWorkerDialog(mainWindow, session);
 			URL url = Main.class.getResource("/resources/delta.png");
 			ViewFrame vf = new ViewFrame("Model incremental update", null, "");
 			vf.setFrameIcon(new ImageIcon(url));

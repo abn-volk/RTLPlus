@@ -94,7 +94,7 @@ public class BackwardMatch extends Match {
 		doOpExit(systemState, logWriter, count);
 		varEnv.clear();
 		if (sync)
-			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), false));
+			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), true));
 		return true;
 	}
 	
