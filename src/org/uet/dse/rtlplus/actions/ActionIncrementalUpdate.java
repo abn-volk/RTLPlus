@@ -65,6 +65,6 @@ public class ActionIncrementalUpdate implements IPluginActionDelegate {
 			vf.setContentPane(syncWorker);
 			mainWindow.addNewViewFrame(vf);
 		}
-		else JOptionPane.showMessageDialog(mainWindow, "This feature is only available for the synchronization transformation type.");
+		else JOptionPane.showMessageDialog(mainWindow, "This feature is only available for the forward/backward transformation type.");
 	}
 }

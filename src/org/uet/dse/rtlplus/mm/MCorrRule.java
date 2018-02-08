@@ -22,21 +22,24 @@ public class MCorrRule extends MRule {
 	public List<String> genAttributeCommands(TransformationType type){
 		List<String> commands = new ArrayList<>();
 		for (MObject obj : rhs.getObjectList()) {
-			for (String inv : rhs.getInvariantList().get(obj.cls().name())) {
-				switch (type) {
-				case FORWARD:
-				case COEVOLUTION:
-					commands.add("set " + inv.replace("self.", obj.name() + ".").replace("=", ":="));
-					break;
-				case BACKWARD:
-					String[] parts = inv.replace("self.", obj.name() + ".").split("=");
-					if (parts.length == 2) {
-						String newCommand = "set " + parts[1] + ":=" + parts[0];
-						commands.add(newCommand);
+			List<String> invs = rhs.getInvariantList().get(obj.cls().name());
+			if (invs != null) {
+				for (String inv : invs) {
+					switch (type) {
+					case FORWARD:
+					case COEVOLUTION:
+						commands.add("set " + inv.replace("self.", obj.name() + ".").replace("=", ":="));
+						break;
+					case BACKWARD:
+						String[] parts = inv.replace("self.", obj.name() + ".").split("=");
+						if (parts.length == 2) {
+							String newCommand = "set " + parts[1] + ":=" + parts[0];
+							commands.add(newCommand);
+						}
+						break;
+					default:
+						break;
 					}
-					break;
-				default:
-					break;
 				}
 			}
 		}
