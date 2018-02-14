@@ -62,7 +62,10 @@ public class CoevolutionMatch extends Match {
 		for (String cmd : commands) {
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
-			try {
+			if (statement == null) {
+				logWriter.println("Cannot parse command: " + cmd);
+				doOpExit(systemState, logWriter, count);
+			} else try {
 				systemState.system().execute(statement);
 				count++;
 			} catch (MSystemException e) {

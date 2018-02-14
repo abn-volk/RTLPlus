@@ -70,14 +70,16 @@ public class BackwardMatch extends Match {
 		for (String cmd : commands) {
 			MStatement statement = ShellCommandCompiler.compileShellCommand(systemState.system().model(), systemState,
 					systemState.system().getVariableEnvironment(), cmd, "<input>", logWriter, false);
-			if (statement == null) logWriter.println("Statement is null ");
-			try {
+			if (statement == null) {
+				logWriter.println("Cannot parse command: " + cmd);
+				doOpExit(systemState, logWriter, count);
+			} else try {
 				systemState.system().execute(statement);
 				count++;
 			} catch (MSystemException e) {
 				logWriter.println(e.getMessage());
 				// System.out.println(varEnv);
-				for (int i=0; i<count; i++) {
+				for (int i = 0; i < count; i++) {
 					try {
 						systemState.system().undoLastStatement();
 					} catch (MSystemException e1) {
@@ -97,7 +99,7 @@ public class BackwardMatch extends Match {
 			systemState.system().getEventBus().post(new OperationExitEvent(operation.name(), true));
 		return true;
 	}
-	
+
 	private boolean doOpExit(MSystemState systemState, PrintWriter logWriter, int count) {
 		try {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
@@ -127,7 +129,7 @@ public class BackwardMatch extends Match {
 	public int getNewLinksNum() {
 		return rule.getSrcRule().getNewLinks().size();
 	}
-	
+
 	@Override
 	public int getNewCorrsNum() {
 		return rule.getCorrRule().getNewObjects().size();
