@@ -129,6 +129,7 @@ public class SyncWorker {
 	@Subscribe
 	public void onObjectDestroyed(ObjectDestroyedEvent e) {
 		String objName = e.getDestroyedObject().name();
+		// System.out.println("Object destroyed: " + objName);
 		MObject obj = e.getDestroyedObject();
 		if (!running) {
 			eventBus.unregister(this);
@@ -153,8 +154,8 @@ public class SyncWorker {
 						pastTransformations.remove(tran);
 					}
 				}
-				eventBus.register(this);
 			}
+			eventBus.register(this);
 		}
 	}
 	
@@ -178,7 +179,7 @@ public class SyncWorker {
 				api.deleteObject(objName);
 			} catch (UseApiException ignored) {}
 		}
-		logWriter.println("Transformation undone: " + event.getOpName());
+		// logWriter.println("Transformation undone: " + event.getOpName());
 	}
 	
 	private Set<String> findAllDependencies(Set<String> corrObjs, Set<String> allDeps) {
@@ -223,10 +224,16 @@ public class SyncWorker {
 					sameSide = false;
 					break;
 				}
-				if (side == Side.SOURCE)
-					ruleList.addAll(rulesForSrcClass.get(obj.cls().name()));
-				else if (side == Side.TARGET)
-					ruleList.addAll(rulesForTrgClass.get(obj.cls().name()));
+				if (side == Side.SOURCE) {
+					Collection<MTggRule> rules = rulesForSrcClass.get(obj.cls().name());
+					if (rules != null) 
+						ruleList.addAll(rules);
+				}
+				else if (side == Side.TARGET) {
+					Collection<MTggRule> rules = rulesForTrgClass.get(obj.cls().name());
+					if (rules != null)
+						ruleList.addAll(rules);
+				}
 			}
 			if (sameSide) {
 				switch (side) {
@@ -263,12 +270,13 @@ public class SyncWorker {
 	public void onAttributeAssigned(AttributeAssignedEvent e) {
 		if (!running) {
 			eventBus.unregister(this);
-			//System.out.println("Attribute assignment");
+			System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
 			switch (classMap.get(e.getObject().cls().name())) {
 			case SOURCE:
+				// System.out.println("Source object changed!");
 				Set<String> corrObjs = corrObjsForSrc.get(e.getObject().name());
 				if (corrObjs != null) {
-					//System.out.println(corrObjs);
+					// System.out.println(corrObjs);
 					for (String corr : corrObjs) {
 						MObject corrObj = state.objectByName(corr);
 						if (corrObj != null) {
@@ -326,7 +334,7 @@ public class SyncWorker {
 				String preCond = syncForward? tggRule.getSrcRule().genPreCondBoth(false)
 						: tggRule.getTrgRule().genPreCondBoth(false);
 				preCond = preCond.trim();
-				logWriter.println("Preconditions: " + preCond);
+				//logWriter.println("Preconditions: " + preCond);
 				if (!preCond.isEmpty()) {
 					// Assign variables
 					VariableEnvironment varEnv = state.system().getVariableEnvironment();
@@ -364,31 +372,35 @@ public class SyncWorker {
 	}
 
 	private void runForwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		List<Match> fMatches = new ArrayList<>();
-		do {
-			MatchManager fManager = new ForwardMatchManager(state, sync);
-			fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
-			for (Match match : fMatches) {
-				boolean res = match.run(state, logWriter);
-				if (res)
-					break;
+		// System.out.println("Running forward matches");
+		if (ruleList != null) {
+			List<Match> fMatches = new ArrayList<>();
+			do {
+				MatchManager fManager = new ForwardMatchManager(state, sync);
+				fMatches = fManager.findMatchesForRulesAndObjects(ruleList, objects);
+				for (Match match : fMatches) {
+					boolean res = match.run(state, logWriter);
+					if (res)
+						break;
+				}
 			}
+			while (fMatches.size() > 0);
 		}
-		while (fMatches.size() > 0);
 	}
 	
 	private void runBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
-		List<Match> bMatches = new ArrayList<>();
-		do {
-			MatchManager bManager = new BackwardMatchManager(state, sync);
-			bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
-			for (Match match : bMatches) {
-				boolean res = match.run(state, logWriter);
-				if (res)
-					break;
+		if (ruleList != null) {
+			List<Match> bMatches = new ArrayList<>();
+			do {
+				MatchManager bManager = new BackwardMatchManager(state, sync);
+				bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
+				for (Match match : bMatches) {
+					boolean res = match.run(state, logWriter);
+					if (res)
+						break;
+				}
 			}
+			while (bMatches.size() > 0);
 		}
-		while (bMatches.size() > 0);
 	}
-
 }

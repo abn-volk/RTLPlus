@@ -193,7 +193,7 @@ public class AstCorrLink {
 		List<MAssociation> result = new ArrayList<>(2);
 		if (assocs.isEmpty()) {
 			ModelFactory mf = ctx.modelFactory();
-			MAssociation ass = mf.createAssociation(src.name() + "_" + corr.name());
+			MAssociation ass = mf.createAssociation(corr.name() + "_" + src.name());
 			ass.addAssociationEnd(
 					mf.createAssociationEnd(src, role1, MMultiplicity.ONE, MAggregationKind.NONE, false, null));
 			MMultiplicity mult = multipleSource ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
@@ -210,7 +210,7 @@ public class AstCorrLink {
 		assocs = ctx.model().getAssociationsBetweenClasses(classes);
 		if (assocs.isEmpty()) {
 			ModelFactory mf = ctx.modelFactory();
-			MAssociation ass = mf.createAssociation(trg.name() + "_" + corr.name());
+			MAssociation ass = mf.createAssociation(corr.name() + "_" + trg.name());
 			ass.addAssociationEnd(
 					mf.createAssociationEnd(trg, role2, MMultiplicity.ONE, MAggregationKind.NONE, false, null));
 			MMultiplicity mult = multipleTarget ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
