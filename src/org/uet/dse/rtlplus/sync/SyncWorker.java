@@ -270,7 +270,7 @@ public class SyncWorker {
 	public void onAttributeAssigned(AttributeAssignedEvent e) {
 		if (!running) {
 			eventBus.unregister(this);
-			System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
+			// System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
 			switch (classMap.get(e.getObject().cls().name())) {
 			case SOURCE:
 				// System.out.println("Source object changed!");
