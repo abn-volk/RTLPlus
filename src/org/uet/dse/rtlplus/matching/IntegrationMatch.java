@@ -30,9 +30,8 @@ public class IntegrationMatch extends Match {
 
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
-		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
-		// Create new target objects
-		commands.addAll(rule.getTrgRule().genLetCommandsRight("matchTR"));
+		List<String> commands = rule.getSrcRule().genLetCommandsBoth("matchSR");
+		commands.addAll(rule.getTrgRule().genLetCommandsBoth("matchTR"));
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes

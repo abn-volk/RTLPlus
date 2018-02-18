@@ -158,6 +158,17 @@ public class MRule {
 		}
 		return commands;
 	}
+	
+	public List<String> genLetCommandsBoth(String prefix) {
+		List<String> commands = new ArrayList<String>();
+		for (MObject obj : lhs.getObjectList()) {
+			commands.add("let " + obj.name() + ":" + obj.cls().name() + " = " + prefix + "." + obj.name());
+		}
+		for (MObject obj : rhs.getObjectList()) {
+			commands.add("let " + obj.name() + ":" + obj.cls().name() + " = " + prefix + "." + obj.name());
+		}
+		return commands;
+	}
 
 	public List<String> genCreationCommands(String prefix, MSystemState systemState) {
 		List<String> commands = genLetCommandsLeft(prefix);

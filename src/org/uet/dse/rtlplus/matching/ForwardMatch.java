@@ -33,7 +33,7 @@ public class ForwardMatch extends Match {
 
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
-		List<String> commands = rule.getSrcRule().genLetCommandsRight("matchSR");
+		List<String> commands = rule.getSrcRule().genLetCommandsBoth("matchSR");
 		// Create new target objects
 		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
 		// Set attributes for target objects
@@ -55,6 +55,9 @@ public class ForwardMatch extends Match {
 			}
 			TupleValue tuple = new TupleValue(type, parts);
 			varEnv.assign(varDecl.name(), tuple);
+		}
+		for (Map.Entry<String, MObject> entry : objectList.entrySet()) {
+			varEnv.assign(entry.getKey(), entry.getValue().value());
 		}
 		// Openter and opexit
 		if (sync)

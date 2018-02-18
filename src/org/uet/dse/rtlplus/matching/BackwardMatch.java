@@ -33,7 +33,7 @@ public class BackwardMatch extends Match {
 
 	@Override
 	public boolean run(MSystemState systemState, PrintWriter logWriter) {
-		List<String> commands = rule.getTrgRule().genLetCommandsRight("matchTR");
+		List<String> commands = rule.getTrgRule().genLetCommandsBoth("matchTR");
 		// Create new source objects
 		commands.addAll(rule.getSrcRule().genCreationCommands("matchSL", systemState));
 		// Set attributes for source objects
