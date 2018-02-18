@@ -1,9 +1,5 @@
 package org.uet.dse.rtlplus.sync;
 
-import java.util.List;
-
-import org.tzi.use.uml.mm.MAssociation;
-
 public class CachedLink {
 	private String association;
 	private String[] linkedObjects;

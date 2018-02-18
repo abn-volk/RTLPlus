@@ -14,16 +14,19 @@ import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.main.Session;
 import org.tzi.use.main.shell.Shell;
+import org.tzi.use.parser.shell.ShellCommandCompiler;
 import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.ocl.value.ObjectValue;
 import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MObject;
+import org.tzi.use.uml.sys.MSystemException;
 import org.tzi.use.uml.sys.MSystemState;
 import org.tzi.use.uml.sys.events.AttributeAssignedEvent;
 import org.tzi.use.uml.sys.events.LinkDeletedEvent;
 import org.tzi.use.uml.sys.events.LinkInsertedEvent;
 import org.tzi.use.uml.sys.events.ObjectCreatedEvent;
 import org.tzi.use.uml.sys.events.ObjectDestroyedEvent;
+import org.tzi.use.uml.sys.soil.MStatement;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
@@ -270,7 +273,7 @@ public class SyncWorker {
 	public void onAttributeAssigned(AttributeAssignedEvent e) {
 		if (!running) {
 			eventBus.unregister(this);
-			// System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
+			//System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
 			switch (classMap.get(e.getObject().cls().name())) {
 			case SOURCE:
 				// System.out.println("Source object changed!");
@@ -284,8 +287,16 @@ public class SyncWorker {
 							if (strs != null) {
 								//System.out.println("Strs = " + strs.toString());
 								for (String str : strs) {
-									String line = str.replace("self", corr);
-									Shell.getInstance().processLineSafely("! set " + line);
+									String line = "set " + str.replace("self", corr);
+									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
+											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
+									if (statement == null) {
+										logWriter.println("Cannot parse command: " + line);
+									} else try {
+										state.system().execute(statement);
+									} catch (MSystemException exception) {
+										logWriter.println("MSystemException: " + exception.getMessage());
+									}
 								}
 							}
 						}
@@ -306,8 +317,16 @@ public class SyncWorker {
 							Set<String> strs = backwardCmdsForCorr.get(corrObj.cls().name());
 							if (strs != null) {
 								for (String str : strs) {
-									String line = str.replace("self", corr);
-									Shell.getInstance().processLineSafely("! set " + line);
+									String line = "set " + str.replace("self", corr);
+									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
+											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
+									if (statement == null) {
+										logWriter.println("Cannot parse command: " + line);
+									} else try {
+										state.system().execute(statement);
+									} catch (MSystemException exception) {
+										logWriter.println("MSystemException: " + exception.getMessage());
+									}
 								}
 							}
 						}
