@@ -33,6 +33,10 @@ public abstract class Match {
 		return operation.name() + ": " + objectList.toString();
 	}
 	
+	public MTggRule getRule() {
+		return rule;
+	}
+	
 	public Map<String, MObject> getObjectList() {
 		return objectList;
 	}

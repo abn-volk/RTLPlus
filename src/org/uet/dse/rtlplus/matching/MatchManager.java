@@ -100,6 +100,8 @@ public abstract class MatchManager {
 				if (currentMatches != null) matches.addAll(currentMatches);
 			}
 		}
+		if (Main.matchComparator != null)
+			matches.sort(Main.matchComparator);
 		return matches;
 	}
 
@@ -111,6 +113,8 @@ public abstract class MatchManager {
 			List<Match> currentMatches = findMatchForRule(rule);
 			if (currentMatches != null) matches.addAll(currentMatches);
 		}
+		if (Main.matchComparator != null)
+			matches.sort(Main.matchComparator);
 		return matches;
 	}
 }

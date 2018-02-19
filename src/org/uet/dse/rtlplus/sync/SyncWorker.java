@@ -413,6 +413,7 @@ public class SyncWorker {
 			do {
 				MatchManager bManager = new BackwardMatchManager(state, sync);
 				bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
+				//logWriter.println(bMatches.toString());
 				for (Match match : bMatches) {
 					boolean res = match.run(state, logWriter);
 					if (res)

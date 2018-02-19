@@ -35,7 +35,7 @@ public class SyncData {
 		pastTransformations = new LinkedHashMap<>();
 		transformationForCorrObj = new HashMap<>();
 		for (MTggRule tggRule : rules.getRuleList()) {
-			for (MObject obj : tggRule.getSrcRule().getNewObjects()) {
+			for (MObject obj : tggRule.getSrcRule().getAllObjects()) {
 				Set<MTggRule> tggRules = rulesForSrcClass.get(obj.cls().name());
 				if (tggRules == null) {
 					tggRules = new HashSet<>();
@@ -44,8 +44,8 @@ public class SyncData {
 				tggRules.add(tggRule);
 
 			}
-			for (MObject obj : tggRule.getTrgRule().getNewObjects()) {
-				Set<MTggRule> tggRules = rulesForSrcClass.get(obj.cls().name());
+			for (MObject obj : tggRule.getTrgRule().getAllObjects()) {
+				Set<MTggRule> tggRules = rulesForTrgClass.get(obj.cls().name());
 				if (tggRules == null) {
 					tggRules = new HashSet<>();
 					rulesForTrgClass.put(obj.cls().name(), tggRules);

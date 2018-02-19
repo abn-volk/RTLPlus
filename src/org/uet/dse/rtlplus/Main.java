@@ -1,8 +1,11 @@
 package org.uet.dse.rtlplus;
 
+import java.util.Comparator;
+
 import org.tzi.use.runtime.IPlugin;
 import org.tzi.use.runtime.IPluginRuntime;
 import org.tzi.use.util.UniqueNameGenerator;
+import org.uet.dse.rtlplus.matching.Match;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 import org.uet.dse.rtlplus.sync.SyncData;
@@ -21,6 +24,7 @@ public class Main implements IPlugin {
 	private static UniqueNameGenerator fUniqueNameGenerator;
 	private static SyncData syncData;
 	public static boolean syncWindowOpened = false;
+	public static Comparator<Match> matchComparator;
 
 	public static MRuleCollection getTggRuleCollection() {
 		return fTggRules;

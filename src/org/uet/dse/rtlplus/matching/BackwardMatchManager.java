@@ -8,6 +8,7 @@ import java.util.Map;
 import org.tzi.use.uml.mm.MOperation;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
+import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.mm.MTggRule;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
 
@@ -58,6 +59,8 @@ public class BackwardMatchManager extends MatchManager {
 				}
 			}
 		}
+		if (Main.matchComparator != null)
+			matches.sort(Main.matchComparator);
 		return matches;
 	}
 
@@ -126,6 +129,8 @@ public class BackwardMatchManager extends MatchManager {
 				}
 			}
 		}
+		if (Main.matchComparator != null)
+			matches.sort(Main.matchComparator);
 		return matches;
 	}
 

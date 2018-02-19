@@ -1,5 +1,6 @@
 package org.uet.dse.rtlplus.mm;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,13 +32,14 @@ public class MRuleCollection {
 	public Map<String, Side> getClassMap() {
 		return classMap;
 	}
+	public List<MTggRule> ruleList = new ArrayList<>();
 
 	public MRuleCollection(TransformationType _type) {
 		type = _type;
 	}
 
-	public Collection<MTggRule> getRuleList() {
-		return rules.values();
+	public List<MTggRule> getRuleList() {
+		return ruleList;
 	}
 
 	public String getName() {
@@ -50,6 +52,7 @@ public class MRuleCollection {
 
 	public void addRule(MTggRule rule) {
 		rules.put(rule.getName(), rule);
+		ruleList.add(rule);
 	}
 	
 	public MTggRule getRuleByName(String name) {
