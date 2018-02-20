@@ -83,9 +83,10 @@ public class MTggRule {
 				.append("pre " + name + RTLKeyword.forwardTransform + "_pre: \n").append(letString);
 		String srcPre = srcRule.genPreCondBoth(true);
 		String trgPre = trgRule.genPreCondLeft(true);
+		String trgPreRight = trgRule.genPreCondRight();
 		String corrPre = corrRule.genPreCondLeft(true);
 		String srcLnkPre = srcLnkCons.stream().collect(Collectors.joining(" and\n"));
-		String result = Arrays.asList(srcPre, trgPre, corrPre, srcLnkPre).stream().filter(it -> !it.isEmpty())
+		String result = Arrays.asList(srcPre, trgPre, trgPreRight, corrPre, srcLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");
@@ -144,10 +145,11 @@ public class MTggRule {
 		cons.append("\ncontext RuleCollection::").append(sb)
 				.append("pre " + name + RTLKeyword.backwardTransform + "_pre: \n").append(letString);
 		String srcCond = srcRule.genPreCondLeft(true);
+		String srcPreRight = srcRule.genPreCondRight();
 		String trgCond = trgRule.genPreCondBoth(true);
 		String corrCond = corrRule.genPreCondLeft(true);
 		String trgLnkPre = trgLnkCons.stream().collect(Collectors.joining(" and\n"));
-		String result = Arrays.asList(srcCond, trgCond, corrCond, trgLnkPre).stream().filter(it -> !it.isEmpty())
+		String result = Arrays.asList(srcCond, srcPreRight, trgCond, corrCond, trgLnkPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");
@@ -261,9 +263,11 @@ public class MTggRule {
 		cons.append("\ncontext RuleCollection::").append(sb)
 				.append("pre " + name + RTLKeyword.coEvolution + "_pre: \n").append(letString);
 		String srcPre = srcRule.genPreCondLeft(true);
+		String srcPreRight = srcRule.genPreCondRight();
 		String trgPre = trgRule.genPreCondLeft(true);
+		String trgPreRight = trgRule.genPreCondRight();
 		String corrPre = corrRule.genPreCondLeft(true);
-		String result = Arrays.asList(srcPre, trgPre, corrPre).stream().filter(it -> !it.isEmpty())
+		String result = Arrays.asList(srcPre, srcPreRight, trgPre, trgPreRight, corrPre).stream().filter(it -> !it.isEmpty())
 				.collect(Collectors.joining(" and\n"));
 		if (result.isEmpty())
 			cons.append("true\n");

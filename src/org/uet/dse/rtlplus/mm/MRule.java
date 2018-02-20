@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.tzi.use.uml.mm.MMultiplicity;
 import org.tzi.use.uml.sys.MLink;
+import org.tzi.use.uml.sys.MLinkEnd;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.sync.CachedLink;
@@ -71,6 +73,33 @@ public class MRule {
 
 	public String genPreCondLeft(boolean hasLineBreaks) {
 		return lhs.genPreCondition(hasLineBreaks);
+	}
+	
+	public String genPreCondRight() {
+		List<String> cons = new ArrayList<>();
+		for (MLink lnk : rhs.getLinkList()) {
+			for (int i = 0; i < lnk.linkedObjectsAsArray().length - 1; i++) {
+				for (int j = i+1; j < lnk.linkedObjectsAsArray().length; j++) {
+					MObject obj1 = lnk.linkedObjectsAsArray()[i];
+					MObject obj2 = lnk.linkedObjectsAsArray()[j];
+					boolean existing1 = lhs.getObjectList().contains(obj1);
+					boolean existing2 = lhs.getObjectList().contains(obj2);
+					MLinkEnd lnkEnd1 = lnk.getLinkEnd(i);
+					MLinkEnd lnkEnd2 = lnk.getLinkEnd(j);
+					int mult1 = lnkEnd1.associationEnd().multiplicity()
+							.getRanges().get(lnkEnd1.associationEnd().multiplicity().getRanges().size() - 1)
+							.getUpper();
+					int mult2 = lnkEnd2.associationEnd().multiplicity()
+							.getRanges().get(lnkEnd2.associationEnd().multiplicity().getRanges().size() - 1)
+							.getUpper();
+					if (existing1 && mult2 != MMultiplicity.MANY)
+						cons.add(obj1.name() + "." + lnkEnd2.associationEnd().name() + "->size() < " + Integer.toString(mult2));
+					if (existing2 && mult1 != MMultiplicity.MANY)
+						cons.add(obj2.name() + "." + lnkEnd1.associationEnd().name() + "->size() < " + Integer.toString(mult1));
+				}
+			}
+		}
+		return cons.stream().collect(Collectors.joining(" and\n"));
 	}
 
 	public String genPreCondBoth(boolean hasLineBreaks) {
