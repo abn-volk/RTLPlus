@@ -164,23 +164,32 @@ public class SyncWorker {
 	
 	private void undoTransformation(OperationEnterEvent event) {
 		// Delete links
-		for (CachedLink lnk : event.getLinksToCreate()) {
-			try {
-				api.deleteLink(lnk.getAssociation(), lnk.getLinkedObjects());
+		List<CachedLink> linksToCreate = event.getLinksToCreate();
+		if (linksToCreate != null) {
+			for (CachedLink lnk : linksToCreate) {
+				try {
+					api.deleteLink(lnk.getAssociation(), lnk.getLinkedObjects());
+				}
+				catch (UseApiException ignored) {}
 			}
-			catch (UseApiException ignored) {}
 		}
 		// Delete objects
-		for (String objName : event.getObjectsToCreate().values()) {
-			try {
-				api.deleteObject(objName);
-			} catch (UseApiException ignored) {}
+		Map<String, String> objectsToCreate = event.getObjectsToCreate();
+		if (objectsToCreate != null) {
+			for (String objName : objectsToCreate.values()) {
+				try {
+					api.deleteObject(objName);
+				} catch (UseApiException ignored) {}
+			}
 		}
 		// Delete correlation objects
-		for (String objName : event.getCorrObjsToCreate().values()) {
-			try {
-				api.deleteObject(objName);
-			} catch (UseApiException ignored) {}
+		Map<String, String> corrObjsToCreate = event.getCorrObjsToCreate(); 
+		if (corrObjsToCreate != null) {
+			for (String objName : corrObjsToCreate.values()) {
+				try {
+					api.deleteObject(objName);
+				} catch (UseApiException ignored) {}
+			}
 		}
 		// logWriter.println("Transformation undone: " + event.getOpName());
 	}
