@@ -60,8 +60,8 @@ public class BackwardMatch extends Match {
 		if (sync)
 			systemState.system().getEventBus()
 					.post(new OperationEnterEvent(TransformationType.FORWARD, objectList,
-							rule.getTrgRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
-							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
+							rule.getSrcRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
+							rule.getSrcRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
 		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
@@ -84,6 +84,7 @@ public class BackwardMatch extends Match {
 						systemState.system().undoLastStatement();
 					} catch (MSystemException e1) {
 						doOpExit(systemState, logWriter, count);
+						return false;
 					}
 				}
 				varEnv.clear();
@@ -105,7 +106,7 @@ public class BackwardMatch extends Match {
 			systemState.system().execute(ShellCommandCompiler.compileShellCommand(systemState.system().model(),
 					systemState, systemState.system().getVariableEnvironment(), "opexit", "<input>", logWriter, false));
 			return true;
-		} catch (MSystemException e) {
+		} catch (Exception e) {
 			if (e.getMessage().contains("postcondition false")) {
 				for (int i = 0; i < count; i++) {
 					try {

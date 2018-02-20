@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.main.Session;
-import org.tzi.use.main.shell.Shell;
 import org.tzi.use.parser.shell.ShellCommandCompiler;
 import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.ocl.value.ObjectValue;
@@ -163,6 +162,7 @@ public class SyncWorker {
 	}
 	
 	private void undoTransformation(OperationEnterEvent event) {
+		//System.out.println("Undoing transformation: " + event.getOpName());
 		// Delete links
 		List<CachedLink> linksToCreate = event.getLinksToCreate();
 		if (linksToCreate != null) {
@@ -362,7 +362,6 @@ public class SyncWorker {
 				String preCond = syncForward? tggRule.getSrcRule().genPreCondBoth(false)
 						: tggRule.getTrgRule().genPreCondBoth(false);
 				preCond = preCond.trim();
-				//logWriter.println("Preconditions: " + preCond);
 				if (!preCond.isEmpty()) {
 					// Assign variables
 					VariableEnvironment varEnv = state.system().getVariableEnvironment();
@@ -422,7 +421,6 @@ public class SyncWorker {
 			do {
 				MatchManager bManager = new BackwardMatchManager(state, sync);
 				bMatches = bManager.findMatchesForRulesAndObjects(ruleList, objects);
-				//logWriter.println(bMatches.toString());
 				for (Match match : bMatches) {
 					boolean res = match.run(state, logWriter);
 					if (res)
