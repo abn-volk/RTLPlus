@@ -80,5 +80,14 @@
 			toolbaritem="Export model" 
 			id="org.uet.dse.rtlplus.actions.ActionExportModel">
 		</action>
+		<action label="Test with classifying terms" 
+			icon="resources/test.png" 
+			class="org.uet.dse.rtlplus.actions.ActionTestWithCT" 
+			tooltip="Test with classifying terms" 
+			menu="RTL plugin" 
+			menuitem="Test with classifying terms" 
+			toolbaritem="Test with classifying terms" 
+			id="org.uet.dse.rtlplus.actions.ActionTestWithCT">
+		</action>
 	</actions>
 </plugin>
