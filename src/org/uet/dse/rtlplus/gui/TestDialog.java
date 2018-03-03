@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -13,14 +14,18 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 
 import org.tzi.use.config.Options;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.util.ExtFileFilter;
 import org.tzi.use.main.Session;
 import org.uet.dse.rtlplus.testing.CtTester;
+import org.uet.dse.rtlplus.testing.TestResult;
 
 @SuppressWarnings("serial")
 public class TestDialog extends JDialog{
@@ -98,6 +103,15 @@ public class TestDialog extends JDialog{
 		c5.add(btnTrgTerms);
 		c5.add(Box.createHorizontalStrut(10));
 		
+		JLabel labelBitwidth = new JLabel("Bitwidth: ");
+		JSpinner bwSpinner = new JSpinner(new SpinnerNumberModel(8, 1, 32, 1));
+		Container c6 = Box.createHorizontalBox();
+		c6.add(Box.createHorizontalStrut(10));
+		c6.add(labelBitwidth);
+		c6.add(Box.createHorizontalStrut(10));
+		c6.add(bwSpinner);
+		c6.add(Box.createHorizontalGlue());
+		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
@@ -118,17 +132,24 @@ public class TestDialog extends JDialog{
 				File propFile = new File(textProp.getText());
 				String srcTerms = textSrcTerms.getText();
 				String trgTerms = textTrgTerms.getText();
+				Integer bw = (Integer) bwSpinner.getValue();
 				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Test running", "", 0, 100);
-				// TODO: Do not hardcode this
-				int bitwidth = 12;
-				CtTester tester = new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bitwidth);
+				CtTester tester = new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw);
 				tester.addPropertyChangeListener(new PropertyChangeListener() {
 
 					@Override
 					public void propertyChange(PropertyChangeEvent arg0) {
-						// TODO Implement this to get the result.
-						System.out.println(arg0.getPropertyName());
 						System.out.println(arg0.getNewValue());
+						if (SwingWorker.StateValue.DONE.equals(arg0.getNewValue())) {
+							try {
+								TestResult res = tester.get();
+								parent.logWriter().println(String.format("Found %d solutions", res.getResults().size()));
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								e.printStackTrace();
+							}
+						}
 					}
 					
 				});
@@ -137,12 +158,12 @@ public class TestDialog extends JDialog{
 			}
 			
 		});
-		Container c6 = Box.createHorizontalBox();
-		c6.add(Box.createGlue());
-		c6.add(btnOK);
-		c6.add(Box.createHorizontalStrut(10));
-		c6.add(btnCancel);
-		c6.add(Box.createHorizontalStrut(10));
+		Container c7 = Box.createHorizontalBox();
+		c7.add(Box.createGlue());
+		c7.add(btnOK);
+		c7.add(Box.createHorizontalStrut(10));
+		c7.add(btnCancel);
+		c7.add(Box.createHorizontalStrut(10));
 		
 
 		Container content = getContentPane();
@@ -160,6 +181,8 @@ public class TestDialog extends JDialog{
 		content.add(c5);
 		content.add(Box.createVerticalStrut(10));
 		content.add(c6);
+		content.add(Box.createVerticalStrut(10));
+		content.add(c7);
 		content.add(Box.createVerticalStrut(10));
 		
 		setResizable(true);
