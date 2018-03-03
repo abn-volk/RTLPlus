@@ -44,7 +44,7 @@ public class RTLLoader {
 		this.logWriter = logWriter;
 	}
 	
-	public void run() {
+	public boolean run() {
 		// Parse metamodel
 		parseModels();
 		// Parse TGG rule
@@ -77,11 +77,14 @@ public class RTLLoader {
 				UseSystemApi.create(session).createObject("RuleCollection", "rc");
 			} catch (UseApiException e) {
 				e.printStackTrace();
+				return false;
 			}
 			Main.setRTLRule(ruleCollection);
 			logWriter.println("Compilation successful");
+			return true;
 		} else {
 			logWriter.println("Compilation failed");
+			return false;
 		}
 	}
 	

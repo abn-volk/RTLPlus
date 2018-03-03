@@ -8,7 +8,7 @@ public class ActionTestWithCT implements IPluginActionDelegate {
 
 	@Override
 	public void performAction(IPluginAction pluginAction) {
-		TestDialog dialog = new TestDialog(pluginAction.getParent());
+		TestDialog dialog = new TestDialog(pluginAction.getParent(), pluginAction.getSession());
 		dialog.setVisible(true);
 	}
 

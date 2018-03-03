@@ -3,6 +3,9 @@ package org.uet.dse.rtlplus.gui;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -11,16 +14,18 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
 
 import org.tzi.use.config.Options;
 import org.tzi.use.gui.main.MainWindow;
 import org.tzi.use.gui.util.ExtFileFilter;
+import org.tzi.use.main.Session;
+import org.uet.dse.rtlplus.testing.CtTester;
 
 @SuppressWarnings("serial")
 public class TestDialog extends JDialog{
-	public TestDialog(MainWindow parent) {
+	public TestDialog(MainWindow parent, Session session) {
 		super(parent, "Testing with classifying terms");
-		
 		JLabel labelSrcModel = new JLabel("Source metamodel: " + Options.getRecentFile("use").getFileName());
 		Container c0 = Box.createHorizontalBox();
 		c0.add(Box.createHorizontalStrut(10));
@@ -103,6 +108,35 @@ public class TestDialog extends JDialog{
 		
 		JButton btnOK = new JButton("OK");
 		//TODO: implement action listener
+		btnOK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("OK clicked");
+				File srcModel = Options.getRecentFile("use").toFile();
+				File trgModel = new File(textTrgModel.getText());
+				String tggName = textTggFile.getText();
+				File propFile = new File(textProp.getText());
+				String srcTerms = textSrcTerms.getText();
+				String trgTerms = textTrgTerms.getText();
+				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Test running", "", 0, 100);
+				// TODO: Do not hardcode this
+				int bitwidth = 12;
+				CtTester tester = new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bitwidth);
+				tester.addPropertyChangeListener(new PropertyChangeListener() {
+
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0) {
+						// TODO Implement this to get the result.
+						System.out.println(arg0.getPropertyName());
+						System.out.println(arg0.getNewValue());
+					}
+					
+				});
+				tester.run();
+				
+			}
+			
+		});
 		Container c6 = Box.createHorizontalBox();
 		c6.add(Box.createGlue());
 		c6.add(btnOK);
