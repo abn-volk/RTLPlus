@@ -106,14 +106,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 	@Override
 	protected TestResult doInBackground() throws Exception {
-		// TODO Auto-generated method stub
-		// TODO Use RTL loader to load the models & tgg rules in a NEW session
-		// TODO Use a new session for Kodkod (pay attention to src/trg model for fwd/bwd
-		// trans)
-		// TODO Copy code from KodkodCTScrolling... to generate models
-		// TODO Read CTs and add them to somewhere
 		monitor.setNote("Loading metamodels and rules");
-		System.out.println("Loading metamodels and rules");
 		monitor.setProgress(20);
 		RTLLoader loader = new RTLLoader(session, srcModel, trgModel, tggName, new PrintWriter(System.out));
 		boolean res = loader.run();
@@ -137,22 +130,20 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		MModel newModel;
 
 		monitor.setNote("Reading source classifying terms");
-		System.out.println("Reading source classifying terms");
 		monitor.setProgress(30);
 		BufferedReader reader = new BufferedReader(new USECommentFilterReader(new FileReader(srcTerms)));
-		System.out.println("Hello");
 		List<Pair<String>> srcTermList = new ArrayList<>();
 		if (type == TransformationType.FORWARD) {
-			newModel = USECompiler.compileSpecification(new FileInputStream(srcModel), srcModel.getName(), new PrintWriter(System.err), new ModelFactory());
+			newModel = USECompiler.compileSpecification(new FileInputStream(srcModel), srcModel.getName(),
+					new PrintWriter(System.err), new ModelFactory());
 			newSystem = new MSystem(newModel);
 			newSession.setSystem(newSystem);
 			validator = new UseCTScrollingKodkodModelValidator(newSession);
 			PluginModelFactory.INSTANCE.registerForSession(newSession);
 			iModel = PluginModelFactory.INSTANCE.getModel(newModel);
-			readResult = readTerms(reader, srcTermList, terms, newModel, iModel,
-					validator);
+			readResult = readTerms(reader, srcTermList, terms, newModel, iModel, validator);
 		} else
-			readResult = readTerms(reader, srcTermList, otherTerms, Main.getTggRuleCollection().getSourceModel());
+			readResult = readTerms(reader, srcTermList, otherTerms, session.system().model());
 		if (srcTermList.isEmpty()) {
 			error = "There are no source classifying terms.";
 			return null;
@@ -161,21 +152,20 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 			return null;
 
 		monitor.setNote("Reading target classifying terms");
-		System.out.println("Reading target classifying terms");
 		monitor.setProgress(40);
 		BufferedReader reader2 = new BufferedReader(new USECommentFilterReader(new FileReader(trgTerms)));
 		List<Pair<String>> trgTermList = new ArrayList<>();
 		if (type == TransformationType.BACKWARD) {
-			newModel = USECompiler.compileSpecification(new FileInputStream(trgModel), trgModel.getName(), new PrintWriter(System.err), new ModelFactory());
+			newModel = USECompiler.compileSpecification(new FileInputStream(trgModel), trgModel.getName(),
+					new PrintWriter(System.err), new ModelFactory());
 			newSystem = new MSystem(newModel);
 			newSession.setSystem(newSystem);
 			validator = new UseCTScrollingKodkodModelValidator(newSession);
 			PluginModelFactory.INSTANCE.registerForSession(newSession);
 			iModel = PluginModelFactory.INSTANCE.getModel(newModel);
-			readResult = readTerms(reader2, trgTermList, terms, newModel, iModel,
-					validator);
+			readResult = readTerms(reader2, trgTermList, terms, newModel, iModel, validator);
 		} else
-			readResult = readTerms(reader2, trgTermList, otherTerms, Main.getTggRuleCollection().getTargetModel());
+			readResult = readTerms(reader2, trgTermList, otherTerms, session.system().model());
 		if (trgTermList.isEmpty()) {
 			error = "There are no target classifying terms.";
 			return null;
@@ -184,7 +174,6 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 			return null;
 
 		monitor.setNote("Reading properties file");
-		System.out.println("Reading properties file");
 		monitor.setProgress(50);
 		HierarchicalINIConfiguration hierarchicalINIConfiguration = new HierarchicalINIConfiguration();
 		try {
@@ -206,7 +195,6 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		enricher.enrichModel(newSystem, iModel);
 
 		monitor.setNote("Finding models");
-		System.out.println("Finding models");
 		monitor.setProgress(60);
 		boolean running = true;
 		KodkodModelValidatorConfiguration configuration = KodkodModelValidatorConfiguration.INSTANCE;
@@ -267,8 +255,10 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 						matches = manager.findMatches();
 						for (Match match : matches) {
 							boolean result = match.run(session.system().state(), new PrintWriter(System.out));
-							if (result)
+							if (result) {
 								canSucceed = true;
+								break;
+							}
 						}
 						if (!canSucceed)
 							break;
@@ -276,7 +266,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 					systemStates.add(session.system().state());
 					List<Value> vals = new ArrayList<>();
 					for (Expression ex : otherTerms) {
-						Value val = eval.eval(ex, session.system().state());
+						Value val = eval.eval(ex, session.system().state(), session.system().varBindings());
 						vals.add(val);
 					}
 					otherTermSolutions.add(vals);
@@ -294,15 +284,14 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		} while (running);
 
 		if (termSolutions.size() == systemStates.size() && systemStates.size() == otherTermSolutions.size()) {
-			System.out.println("SUCCCCCCCCCCCCCCCCCCESS");
 			return new TestResult(srcTermList, trgTermList, systemStates, termSolutions, otherTermSolutions,
 					type == TransformationType.FORWARD);
 		}
-		error = String.format("List size mismatch: termSolutions = %d, systemStates = %d, otherTermSolutions = %d", 
+		error = String.format("List size mismatch: termSolutions = %d, systemStates = %d, otherTermSolutions = %d",
 				systemStates.size(), termSolutions.size(), otherTermSolutions.size());
 		return null;
 	}
-	
+
 	private boolean copySystemState(MSystem fromSys, Session toSes) {
 		MSystemState state = fromSys.state();
 		UseSystemApi api = UseSystemApi.create(toSes);
@@ -312,7 +301,8 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 				api.createObject(obj.cls().name(), obj.name());
 			}
 			for (MLink lnk : state.allLinks()) {
-				api.createLink(lnk.association().name(), lnk.linkedObjects().stream().map(it -> it.name()).collect(Collectors.toList()).toArray(new String[lnk.linkedObjectsAsArray().length]));
+				api.createLink(lnk.association().name(), lnk.linkedObjects().stream().map(it -> it.name())
+						.collect(Collectors.toList()).toArray(new String[lnk.linkedObjectsAsArray().length]));
 			}
 			for (MObject obj : state.allObjects()) {
 				for (Entry<MAttribute, Value> entry : obj.state(state).attributeValueMap().entrySet()) {
@@ -320,8 +310,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 				}
 			}
 			return true;
-		}
-		catch (UseApiException e) {
+		} catch (UseApiException e) {
 			error = "Error when copying system state: " + e.getMessage();
 			return false;
 		}
@@ -380,7 +369,6 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 	private boolean readTerms(BufferedReader reader, List<Pair<String>> terms, List<Expression> otherTerms,
 			MModel model) {
-		System.out.println("Reading terms without validator");
 		do {
 			try {
 				String name = reader.readLine();
@@ -422,7 +410,6 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 	private boolean readTerms(BufferedReader reader, List<Pair<String>> terms, List<ClassifyingTerm> cts, MModel model,
 			IModel iModel, UseCTScrollingKodkodModelValidator validator) {
-		System.out.println("Reading terms with validator");
 		do {
 			try {
 				String name = reader.readLine();

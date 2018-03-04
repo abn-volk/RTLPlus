@@ -16,7 +16,10 @@ public class TestResult implements TableModel {
 	
 	private List<Result> results;
 	private String[] columnNames;
-	
+	private boolean isForward;
+	private List<Pair<String>> srcTermList;
+	private List<Pair<String>> trgTermList;
+
 	public TestResult(List<Pair<String>> srcTermList, List<Pair<String>> trgTermList, List<MSystemState> systemStates,
 			List<LinkedHashMap<ClassifyingTerm, Value>> termSolutions, List<List<Value>> otherTermSolutions, boolean forward) {
 		results = new ArrayList<>();
@@ -24,10 +27,25 @@ public class TestResult implements TableModel {
 			results.add(new Result(systemStates.get(i), termSolutions.get(i), otherTermSolutions.get(i)));
 		}
 		columnNames = forward? new String[] {"Source CTs", "Target CTs"} : new String[] {"Target CTs", "Source CTs"};
+		isForward = forward;
+		this.srcTermList = srcTermList;
+		this.trgTermList = trgTermList;
 	}
 	
+	public List<Pair<String>> getSrcTermList() {
+		return srcTermList;
+	}
+
+	public List<Pair<String>> getTrgTermList() {
+		return trgTermList;
+	}
+
 	public List<Result> getResults() {
 		return results;
+	}
+	
+	public boolean isForward() {
+		return isForward;
 	}
 
 	@Override

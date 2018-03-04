@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -18,12 +19,15 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ProgressMonitor;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.tzi.use.config.Options;
 import org.tzi.use.gui.main.MainWindow;
+import org.tzi.use.gui.main.ViewFrame;
 import org.tzi.use.gui.util.ExtFileFilter;
 import org.tzi.use.main.Session;
+import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.testing.CtTester;
 import org.uet.dse.rtlplus.testing.TestResult;
 
@@ -35,7 +39,7 @@ public class TestDialog extends JDialog{
 		Container c0 = Box.createHorizontalBox();
 		c0.add(Box.createHorizontalStrut(10));
 		c0.add(labelSrcModel);
-		c0.add(Box.createHorizontalStrut(10));
+		c0.add(Box.createHorizontalGlue());
 		
 		JLabel labelTrgModel = new JLabel("Target metamodel: ");
 		JTextField textTrgModel = new JTextField(35);
@@ -121,7 +125,6 @@ public class TestDialog extends JDialog{
 		});
 		
 		JButton btnOK = new JButton("OK");
-		//TODO: implement action listener
 		btnOK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -144,6 +147,20 @@ public class TestDialog extends JDialog{
 							try {
 								TestResult res = tester.get();
 								parent.logWriter().println(String.format("Found %d solutions", res.getResults().size()));
+								SwingUtilities.invokeLater(new Runnable() {
+
+									@Override
+									public void run() {
+										TestResultDialog resDialog = new TestResultDialog(parent, session, res);
+										ViewFrame vf = new ViewFrame("Test result", null, "");
+										vf.setFrameIcon(new ImageIcon(Main.class.getResource("/resources/test.png")));
+										vf.setContentPane(resDialog);
+										vf.pack();
+										parent.addNewViewFrame(vf);
+										dispose();
+									}
+									
+								});
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							} catch (ExecutionException e) {
@@ -168,6 +185,7 @@ public class TestDialog extends JDialog{
 
 		Container content = getContentPane();
 		content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+		content.add(Box.createVerticalStrut(10));
 		content.add(c0);
 		content.add(Box.createVerticalStrut(10));
 		content.add(c1);
