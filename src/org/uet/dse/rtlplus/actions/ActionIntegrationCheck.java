@@ -1,6 +1,5 @@
 package org.uet.dse.rtlplus.actions;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -20,7 +19,7 @@ public class ActionIntegrationCheck implements IPluginActionDelegate {
 	@Override
 	public void performAction(IPluginAction pluginAction) {
 		MainWindow mainWindow = pluginAction.getParent();
-		PrintWriter logWriter = mainWindow.logWriter();
+		//PrintWriter logWriter = mainWindow.logWriter();
 		MSystemState state = pluginAction.getSession().system().state();
 		MatchManager manager = null;
 		if (Main.getTggRuleCollection().getType() == TransformationType.INTEGRATION) {

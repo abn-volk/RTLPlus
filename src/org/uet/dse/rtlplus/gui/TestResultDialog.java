@@ -1,11 +1,9 @@
 package org.uet.dse.rtlplus.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -64,7 +62,7 @@ public class TestResultDialog extends JPanel {
 		table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
-				Result res = result.getResults().get(arg0.getFirstIndex());
+				Result res = result.getResults().get(table.getSelectedRow());
 				session.system().reset();
 				copySystemState(res.getState(), session);
 				if (result.isForward()) {

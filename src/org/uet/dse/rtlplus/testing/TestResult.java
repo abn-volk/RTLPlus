@@ -3,7 +3,6 @@ package org.uet.dse.rtlplus.testing;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
