@@ -595,6 +595,12 @@ public class RtlObjectDiagram extends RtlDiagramView implements HighlightChangeL
 			break;
 		}
 	}
+	
+	public void clearAllData() {
+		fGraph.clear();
+		visibleData.clear();
+		hiddenData.clear();
+	}
 
 	/**
 	 * Adds a link to the diagram.

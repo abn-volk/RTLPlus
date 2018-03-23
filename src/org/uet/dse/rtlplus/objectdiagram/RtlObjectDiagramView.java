@@ -223,6 +223,14 @@ public class RtlObjectDiagramView extends JPanel implements View, PrintableView,
 		matchedObjects = e.getMatchedObjects();
 		fObjectDiagram.invalidateContent(true);
 	}
+	
+	@Subscribe
+	public void onSystemReset(SystemResetEvent e) {
+		matchedObjects.clear();
+		fObjectDiagram.clearAllData();
+		fObjectDiagram.invalidateContent(true);
+		fObjectDiagram.repaint();
+	}
 
 	/**
 	 * After the occurence of an event the view is updated.

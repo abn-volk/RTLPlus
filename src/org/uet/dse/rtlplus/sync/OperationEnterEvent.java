@@ -12,15 +12,16 @@ import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
 public class OperationEnterEvent {
 	private TransformationType type;
 	private Map<String, String> matchedObjects;
-	private Map<String, String> objectsToCreate; 
+	private Map<String, String> objectsToCreate;
 	private Map<String, String> corrObjsToCreate;
 	private List<CachedLink> linksToCreate;
 	private Set<String> matchedCorrObjs;
 	private String opName;
 	private String ruleName;
-	
-	public OperationEnterEvent(TransformationType type, Map<String, MObject> matchedObjects, Map<String, String> objectsToCreate, 
-			Map<String, String> corrObjsToCreate, List<CachedLink> linksToCreate, Set<String> corrParams, String opName, String ruleName) {
+
+	public OperationEnterEvent(TransformationType type, Map<String, MObject> matchedObjects,
+			Map<String, String> objectsToCreate, Map<String, String> corrObjsToCreate, List<CachedLink> linksToCreate,
+			Set<String> corrParams, String opName, String ruleName) {
 		super();
 		this.type = type;
 		this.matchedObjects = new HashMap<>();
@@ -31,16 +32,17 @@ public class OperationEnterEvent {
 		this.corrObjsToCreate = corrObjsToCreate;
 		this.linksToCreate = linksToCreate;
 		this.matchedCorrObjs = new HashSet<>();
-		for(String param : corrParams) {
+		for (String param : corrParams) {
 			matchedCorrObjs.add(matchedObjects.get(param).name());
 		}
 		this.opName = opName;
 		this.ruleName = ruleName;
 	}
-	
+
 	public Map<String, String> getMatchedObjects() {
 		return matchedObjects;
 	}
+
 	public Set<String> getMatchedCorrObjs() {
 		return matchedCorrObjs;
 	}
@@ -67,6 +69,11 @@ public class OperationEnterEvent {
 
 	public String getRuleName() {
 		return ruleName;
-	}	
-	
+	}
+
+	@Override
+	public String toString() {
+		return opName;
+	}
+
 }

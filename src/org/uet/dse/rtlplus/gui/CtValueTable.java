@@ -1,11 +1,14 @@
 package org.uet.dse.rtlplus.gui;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tzi.use.uml.ocl.value.Value;
@@ -36,6 +39,14 @@ public class CtValueTable extends JTable {
 		else return null;
 	}
 
+	@Override
+    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+        Component component = super.prepareRenderer(renderer, row, column);
+        int rendererWidth = component.getPreferredSize().width;
+        TableColumn tableColumn = getColumnModel().getColumn(column);
+        tableColumn.setPreferredWidth(Math.max(rendererWidth + getIntercellSpacing().width, tableColumn.getPreferredWidth()));
+        return component;
+     }
 
 	private static class CtValueTableModel implements TableModel {
 		

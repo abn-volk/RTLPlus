@@ -84,7 +84,7 @@ public class TestDialog extends JDialog{
 		JLabel labelSrcTerms = new JLabel("Source CTs: ");
 		JTextField textSrcTerms = new JTextField(35);
 		JButton btnSrcTerms = new JButton("Browse...");
-		btnSrcTerms.addActionListener(new FileChooserActionListener("Classifying terms for source metamodel", null, null, textSrcTerms));
+		btnSrcTerms.addActionListener(new FileChooserActionListener("Classifying terms for source metamodel", "txt", "Classifying terms", textSrcTerms));
 		Container c4 = Box.createHorizontalBox();
 		c4.add(Box.createHorizontalStrut(10));
 		c4.add(labelSrcTerms);
@@ -97,7 +97,7 @@ public class TestDialog extends JDialog{
 		JLabel labelTrgTerms = new JLabel("Target CTs: ");
 		JTextField textTrgTerms = new JTextField(35);
 		JButton btnTrgTerms = new JButton("Browse...");
-		btnTrgTerms.addActionListener(new FileChooserActionListener("Classifying terms for target metamodel", null, null, textTrgTerms));
+		btnTrgTerms.addActionListener(new FileChooserActionListener("Classifying terms for target metamodel", "txt", "Classifying terms", textTrgTerms));
 		Container c5 = Box.createHorizontalBox();
 		c5.add(Box.createHorizontalStrut(10));
 		c5.add(labelTrgTerms);
@@ -116,6 +116,19 @@ public class TestDialog extends JDialog{
 		c6.add(bwSpinner);
 		c6.add(Box.createHorizontalGlue());
 		
+		JLabel labelMapping = new JLabel("Mappings (optional): ");
+		JTextField textMapping = new JTextField(35);
+		JButton btnMapping = new JButton("Browse...");
+		btnMapping.addActionListener(new FileChooserActionListener("Open a mapping file", "txt", "Mapping file", textMapping));
+		Container c8 = Box.createHorizontalBox();
+		c8.add(Box.createHorizontalStrut(10));
+		c8.add(labelMapping);
+		c8.add(Box.createHorizontalStrut(10));
+		c8.add(textMapping);
+		c8.add(Box.createHorizontalStrut(10));
+		c8.add(btnMapping);
+		c8.add(Box.createHorizontalStrut(10));
+		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			@Override
@@ -123,6 +136,7 @@ public class TestDialog extends JDialog{
 				dispose();
 			}
 		});
+		
 		
 		JButton btnOK = new JButton("OK");
 		btnOK.addActionListener(new ActionListener() {
@@ -136,8 +150,11 @@ public class TestDialog extends JDialog{
 				String srcTerms = textSrcTerms.getText();
 				String trgTerms = textTrgTerms.getText();
 				Integer bw = (Integer) bwSpinner.getValue();
+				String mappingFile = textMapping.getText();
 				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Test running", "", 0, 100);
-				CtTester tester = new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw);
+				CtTester tester = (mappingFile.isEmpty())?
+					new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw) :
+						new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw, new File(mappingFile));
 				tester.addPropertyChangeListener(new PropertyChangeListener() {
 
 					@Override
@@ -199,6 +216,8 @@ public class TestDialog extends JDialog{
 		content.add(c5);
 		content.add(Box.createVerticalStrut(10));
 		content.add(c6);
+		content.add(Box.createVerticalStrut(10));
+		content.add(c8);
 		content.add(Box.createVerticalStrut(10));
 		content.add(c7);
 		content.add(Box.createVerticalStrut(10));

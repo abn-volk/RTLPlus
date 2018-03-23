@@ -10,6 +10,7 @@ import javax.swing.table.TableModel;
 import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MSystemState;
 import org.tzi.use.util.Pair;
+import org.uet.dse.rtlplus.sync.OperationEnterEvent;
 
 public class TestResult implements TableModel {
 	
@@ -18,17 +19,21 @@ public class TestResult implements TableModel {
 	private boolean isForward;
 	private List<Pair<String>> srcTermList;
 	private List<Pair<String>> trgTermList;
-
+	
+	
 	public TestResult(List<Pair<String>> srcTermList, List<Pair<String>> trgTermList, List<MSystemState> systemStates,
-			List<LinkedHashMap<ClassifyingTerm, Value>> termSolutions, List<List<Value>> otherTermSolutions, boolean forward) {
+			List<LinkedHashMap<ClassifyingTerm, Value>> termSolutions, List<List<Value>> otherTermSolutions, boolean forward, 
+			List<List<String>> termEvalLogs, List<List<String>> otherTermEvalLogs, List<List<OperationEnterEvent>> transformations, List<Mapping> mappings) {
 		results = new ArrayList<>();
 		for (int i = 0; i < systemStates.size(); i++) {
-			results.add(new Result(systemStates.get(i), termSolutions.get(i), otherTermSolutions.get(i)));
+			results.add(new Result(systemStates.get(i), termSolutions.get(i), otherTermSolutions.get(i),
+					termEvalLogs.get(i), otherTermEvalLogs.get(i), transformations.get(i), mappings));
 		}
-		columnNames = forward? new String[] {"Source CTs", "Target CTs"} : new String[] {"Target CTs", "Source CTs"};
+		columnNames = forward? new String[] {"Source CTs", "Target CTs", "Result"} : new String[] {"Target CTs", "Source CTs", "Result"};
 		isForward = forward;
 		this.srcTermList = srcTermList;
 		this.trgTermList = trgTermList;
+		
 	}
 	
 	public List<Pair<String>> getSrcTermList() {
@@ -38,7 +43,19 @@ public class TestResult implements TableModel {
 	public List<Pair<String>> getTrgTermList() {
 		return trgTermList;
 	}
+	
+	public List<Pair<String>> getLeftTermList() {
+		if (isForward)
+			return srcTermList;
+		else return trgTermList;
+	}
 
+	public List<Pair<String>> getRightTermList() {
+		if (isForward)
+			return trgTermList;
+		else return srcTermList;
+	}
+	
 	public List<Result> getResults() {
 		return results;
 	}
@@ -58,7 +75,7 @@ public class TestResult implements TableModel {
 
 	@Override
 	public int getColumnCount() {
-		return 2;
+		return 3;
 	}
 
 	@Override
@@ -74,10 +91,14 @@ public class TestResult implements TableModel {
 	@Override
 	public Object getValueAt(int row, int col) {
 		Result res = results.get(row);
-		if (col == 0) 
+		switch(col) {
+		case 0:
 			return res.getTermSolutionString();
-		else 
+		case 1:
 			return res.getOtherTermSolutionString();
+		default:
+			return res.getResult().getFinalResult().toString();
+		}
 	}
 
 	@Override

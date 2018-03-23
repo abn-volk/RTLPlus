@@ -15,5 +15,8 @@ public class CachedLink {
 		this.linkedObjects = linkedObjects;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return association + "(" + String.join(", ", linkedObjects) + ")";
+	}
 }

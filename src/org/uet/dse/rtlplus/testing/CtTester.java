@@ -3,6 +3,7 @@ package org.uet.dse.rtlplus.testing;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -67,6 +68,7 @@ import org.uet.dse.rtlplus.matching.ForwardMatchManager;
 import org.uet.dse.rtlplus.matching.Match;
 import org.uet.dse.rtlplus.matching.MatchManager;
 import org.uet.dse.rtlplus.mm.MRuleCollection.TransformationType;
+import org.uet.dse.rtlplus.sync.OperationEnterEvent;
 
 import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
@@ -88,6 +90,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 	private String trgTerms;
 	private ProgressMonitor monitor;
 	private int bitwidth;
+	private File mappingFile;
 	private String error;
 
 	public CtTester(Session session, File srcModel, File trgModel, String tggName, File propFile, String srcTerms,
@@ -102,6 +105,21 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		this.trgTerms = trgTerms;
 		this.monitor = monitor;
 		this.bitwidth = bitwidth;
+	}
+	
+	public CtTester(Session session, File srcModel, File trgModel, String tggName, File propFile, String srcTerms,
+			String trgTerms, ProgressMonitor monitor, int bitwidth, File mappingFile) {
+		super();
+		this.session = session;
+		this.srcModel = srcModel;
+		this.trgModel = trgModel;
+		this.tggName = tggName;
+		this.propFile = propFile;
+		this.srcTerms = srcTerms;
+		this.trgTerms = trgTerms;
+		this.monitor = monitor;
+		this.bitwidth = bitwidth;
+		this.mappingFile = mappingFile;
 	}
 
 	@Override
@@ -191,6 +209,13 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 			error = LogMessages.configurationError;
 			return null;
 		}
+		
+		monitor.setNote("Reading mappings");
+		monitor.setProgress(55);
+		List<Mapping> mappings = new ArrayList<>();
+		if (mappingFile != null)
+			readMappings(mappingFile, mappings, terms.size(), otherTerms.size());
+		
 		ModelEnricher enricher = KodkodModelValidatorConfiguration.INSTANCE.getModelEnricher();
 		enricher.enrichModel(newSystem, iModel);
 
@@ -201,8 +226,11 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		configuration.setBitwidth(bitwidth);
 		List<Map<Relation, TupleSet>> solutions = new ArrayList<Map<Relation, TupleSet>>();
 		List<LinkedHashMap<ClassifyingTerm, Value>> termSolutions = new ArrayList<>();
+		List<List<String>> termEvalLogs = new ArrayList<>();
 		List<MSystemState> systemStates = new ArrayList<>();
 		List<List<Value>> otherTermSolutions = new ArrayList<>();
+		List<List<String>> otherTermEvalLogs = new ArrayList<>();
+		List<List<OperationEnterEvent>> transformations = new ArrayList<>(terms.size());
 		do {
 			if (termSolutions.size() > 0) {
 				Formula f = genClassifyingTermFormula(termSolutions, terms, iModel);
@@ -229,17 +257,22 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 					solutions.add(solution.instance().relationTuples());
 					Evaluator eval = new Evaluator();
 					LinkedHashMap<ClassifyingTerm, Value> solutionMap = new LinkedHashMap<>(terms.size());
+					List<String> solutionLogs = new ArrayList<>(terms.size());
 					for (ClassifyingTerm term : terms) {
+						StringWriter sr = new StringWriter();
+						PrintWriter pr = new PrintWriter(sr);
 						Value kodkodEval = evaluateKodkod(term, solver.evaluator());
-						Value useEval = eval.eval(term.oclExpression(), newSession.system().state());
+						Value useEval = eval.eval(term.oclExpression(), newSession.system().state(), newSession.system().varBindings(), pr);
 						if (kodkodEval != null && !kodkodEval.equals(useEval)) {
 							error = "Kodkod and USE evaluate classifying term " + StringUtil.inQuotes(term.name())
 									+ " differently. Kodkod: " + kodkodEval + "; USE: " + useEval;
 							return null;
 						}
 						solutionMap.put(term, useEval);
+						solutionLogs.add(sr.toString());
 					}
 					termSolutions.add(solutionMap);
+					termEvalLogs.add(solutionLogs);
 
 					// Copy system state and transform model
 					session.reset();
@@ -247,8 +280,10 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 					if (!copyRes)
 						return null;
 					MatchManager manager = (type == TransformationType.FORWARD)
-							? new ForwardMatchManager(session.system().state(), false)
-							: new BackwardMatchManager(session.system().state(), false);
+							? new ForwardMatchManager(session.system().state(), true)
+							: new BackwardMatchManager(session.system().state(), true);
+					OperationCollector collector = new OperationCollector();
+					collector.subscribe(session.system().getEventBus());
 					List<Match> matches;
 					do {
 						boolean canSucceed = false;
@@ -263,13 +298,20 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 						if (!canSucceed)
 							break;
 					} while (matches.size() > 0);
+					transformations.add(collector.getEventList());
+					collector.unsubscribe(session.system().getEventBus());
 					systemStates.add(session.system().state());
-					List<Value> vals = new ArrayList<>();
+					List<Value> vals = new ArrayList<>(otherTerms.size());
+					List<String> logs = new ArrayList<>(otherTerms.size());
 					for (Expression ex : otherTerms) {
-						Value val = eval.eval(ex, session.system().state(), session.system().varBindings());
+						StringWriter sr = new StringWriter();
+						PrintWriter pr = new PrintWriter(sr);
+						Value val = eval.eval(ex, session.system().state(), session.system().varBindings(), pr);
 						vals.add(val);
+						logs.add(sr.toString());
 					}
 					otherTermSolutions.add(vals);
+					otherTermEvalLogs.add(logs);
 					break;
 				case UNSATISFIABLE:
 				case TRIVIALLY_UNSATISFIABLE:
@@ -285,7 +327,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 		if (termSolutions.size() == systemStates.size() && systemStates.size() == otherTermSolutions.size()) {
 			return new TestResult(srcTermList, trgTermList, systemStates, termSolutions, otherTermSolutions,
-					type == TransformationType.FORWARD);
+					type == TransformationType.FORWARD, termEvalLogs, otherTermEvalLogs, transformations, mappings);
 		}
 		error = String.format("List size mismatch: termSolutions = %d, systemStates = %d, otherTermSolutions = %d",
 				systemStates.size(), termSolutions.size(), otherTermSolutions.size());
@@ -509,6 +551,28 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 			}
 		}
 		return kodkodEval;
+	}
+	
+	private boolean readMappings(File mappingFile, List<Mapping> mappings, int numLeftTerms, int numRightTerms) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(mappingFile))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				Mapping m = Mapping.fromString(line, numLeftTerms, numRightTerms);
+				if (m != null)
+					mappings.add(m);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			error = e.getMessage();
+			return false;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			error = e.getMessage();
+			return false;
+		}
+		return true;
 	}
 
 	@Override
