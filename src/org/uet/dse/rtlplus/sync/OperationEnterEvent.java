@@ -18,10 +18,11 @@ public class OperationEnterEvent {
 	private Set<String> matchedCorrObjs;
 	private String opName;
 	private String ruleName;
+	private List<String> commands;
 
 	public OperationEnterEvent(TransformationType type, Map<String, MObject> matchedObjects,
 			Map<String, String> objectsToCreate, Map<String, String> corrObjsToCreate, List<CachedLink> linksToCreate,
-			Set<String> corrParams, String opName, String ruleName) {
+			Set<String> corrParams, String opName, String ruleName, List<String> commands) {
 		super();
 		this.type = type;
 		this.matchedObjects = new HashMap<>();
@@ -37,6 +38,7 @@ public class OperationEnterEvent {
 		}
 		this.opName = opName;
 		this.ruleName = ruleName;
+		this.commands = commands;
 	}
 
 	public Map<String, String> getMatchedObjects() {
@@ -69,6 +71,10 @@ public class OperationEnterEvent {
 
 	public String getRuleName() {
 		return ruleName;
+	}
+
+	public List<String> getCommands() {
+		return commands;
 	}
 
 	@Override

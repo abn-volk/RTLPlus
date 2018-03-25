@@ -152,28 +152,11 @@ public class TestResultDialog extends JPanel {
 					List<String> objNames = new ArrayList<>(event.getMatchedObjects().values());
 					List<String> newObjNames = new ArrayList<>(event.getObjectsToCreate().values());
 					newObjNames.addAll(event.getCorrObjsToCreate().values());
-					List<CachedLink> newLinks = event.getLinksToCreate();
 					List<MObject> objs = objNames.stream().map((it) -> session.system().state().objectByName(it)).collect(Collectors.toList());
 					List<MObject> newObjs = newObjNames.stream().map((it) -> session.system().state().objectByName(it)).collect(Collectors.toList());
 					objs.addAll(newObjs);
 					eventBus.post(new MatchSelectedEvent(objs));
-					StringBuilder sb = new StringBuilder();
-					if (objNames.size() > 0) {
-						sb.append("Matched objects:\n")
-							.append(String.join(", ", objNames))
-							.append("\n");
-					}
-					if (newObjNames.size() > 0) {
-						sb.append("Created objects:\n")
-							.append(String.join(", ", newObjNames))
-							.append("\n");
-					}
-					if (newLinks.size() > 0) {
-						sb.append("Created links:\n")
-							.append(String.join(", ", newLinks.stream().map((it) -> it.toString()).collect(Collectors.toList())))
-							.append("\n");
-					}
-					transLog.setText(sb.toString());
+					transLog.setText(event.getCommands().stream().skip(1).collect(Collectors.joining("\n", "Executed commands:\n", "")));
 				} else {
 					eventBus.post(new MatchSelectedEvent(new ArrayList<MObject>(0)));
 					transLog.setText("");

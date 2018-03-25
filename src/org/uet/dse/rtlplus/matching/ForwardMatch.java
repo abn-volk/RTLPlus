@@ -64,7 +64,7 @@ public class ForwardMatch extends Match {
 			systemState.system().getEventBus()
 					.post(new OperationEnterEvent(TransformationType.FORWARD, objectList,
 							rule.getTrgRule().getObjectsToCreate(), rule.getCorrRule().getObjectsToCreate(),
-							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName()));
+							rule.getTrgRule().getLinksToCreate(), corrParams, operation.name(), rule.getName(), commands));
 		int count = 0;
 		String openter = "openter rc " + operation.name() + "("
 				+ operation.paramNames().stream().collect(Collectors.joining(", ")) + ")";
