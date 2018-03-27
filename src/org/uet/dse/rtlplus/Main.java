@@ -43,5 +43,13 @@ public class Main implements IPlugin {
 	public static SyncData getSyncData() {
 		return syncData;
 	}
+	
+	public static String targetMM = "";
+	public static String tggFile = "";
+	public static String prop = "";
+	public static String sourceCT = "";
+	public static String targetCT = "";
+	public static int bitwidth = 8;
+	public static String mapping = "";
 
 }

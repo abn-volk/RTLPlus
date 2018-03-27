@@ -44,6 +44,7 @@ public class TestDialog extends JDialog{
 		JLabel labelTrgModel = new JLabel("Target metamodel: ");
 		JTextField textTrgModel = new JTextField(35);
 		labelTrgModel.setLabelFor(textTrgModel);
+		textTrgModel.setText(Main.targetMM);
 		JButton btnTrgModel = new JButton("Browse...");
 		btnTrgModel.addActionListener(new FileChooserActionListener("Open target metamodel", "use", "USE specification", textTrgModel));
 		Container c1 = Box.createHorizontalBox();
@@ -57,6 +58,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelTggFile = new JLabel("TGG file: ");
 		JTextField textTggFile = new JTextField(35);
+		labelTggFile.setLabelFor(textTggFile);
+		textTggFile.setText(Main.tggFile);
 		JButton btnTggFile = new JButton("Browse...");
 		btnTggFile.addActionListener(new FileChooserActionListener("Open TGG file", "tgg", "TGG rules", textTggFile));
 		Container c2 = Box.createHorizontalBox();
@@ -70,6 +73,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelProp = new JLabel("Properties file: ");
 		JTextField textProp = new JTextField(35);
+		labelProp.setLabelFor(textProp);
+		textProp.setText(Main.prop);
 		JButton btnProp = new JButton("Browse...");
 		btnProp.addActionListener(new FileChooserActionListener("Open properties file", "properties", "Properties file", textProp));
 		Container c3 = Box.createHorizontalBox();
@@ -83,6 +88,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelSrcTerms = new JLabel("Source CTs: ");
 		JTextField textSrcTerms = new JTextField(35);
+		labelSrcTerms.setLabelFor(textSrcTerms);
+		textSrcTerms.setText(Main.sourceCT);
 		JButton btnSrcTerms = new JButton("Browse...");
 		btnSrcTerms.addActionListener(new FileChooserActionListener("Classifying terms for source metamodel", "txt", "Classifying terms", textSrcTerms));
 		Container c4 = Box.createHorizontalBox();
@@ -96,6 +103,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelTrgTerms = new JLabel("Target CTs: ");
 		JTextField textTrgTerms = new JTextField(35);
+		labelTrgTerms.setLabelFor(textTrgTerms);
+		textTrgTerms.setText(Main.targetCT);
 		JButton btnTrgTerms = new JButton("Browse...");
 		btnTrgTerms.addActionListener(new FileChooserActionListener("Classifying terms for target metamodel", "txt", "Classifying terms", textTrgTerms));
 		Container c5 = Box.createHorizontalBox();
@@ -109,6 +118,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelBitwidth = new JLabel("Bitwidth: ");
 		JSpinner bwSpinner = new JSpinner(new SpinnerNumberModel(8, 1, 32, 1));
+		labelBitwidth.setLabelFor(bwSpinner);
+		bwSpinner.setValue(Main.bitwidth);
 		Container c6 = Box.createHorizontalBox();
 		c6.add(Box.createHorizontalStrut(10));
 		c6.add(labelBitwidth);
@@ -118,6 +129,8 @@ public class TestDialog extends JDialog{
 		
 		JLabel labelMapping = new JLabel("Mappings (optional): ");
 		JTextField textMapping = new JTextField(35);
+		labelMapping.setLabelFor(textMapping);
+		textMapping.setText(Main.mapping);
 		JButton btnMapping = new JButton("Browse...");
 		btnMapping.addActionListener(new FileChooserActionListener("Open a mapping file", "txt", "Mapping file", textMapping));
 		Container c8 = Box.createHorizontalBox();
@@ -142,7 +155,13 @@ public class TestDialog extends JDialog{
 		btnOK.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("OK clicked");
+				Main.targetMM = textTrgModel.getText();
+				Main.tggFile = textTggFile.getText();
+				Main.prop = textProp.getText();
+				Main.sourceCT = textSrcTerms.getText();
+				Main.targetCT = textTrgTerms.getText();
+				Main.bitwidth = (Integer) bwSpinner.getValue();
+				Main.mapping = textMapping.getText();
 				File srcModel = Options.getRecentFile("use").toFile();
 				File trgModel = new File(textTrgModel.getText());
 				String tggName = textTggFile.getText();
@@ -152,6 +171,7 @@ public class TestDialog extends JDialog{
 				Integer bw = (Integer) bwSpinner.getValue();
 				String mappingFile = textMapping.getText();
 				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Running...", "", 0, 100);
+				monitor.setProgress(0);
 				monitor.setMillisToPopup(0);
 				CtTester tester = (mappingFile.isEmpty())?
 					new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw) :
@@ -192,7 +212,6 @@ public class TestDialog extends JDialog{
 					}
 					
 				});
-				monitor.setProgress(0);
 				tester.execute();
 			}
 			
