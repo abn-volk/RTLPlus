@@ -151,44 +151,49 @@ public class TestDialog extends JDialog{
 				String trgTerms = textTrgTerms.getText();
 				Integer bw = (Integer) bwSpinner.getValue();
 				String mappingFile = textMapping.getText();
-				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Test running", "", 0, 100);
+				ProgressMonitor monitor = new ProgressMonitor(TestDialog.this, "Running...", "", 0, 100);
+				monitor.setMillisToPopup(0);
 				CtTester tester = (mappingFile.isEmpty())?
 					new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw) :
 						new CtTester(session, srcModel, trgModel, tggName, propFile, srcTerms, trgTerms, monitor, bw, new File(mappingFile));
 				tester.addPropertyChangeListener(new PropertyChangeListener() {
-
 					@Override
 					public void propertyChange(PropertyChangeEvent arg0) {
-						System.out.println(arg0.getNewValue());
 						if (SwingWorker.StateValue.DONE.equals(arg0.getNewValue())) {
+							monitor.setProgress(100);
+							monitor.close();
 							try {
 								TestResult res = tester.get();
-								parent.logWriter().println(String.format("Found %d solutions", res.getResults().size()));
-								SwingUtilities.invokeLater(new Runnable() {
-
-									@Override
-									public void run() {
-										TestResultDialog resDialog = new TestResultDialog(parent, session, res);
-										ViewFrame vf = new ViewFrame("Test result", null, "");
-										vf.setFrameIcon(new ImageIcon(Main.class.getResource("/resources/test.png")));
-										vf.setContentPane(resDialog);
-										vf.pack();
-										parent.addNewViewFrame(vf);
-										dispose();
-									}
-									
-								});
+								if (res != null) {
+									parent.logWriter().println(String.format("Found %d solutions", res.getResults().size()));
+									SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											TestResultDialog resDialog = new TestResultDialog(parent, session, res);
+											ViewFrame vf = new ViewFrame("Test result", null, "");
+											vf.setFrameIcon(new ImageIcon(Main.class.getResource("/resources/test.png")));
+											vf.setContentPane(resDialog);
+											vf.pack();
+											parent.addNewViewFrame(vf);
+											dispose();
+										}
+									});
+								}
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							} catch (ExecutionException e) {
 								e.printStackTrace();
 							}
 						}
+						else if ("progress".equals(arg0.getPropertyName())) {
+							int progress = (Integer) arg0.getNewValue();
+							monitor.setProgress(progress);
+						}
 					}
 					
 				});
-				tester.run();
-				
+				monitor.setProgress(0);
+				tester.execute();
 			}
 			
 		});

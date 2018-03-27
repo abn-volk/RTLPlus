@@ -124,8 +124,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 	@Override
 	protected TestResult doInBackground() throws Exception {
-		monitor.setNote("Loading metamodels and rules");
-		monitor.setProgress(20);
+		setProgress(20);
 		RTLLoader loader = new RTLLoader(session, srcModel, trgModel, tggName, new PrintWriter(System.out));
 		boolean res = loader.run();
 		if (!res) {
@@ -147,8 +146,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		List<Expression> otherTerms = new ArrayList<>();
 		MModel newModel;
 
-		monitor.setNote("Reading source classifying terms");
-		monitor.setProgress(30);
+		setProgress(30);
 		BufferedReader reader = new BufferedReader(new USECommentFilterReader(new FileReader(srcTerms)));
 		List<Pair<String>> srcTermList = new ArrayList<>();
 		if (type == TransformationType.FORWARD) {
@@ -169,8 +167,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		if (!readResult)
 			return null;
 
-		monitor.setNote("Reading target classifying terms");
-		monitor.setProgress(40);
+		setProgress(40);
 		BufferedReader reader2 = new BufferedReader(new USECommentFilterReader(new FileReader(trgTerms)));
 		List<Pair<String>> trgTermList = new ArrayList<>();
 		if (type == TransformationType.BACKWARD) {
@@ -191,8 +188,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		if (!readResult)
 			return null;
 
-		monitor.setNote("Reading properties file");
-		monitor.setProgress(50);
+		setProgress(50);
 		HierarchicalINIConfiguration hierarchicalINIConfiguration = new HierarchicalINIConfiguration();
 		try {
 			hierarchicalINIConfiguration.load(new USECommentFilterReader(new FileReader(propFile)));
@@ -210,8 +206,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 			return null;
 		}
 		
-		monitor.setNote("Reading mappings");
-		monitor.setProgress(55);
+		setProgress(55);
 		List<Mapping> mappings = new ArrayList<>();
 		if (mappingFile != null)
 			readMappings(mappingFile, mappings, terms.size(), otherTerms.size());
@@ -219,8 +214,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		ModelEnricher enricher = KodkodModelValidatorConfiguration.INSTANCE.getModelEnricher();
 		enricher.enrichModel(newSystem, iModel);
 
-		monitor.setNote("Finding models");
-		monitor.setProgress(60);
+		setProgress(60);
 		boolean running = true;
 		KodkodModelValidatorConfiguration configuration = KodkodModelValidatorConfiguration.INSTANCE;
 		configuration.setBitwidth(bitwidth);
@@ -232,6 +226,10 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 		List<List<String>> otherTermEvalLogs = new ArrayList<>();
 		List<List<OperationEnterEvent>> transformations = new ArrayList<>(terms.size());
 		do {
+			if (monitor.isCanceled()) {
+				error = "The process has been cancelled.";
+				return null;
+			}
 			if (termSolutions.size() > 0) {
 				Formula f = genClassifyingTermFormula(termSolutions, terms, iModel);
 				((ModelConfigurator) iModel.getConfigurator()).setSolutionFormula(f);
@@ -247,7 +245,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 						ObjectDiagramCreator creator = new ObjectDiagramCreator(iModel, newSession);
 						creator.create(solution.instance().relationTuples());
 						if (creator.hasDiagramErrors() == ErrorType.STRUCTURE) {
-							error = "The q created object diagram has structural errors!";
+							error = "The created object diagram has structural errors!";
 							return null;
 						}
 					} catch (UseApiException e) {
@@ -577,9 +575,7 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 
 	@Override
 	protected void done() {
-		monitor.setProgress(100);
 		if (error != null) {
-			System.out.println(error);
 			JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}

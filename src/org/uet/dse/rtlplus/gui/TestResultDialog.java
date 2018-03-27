@@ -20,6 +20,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -246,8 +247,13 @@ public class TestResultDialog extends JPanel {
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				leftScrollPane, rightScrollPane);
-		splitPane.setDividerLocation(0.5f);
 		add(splitPane);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				splitPane.setDividerLocation(0.5);
+			}
+		});
 	}
 
 	private boolean copySystemState(MSystemState state, Session toSes) {
