@@ -131,7 +131,7 @@ public class TestResultDialog extends JPanel {
 		
 		JLabel validationLabel = new JLabel("Validation result");
 		validationLabel.setAlignmentX(CENTER_ALIGNMENT);
-		JTextArea validationResult = new JTextArea(5, 20);
+		JTextArea validationResult = new JTextArea(3, 20);
 		validationResult.setEditable(false);
 		
 		JLabel transLabel = new JLabel("Executed transformations");

@@ -322,7 +322,10 @@ public class CtTester extends SwingWorker<TestResult, Void> {
 				return null;
 			}
 		} while (running);
-
+		if (termSolutions.isEmpty()) {
+			error = "No solutions were found!";
+			return null;
+		}
 		if (termSolutions.size() == systemStates.size() && systemStates.size() == otherTermSolutions.size()) {
 			return new TestResult(srcTermList, trgTermList, systemStates, termSolutions, otherTermSolutions,
 					type == TransformationType.FORWARD, termEvalLogs, otherTermEvalLogs, transformations, mappings);
