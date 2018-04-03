@@ -40,7 +40,7 @@ public class AstCorr {
 	public MPattern gen(Context ctx) throws MInvalidModelException, MSystemException {
 		List<MObject> objs = new ArrayList<>();
 		List<MLink> lnks = new ArrayList<>();
-		Map<String, List<String>> invs = new LinkedHashMap<>();
+		Map<String, List<AstInvariantCondition>> invs = new LinkedHashMap<>();
 		for (AstCorrLink corrLink : linkList) {
 			MCorrLink lnk = corrLink.gen(ctx);
 			objs.add(lnk.getObj());
@@ -56,7 +56,7 @@ public class AstCorr {
 	public MPattern gen(Context ctx, List<String> srcLnkCons, List<String> trgLnkCons) throws MInvalidModelException, MSystemException {
 		List<MObject> objs = new ArrayList<>();
 		List<MLink> lnks = new ArrayList<>();
-		Map<String, List<String>> invs = new LinkedHashMap<>();
+		Map<String, List<AstInvariantCondition>> invs = new LinkedHashMap<>();
 		for (AstCorrLink corrLink : linkList) {
 			MCorrLink lnk = corrLink.gen(ctx, srcLnkCons, trgLnkCons);
 			objs.add(lnk.getObj());

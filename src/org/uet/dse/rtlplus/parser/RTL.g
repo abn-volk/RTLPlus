@@ -12,7 +12,7 @@ options {
 package org.uet.dse.rtlplus.parser;
 
 import org.tzi.use.parser.base.BaseParser;
-import org.uet.dse.rtlplus.parser.ast.*;
+import org.uet.dse.rtlplus.parser.ast.tgg.*;
 }
 
 @lexer::header {
@@ -103,7 +103,14 @@ invariantTGG returns [AstInvariantTgg n]
 	:	
 		name=IDENT { $n = new AstInvariantTgg($name.text); }
 		COLON 
-		(cond=EQUAL_COND_EXPR { $n.addCondition($cond.text); } )+
+		(cond=invariantCondition { $n.addCondition($cond.n); } )+
+	;
+	
+invariantCondition returns [AstInvariantCondition n]
+	:
+		cond=EQUAL_COND_EXPR { $n = new AstInvariantCondition($cond.text); }
+		(fImpl=COND_IMPL { $n.setForwardImpl($fImpl.text); }
+		 bImpl=COND_IMPL { $n.setBackwardImpl($bImpl.text); } )?
 	;
 	
 /*
@@ -203,6 +210,7 @@ RPAREN		 : ')';
 SEMI		 : ';';
 SLASH 		 : '/';
 STAR 		 : '*';
+BTICK        : '`';	
 
 fragment
 INT:
@@ -278,12 +286,17 @@ VOCAB:
 --------- Start of file RTLLexerRules.gpart --------------------
 */
 
+COND_IMPL
+	:	
+		BTICK (~BTICK)* BTICK {setText(getText().substring(1, getText().length()-1));}
+	;
+
 EQUAL_COND_EXPR
 	:
-	 	LBRACK (~(RBRACK|EQUAL))* EQUAL (~(RBRACK|EQUAL))* RBRACK {setText(getText().substring(1, getText().length()-1));}
+	 	LBRACK (~(RBRACK|EQUAL|SEMI))* EQUAL (~(RBRACK|EQUAL))* RBRACK {setText(getText().substring(1, getText().length()-1));}
 	;
 
 COND_EXPR
 	:
-	    LBRACK (~(']'))* RBRACK {setText(getText().substring(1, getText().length()-1));}
+	    LBRACK (~(RBRACK|SEMI))* RBRACK {setText(getText().substring(1, getText().length()-1));}
 	;

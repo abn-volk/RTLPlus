@@ -296,7 +296,7 @@ public class SyncWorker {
 							if (strs != null) {
 								//System.out.println("Strs = " + strs.toString());
 								for (String str : strs) {
-									String line = "set " + str.replace("self", corr);
+									String line = "set " + str.replace("self.", corr + ".");
 									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
 											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
 									if (statement == null) {
@@ -326,7 +326,7 @@ public class SyncWorker {
 							Set<String> strs = backwardCmdsForCorr.get(corrObj.cls().name());
 							if (strs != null) {
 								for (String str : strs) {
-									String line = "set " + str.replace("self", corr);
+									String line = "set " + str.replace("self.", corr + ".");
 									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
 											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
 									if (statement == null) {

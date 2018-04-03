@@ -1,5 +1,6 @@
 package org.uet.dse.rtlplus.sync;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -10,6 +11,7 @@ import java.util.Set;
 import org.tzi.use.uml.sys.MObject;
 import org.uet.dse.rtlplus.mm.MRuleCollection;
 import org.uet.dse.rtlplus.mm.MTggRule;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstInvariantCondition;
 
 public class SyncData {
 	private Map<String, Set<MTggRule>> rulesForSrcClass;
@@ -53,9 +55,9 @@ public class SyncData {
 				tggRules.add(tggRule);
 
 			}
-			for (Map.Entry<String, List<String>> entry : tggRule.getCorrRule().getRhs().getInvariantList().entrySet()) {
+			for (Map.Entry<String, List<AstInvariantCondition>> entry : tggRule.getCorrRule().getRhs().getInvariantList().entrySet()) {
 				String cls = entry.getKey();
-				List<String> invs = entry.getValue();
+				List<AstInvariantCondition> invs = entry.getValue();
 				Set<String> fCmds = forwardCmdsForCorr.get(cls);
 				if (fCmds == null) {
 					fCmds = new HashSet<>(2);
@@ -66,16 +68,18 @@ public class SyncData {
 					bCmds = new HashSet<>(2);
 					backwardCmdsForCorr.put(cls, bCmds);
 				}
-				for (String inv : invs) {
-					fCmds.add(inv.replace("=", ":="));
-					String[] parts = inv.split("=");
-					bCmds.add(parts[1] + ":=" + parts[0]);
+				for (AstInvariantCondition inv : invs) {
+					if (inv.getForwardImpl() != null && inv.getBackwardImpl() != null) {
+						fCmds.addAll(Arrays.asList(inv.getForwardImpl().split(";")));
+						bCmds.addAll(Arrays.asList(inv.getBackwardImpl().split(";")));
+					} else {
+						fCmds.add(inv.getCondition().replace("=", ":="));
+						String[] parts = inv.getCondition().split("=");
+						bCmds.add(parts[1] + ":=" + parts[0]);
+					}
 				}
 			}
 		}
-//		System.out.println(forwardCmdsForCorr.toString());
-//		System.out.println("=============================");
-//		System.out.println(backwardCmdsForCorr.toString());
 	}
 
 	public Map<String, Set<MTggRule>> getRulesForSrcClass() {

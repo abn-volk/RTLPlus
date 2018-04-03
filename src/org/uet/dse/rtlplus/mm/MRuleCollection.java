@@ -11,6 +11,7 @@ import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MModel;
 import org.uet.dse.rtlplus.parser.Context;
 import org.uet.dse.rtlplus.parser.RTLKeyword;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstInvariantCondition;
 
 public class MRuleCollection {
 	public static enum TransformationType {
@@ -98,24 +99,24 @@ public class MRuleCollection {
 		boolean hasConstraints = false;
 		StringBuilder sb = new StringBuilder("---------- Correlation invariants ----------\nconstraints\n");
 		for (MTggRule rule : rules.values()) {
-			Map<String, List<String>> lhsInvs = rule.getCorrRule().getLhs().getInvariantList();
+			Map<String, List<AstInvariantCondition>> lhsInvs = rule.getCorrRule().getLhs().getInvariantList();
 			if (lhsInvs != null) {
 				for (String cls : lhsInvs.keySet()) {
 					if (lhsInvs.get(cls).size() > 0) {
 						hasConstraints = true;
 						sb.append(RTLKeyword.context + " " + cls + " inv:\n    ");
-						sb.append(lhsInvs.get(cls).stream().collect(Collectors.joining(" and ")));
+						sb.append(lhsInvs.get(cls).stream().map(it -> it.getCondition()).collect(Collectors.joining(" and ")));
 						sb.append('\n');
 					}
 				}
 			}
-			Map<String, List<String>> rhsInvs = rule.getCorrRule().getRhs().getInvariantList();
+			Map<String, List<AstInvariantCondition>> rhsInvs = rule.getCorrRule().getRhs().getInvariantList();
 			if (rhsInvs != null) {
 				for (String cls : rhsInvs.keySet()) {
 					if (rhsInvs.get(cls).size() > 0) {
 						hasConstraints = true;
 						sb.append(RTLKeyword.context + " " + cls + " inv:\n    ");
-						sb.append(rhsInvs.get(cls).stream().collect(Collectors.joining(" and ")));
+						sb.append(rhsInvs.get(cls).stream().map(it -> it.getCondition()).collect(Collectors.joining(" and ")));
 						sb.append('\n');
 					}
 				}

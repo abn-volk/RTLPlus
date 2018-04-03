@@ -6,13 +6,13 @@ import java.util.List;
 public class AstInvariantTgg {
 	
 	private String name;
-	private List<String> condList = new ArrayList<>(1);
+	private List<AstInvariantCondition> condList = new ArrayList<>(1);
 
 	public String getName() {
 		return name;
 	}
 	
-	public List<String> getConditions() {
+	public List<AstInvariantCondition> getConditions() {
 		return condList;
 	}
 
@@ -20,15 +20,15 @@ public class AstInvariantTgg {
 		name = (String) object;
 	}
 
-	public void addCondition(String cond) {
+	public void addCondition(AstInvariantCondition cond) {
 		condList.add(cond);
 	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder(name);
 		sb.append(':');
-		for (String cond : condList) {
-			sb.append('[').append(cond).append(']');
+		for (AstInvariantCondition cond : condList) {
+			sb.append(cond);
 		}
 		return sb.toString();
 	}

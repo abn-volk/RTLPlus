@@ -1,4 +1,4 @@
-// $ANTLR 3.5.1 /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g 2018-01-16 18:23:40
+// $ANTLR 3.5.1 /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g 2018-04-03 22:10:00
 
 /*
  *  @author Duc-Hanh Dang, Khoa-Hai Nguyen, Xuan-Loi Vu
@@ -7,17 +7,9 @@
 package org.uet.dse.rtlplus.parser;
 
 import org.tzi.use.parser.base.BaseParser;
-import org.uet.dse.rtlplus.parser.ast.*;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstCorr;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstCorrLink;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstCorrRule;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstInvariantTgg;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstLink;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstObject;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstPattern;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstRule;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstRuleCollection;
-import org.uet.dse.rtlplus.parser.ast.tgg.AstTggRule;
+import org.uet.dse.rtlplus.parser.ast.tgg.*;
+
+
 import org.antlr.runtime.*;
 import java.util.Stack;
 import java.util.List;
@@ -26,20 +18,18 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class RTLParser extends BaseParser {
 	public static final String[] tokenNames = new String[] {
-		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARROW", "AT", "BAR", "COLON", 
-		"COLON_COLON", "COLON_EQUAL", "COMMA", "COND_EXPR", "DOT", "DOTDOT", "EQUAL", 
-		"EQUAL_COND_EXPR", "ESC", "GREATER", "GREATER_EQUAL", "HASH", "HEX_DIGIT", 
-		"IDENT", "INT", "LBRACE", "LBRACK", "LESS", "LESS_EQUAL", "LPAREN", "MINUS", 
-		"ML_COMMENT", "NEWLINE", "NON_OCL_STRING", "NOT_EQUAL", "PLUS", "RANGE_OR_INT", 
-		"RBRACE", "RBRACK", "REAL", "RPAREN", "SEMI", "SLASH", "SL_COMMENT", "STAR", 
-		"STRING", "VOCAB", "WS", "'as'", "'backward'", "'checkCorr'", "'checkSource'", 
-		"'checkTarget'", "'co-evolution'", "'direction'", "'end'", "'forward'", 
-		"'in'", "'integration'", "'rule'", "'synchronization'", "'synchronization_backward'", 
-		"'synchronization_forward'", "'transformation'"
+		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "ARROW", "AT", "BAR", "BTICK", 
+		"COLON", "COLON_COLON", "COLON_EQUAL", "COMMA", "COND_EXPR", "COND_IMPL", 
+		"DOT", "DOTDOT", "EQUAL", "EQUAL_COND_EXPR", "ESC", "GREATER", "GREATER_EQUAL", 
+		"HASH", "HEX_DIGIT", "IDENT", "INT", "LBRACE", "LBRACK", "LESS", "LESS_EQUAL", 
+		"LPAREN", "MINUS", "ML_COMMENT", "NEWLINE", "NON_OCL_STRING", "NOT_EQUAL", 
+		"PLUS", "RANGE_OR_INT", "RBRACE", "RBRACK", "REAL", "RPAREN", "SEMI", 
+		"SLASH", "SL_COMMENT", "STAR", "STRING", "VOCAB", "WS", "'as'", "'backward'", 
+		"'checkCorr'", "'checkSource'", "'checkTarget'", "'co-evolution'", "'direction'", 
+		"'end'", "'forward'", "'in'", "'integration'", "'rule'", "'synchronization'", 
+		"'synchronization_backward'", "'synchronization_forward'", "'transformation'"
 	};
 	public static final int EOF=-1;
-	public static final int T__46=46;
-	public static final int T__47=47;
 	public static final int T__48=48;
 	public static final int T__49=49;
 	public static final int T__50=50;
@@ -54,48 +44,52 @@ public class RTLParser extends BaseParser {
 	public static final int T__59=59;
 	public static final int T__60=60;
 	public static final int T__61=61;
+	public static final int T__62=62;
+	public static final int T__63=63;
 	public static final int ARROW=4;
 	public static final int AT=5;
 	public static final int BAR=6;
-	public static final int COLON=7;
-	public static final int COLON_COLON=8;
-	public static final int COLON_EQUAL=9;
-	public static final int COMMA=10;
-	public static final int COND_EXPR=11;
-	public static final int DOT=12;
-	public static final int DOTDOT=13;
-	public static final int EQUAL=14;
-	public static final int EQUAL_COND_EXPR=15;
-	public static final int ESC=16;
-	public static final int GREATER=17;
-	public static final int GREATER_EQUAL=18;
-	public static final int HASH=19;
-	public static final int HEX_DIGIT=20;
-	public static final int IDENT=21;
-	public static final int INT=22;
-	public static final int LBRACE=23;
-	public static final int LBRACK=24;
-	public static final int LESS=25;
-	public static final int LESS_EQUAL=26;
-	public static final int LPAREN=27;
-	public static final int MINUS=28;
-	public static final int ML_COMMENT=29;
-	public static final int NEWLINE=30;
-	public static final int NON_OCL_STRING=31;
-	public static final int NOT_EQUAL=32;
-	public static final int PLUS=33;
-	public static final int RANGE_OR_INT=34;
-	public static final int RBRACE=35;
-	public static final int RBRACK=36;
-	public static final int REAL=37;
-	public static final int RPAREN=38;
-	public static final int SEMI=39;
-	public static final int SLASH=40;
-	public static final int SL_COMMENT=41;
-	public static final int STAR=42;
-	public static final int STRING=43;
-	public static final int VOCAB=44;
-	public static final int WS=45;
+	public static final int BTICK=7;
+	public static final int COLON=8;
+	public static final int COLON_COLON=9;
+	public static final int COLON_EQUAL=10;
+	public static final int COMMA=11;
+	public static final int COND_EXPR=12;
+	public static final int COND_IMPL=13;
+	public static final int DOT=14;
+	public static final int DOTDOT=15;
+	public static final int EQUAL=16;
+	public static final int EQUAL_COND_EXPR=17;
+	public static final int ESC=18;
+	public static final int GREATER=19;
+	public static final int GREATER_EQUAL=20;
+	public static final int HASH=21;
+	public static final int HEX_DIGIT=22;
+	public static final int IDENT=23;
+	public static final int INT=24;
+	public static final int LBRACE=25;
+	public static final int LBRACK=26;
+	public static final int LESS=27;
+	public static final int LESS_EQUAL=28;
+	public static final int LPAREN=29;
+	public static final int MINUS=30;
+	public static final int ML_COMMENT=31;
+	public static final int NEWLINE=32;
+	public static final int NON_OCL_STRING=33;
+	public static final int NOT_EQUAL=34;
+	public static final int PLUS=35;
+	public static final int RANGE_OR_INT=36;
+	public static final int RBRACE=37;
+	public static final int RBRACK=38;
+	public static final int REAL=39;
+	public static final int RPAREN=40;
+	public static final int SEMI=41;
+	public static final int SLASH=42;
+	public static final int SL_COMMENT=43;
+	public static final int STAR=44;
+	public static final int STRING=45;
+	public static final int VOCAB=46;
+	public static final int WS=47;
 
 	// delegates
 	public BaseParser[] getDelegates() {
@@ -131,12 +125,12 @@ public class RTLParser extends BaseParser {
 			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:41:2: ( 'transformation' name= IDENT 'direction' direction= ( 'forward' | 'backward' | 'integration' | 'co-evolution' | 'synchronization_forward' | 'synchronization_backward' | 'synchronization' ) (rule= tggRuleDefinition )+ EOF )
 			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:42:3: 'transformation' name= IDENT 'direction' direction= ( 'forward' | 'backward' | 'integration' | 'co-evolution' | 'synchronization_forward' | 'synchronization_backward' | 'synchronization' ) (rule= tggRuleDefinition )+ EOF
 			{
-			match(input,61,FOLLOW_61_in_tggRuleCollection56); 
+			match(input,63,FOLLOW_63_in_tggRuleCollection56); 
 			name=(Token)match(input,IDENT,FOLLOW_IDENT_in_tggRuleCollection60); 
 			 n = new AstRuleCollection((name!=null?name.getText():null)); 
-			match(input,52,FOLLOW_52_in_tggRuleCollection68); 
+			match(input,54,FOLLOW_54_in_tggRuleCollection68); 
 			direction=input.LT(1);
-			if ( input.LA(1)==47||input.LA(1)==51||input.LA(1)==54||input.LA(1)==56||(input.LA(1) >= 58 && input.LA(1) <= 60) ) {
+			if ( input.LA(1)==49||input.LA(1)==53||input.LA(1)==56||input.LA(1)==58||(input.LA(1) >= 60 && input.LA(1) <= 62) ) {
 				input.consume();
 				state.errorRecovery=false;
 			}
@@ -151,7 +145,7 @@ public class RTLParser extends BaseParser {
 			while (true) {
 				int alt1=2;
 				int LA1_0 = input.LA(1);
-				if ( (LA1_0==57) ) {
+				if ( (LA1_0==59) ) {
 					alt1=1;
 				}
 
@@ -207,24 +201,24 @@ public class RTLParser extends BaseParser {
 			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:49:2: ( 'rule' name= IDENT 'checkSource' src= ruleDefinition 'checkTarget' trg= ruleDefinition 'checkCorr' corr= corrRuleDefinition 'end' )
 			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:50:3: 'rule' name= IDENT 'checkSource' src= ruleDefinition 'checkTarget' trg= ruleDefinition 'checkCorr' corr= corrRuleDefinition 'end'
 			{
-			match(input,57,FOLLOW_57_in_tggRuleDefinition122); 
+			match(input,59,FOLLOW_59_in_tggRuleDefinition122); 
 			name=(Token)match(input,IDENT,FOLLOW_IDENT_in_tggRuleDefinition126); 
-			match(input,49,FOLLOW_49_in_tggRuleDefinition130); 
+			match(input,51,FOLLOW_51_in_tggRuleDefinition130); 
 			pushFollow(FOLLOW_ruleDefinition_in_tggRuleDefinition134);
 			src=ruleDefinition();
 			state._fsp--;
 
-			match(input,50,FOLLOW_50_in_tggRuleDefinition138); 
+			match(input,52,FOLLOW_52_in_tggRuleDefinition138); 
 			pushFollow(FOLLOW_ruleDefinition_in_tggRuleDefinition142);
 			trg=ruleDefinition();
 			state._fsp--;
 
-			match(input,48,FOLLOW_48_in_tggRuleDefinition146); 
+			match(input,50,FOLLOW_50_in_tggRuleDefinition146); 
 			pushFollow(FOLLOW_corrRuleDefinition_in_tggRuleDefinition150);
 			corr=corrRuleDefinition();
 			state._fsp--;
 
-			match(input,53,FOLLOW_53_in_tggRuleDefinition154); 
+			match(input,55,FOLLOW_55_in_tggRuleDefinition154); 
 			 n = new AstTggRule((name!=null?name.getText():null), src, trg, corr); 
 			}
 
@@ -527,22 +521,22 @@ public class RTLParser extends BaseParser {
 
 
 	// $ANTLR start "invariantTGG"
-	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:102:1: invariantTGG returns [AstInvariantTgg n] : name= IDENT COLON (cond= EQUAL_COND_EXPR )+ ;
+	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:102:1: invariantTGG returns [AstInvariantTgg n] : name= IDENT COLON (cond= invariantCondition )+ ;
 	public final AstInvariantTgg invariantTGG() throws RecognitionException {
 		AstInvariantTgg n = null;
 
 
 		Token name=null;
-		Token cond=null;
+		AstInvariantCondition cond =null;
 
 		try {
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:103:2: (name= IDENT COLON (cond= EQUAL_COND_EXPR )+ )
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:104:3: name= IDENT COLON (cond= EQUAL_COND_EXPR )+
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:103:2: (name= IDENT COLON (cond= invariantCondition )+ )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:104:3: name= IDENT COLON (cond= invariantCondition )+
 			{
 			name=(Token)match(input,IDENT,FOLLOW_IDENT_in_invariantTGG380); 
 			 n = new AstInvariantTgg((name!=null?name.getText():null)); 
 			match(input,COLON,FOLLOW_COLON_in_invariantTGG386); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:106:3: (cond= EQUAL_COND_EXPR )+
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:106:3: (cond= invariantCondition )+
 			int cnt7=0;
 			loop7:
 			while (true) {
@@ -554,10 +548,13 @@ public class RTLParser extends BaseParser {
 
 				switch (alt7) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:106:4: cond= EQUAL_COND_EXPR
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:106:4: cond= invariantCondition
 					{
-					cond=(Token)match(input,EQUAL_COND_EXPR,FOLLOW_EQUAL_COND_EXPR_in_invariantTGG394); 
-					 n.addCondition((cond!=null?cond.getText():null)); 
+					pushFollow(FOLLOW_invariantCondition_in_invariantTGG394);
+					cond=invariantCondition();
+					state._fsp--;
+
+					 n.addCondition(cond); 
 					}
 					break;
 
@@ -585,8 +582,59 @@ public class RTLParser extends BaseParser {
 
 
 
+	// $ANTLR start "invariantCondition"
+	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:109:1: invariantCondition returns [AstInvariantCondition n] : cond= EQUAL_COND_EXPR (fImpl= COND_IMPL bImpl= COND_IMPL )? ;
+	public final AstInvariantCondition invariantCondition() throws RecognitionException {
+		AstInvariantCondition n = null;
+
+
+		Token cond=null;
+		Token fImpl=null;
+		Token bImpl=null;
+
+		try {
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:110:2: (cond= EQUAL_COND_EXPR (fImpl= COND_IMPL bImpl= COND_IMPL )? )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:111:3: cond= EQUAL_COND_EXPR (fImpl= COND_IMPL bImpl= COND_IMPL )?
+			{
+			cond=(Token)match(input,EQUAL_COND_EXPR,FOLLOW_EQUAL_COND_EXPR_in_invariantCondition419); 
+			 n = new AstInvariantCondition((cond!=null?cond.getText():null)); 
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:112:3: (fImpl= COND_IMPL bImpl= COND_IMPL )?
+			int alt8=2;
+			int LA8_0 = input.LA(1);
+			if ( (LA8_0==COND_IMPL) ) {
+				alt8=1;
+			}
+			switch (alt8) {
+				case 1 :
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:112:4: fImpl= COND_IMPL bImpl= COND_IMPL
+					{
+					fImpl=(Token)match(input,COND_IMPL,FOLLOW_COND_IMPL_in_invariantCondition428); 
+					 n.setForwardImpl((fImpl!=null?fImpl.getText():null)); 
+					bImpl=(Token)match(input,COND_IMPL,FOLLOW_COND_IMPL_in_invariantCondition437); 
+					 n.setBackwardImpl((bImpl!=null?bImpl.getText():null)); 
+					}
+					break;
+
+			}
+
+			}
+
+		}
+		catch (RecognitionException re) {
+			reportError(re);
+			recover(input,re);
+		}
+		finally {
+			// do for sure before leaving
+		}
+		return n;
+	}
+	// $ANTLR end "invariantCondition"
+
+
+
 	// $ANTLR start "objectDefinition"
-	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:117:1: objectDefinition returns [AstObject n] : obj= IDENT COLON cls= IDENT ;
+	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:124:1: objectDefinition returns [AstObject n] : obj= IDENT COLON cls= IDENT ;
 	public final AstObject objectDefinition() throws RecognitionException {
 		AstObject n = null;
 
@@ -595,12 +643,12 @@ public class RTLParser extends BaseParser {
 		Token cls=null;
 
 		try {
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:118:2: (obj= IDENT COLON cls= IDENT )
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:119:3: obj= IDENT COLON cls= IDENT
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:125:2: (obj= IDENT COLON cls= IDENT )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:126:3: obj= IDENT COLON cls= IDENT
 			{
-			obj=(Token)match(input,IDENT,FOLLOW_IDENT_in_objectDefinition423); 
-			match(input,COLON,FOLLOW_COLON_in_objectDefinition425); 
-			cls=(Token)match(input,IDENT,FOLLOW_IDENT_in_objectDefinition429); 
+			obj=(Token)match(input,IDENT,FOLLOW_IDENT_in_objectDefinition466); 
+			match(input,COLON,FOLLOW_COLON_in_objectDefinition468); 
+			cls=(Token)match(input,IDENT,FOLLOW_IDENT_in_objectDefinition472); 
 			 n = new AstObject((obj!=null?obj.getText():null), (cls!=null?cls.getText():null)); 
 			}
 
@@ -619,7 +667,7 @@ public class RTLParser extends BaseParser {
 
 
 	// $ANTLR start "linkDefinition"
-	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:123:1: linkDefinition returns [AstLink n] : LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT ;
+	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:130:1: linkDefinition returns [AstLink n] : LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT ;
 	public final AstLink linkDefinition() throws RecognitionException {
 		AstLink n = null;
 
@@ -632,43 +680,43 @@ public class RTLParser extends BaseParser {
 			n = new AstLink();
 
 		try {
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:127:2: ( LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT )
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:128:3: LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:134:2: ( LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:135:3: LPAREN obj1= IDENT ( COMMA obj2= IDENT )+ RPAREN COLON asc= IDENT
 			{
-			match(input,LPAREN,FOLLOW_LPAREN_in_linkDefinition456); 
-			obj1=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition460); 
+			match(input,LPAREN,FOLLOW_LPAREN_in_linkDefinition499); 
+			obj1=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition503); 
 			 n.addObject((obj1!=null?obj1.getText():null)); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:129:3: ( COMMA obj2= IDENT )+
-			int cnt8=0;
-			loop8:
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:136:3: ( COMMA obj2= IDENT )+
+			int cnt9=0;
+			loop9:
 			while (true) {
-				int alt8=2;
-				int LA8_0 = input.LA(1);
-				if ( (LA8_0==COMMA) ) {
-					alt8=1;
+				int alt9=2;
+				int LA9_0 = input.LA(1);
+				if ( (LA9_0==COMMA) ) {
+					alt9=1;
 				}
 
-				switch (alt8) {
+				switch (alt9) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:129:4: COMMA obj2= IDENT
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:136:4: COMMA obj2= IDENT
 					{
-					match(input,COMMA,FOLLOW_COMMA_in_linkDefinition468); 
-					obj2=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition472); 
+					match(input,COMMA,FOLLOW_COMMA_in_linkDefinition511); 
+					obj2=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition515); 
 					 n.addObject((obj2!=null?obj2.getText():null));
 					}
 					break;
 
 				default :
-					if ( cnt8 >= 1 ) break loop8;
-					EarlyExitException eee = new EarlyExitException(8, input);
+					if ( cnt9 >= 1 ) break loop9;
+					EarlyExitException eee = new EarlyExitException(9, input);
 					throw eee;
 				}
-				cnt8++;
+				cnt9++;
 			}
 
-			match(input,RPAREN,FOLLOW_RPAREN_in_linkDefinition479); 
-			match(input,COLON,FOLLOW_COLON_in_linkDefinition481); 
-			asc=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition487); 
+			match(input,RPAREN,FOLLOW_RPAREN_in_linkDefinition522); 
+			match(input,COLON,FOLLOW_COLON_in_linkDefinition524); 
+			asc=(Token)match(input,IDENT,FOLLOW_IDENT_in_linkDefinition530); 
 			 n.setAssociation((asc!=null?asc.getText():null)); 
 			}
 
@@ -687,7 +735,7 @@ public class RTLParser extends BaseParser {
 
 
 	// $ANTLR start "corrLinkDefinition"
-	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:133:1: corrLinkDefinition returns [AstCorrLink n] : LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT ;
+	// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:140:1: corrLinkDefinition returns [AstCorrLink n] : LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT ;
 	public final AstCorrLink corrLinkDefinition() throws RecognitionException {
 		AstCorrLink n = null;
 
@@ -705,114 +753,114 @@ public class RTLParser extends BaseParser {
 			n = new AstCorrLink();
 
 		try {
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:137:2: ( LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT )
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:138:3: LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:144:2: ( LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT )
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:145:3: LPAREN ( LPAREN srcCls= IDENT RPAREN )? srcObj= IDENT ( STAR )? COMMA ( LPAREN trgCls= IDENT RPAREN )? trgObj= IDENT ( STAR )? RPAREN ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )? 'in' corrObj= IDENT COLON corrCls= IDENT
 			{
-			match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition513); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:139:3: ( LPAREN srcCls= IDENT RPAREN )?
-			int alt9=2;
-			int LA9_0 = input.LA(1);
-			if ( (LA9_0==LPAREN) ) {
-				alt9=1;
+			match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition556); 
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:146:3: ( LPAREN srcCls= IDENT RPAREN )?
+			int alt10=2;
+			int LA10_0 = input.LA(1);
+			if ( (LA10_0==LPAREN) ) {
+				alt10=1;
 			}
-			switch (alt9) {
+			switch (alt10) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:139:4: LPAREN srcCls= IDENT RPAREN
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:146:4: LPAREN srcCls= IDENT RPAREN
 					{
-					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition518); 
-					srcCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition522); 
-					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition524); 
+					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition561); 
+					srcCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition565); 
+					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition567); 
 					 n.setSourceClass((srcCls!=null?srcCls.getText():null)); 
 					}
 					break;
 
 			}
 
-			srcObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition534); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:140:16: ( STAR )?
-			int alt10=2;
-			int LA10_0 = input.LA(1);
-			if ( (LA10_0==STAR) ) {
-				alt10=1;
+			srcObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition577); 
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:147:16: ( STAR )?
+			int alt11=2;
+			int LA11_0 = input.LA(1);
+			if ( (LA11_0==STAR) ) {
+				alt11=1;
 			}
-			switch (alt10) {
+			switch (alt11) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:140:17: STAR
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:147:17: STAR
 					{
-					match(input,STAR,FOLLOW_STAR_in_corrLinkDefinition537); 
+					match(input,STAR,FOLLOW_STAR_in_corrLinkDefinition580); 
 					 n.setMultipleSource(); 
 					}
 					break;
 
 			}
 
-			match(input,COMMA,FOLLOW_COMMA_in_corrLinkDefinition543); 
+			match(input,COMMA,FOLLOW_COMMA_in_corrLinkDefinition586); 
 			 n.setSourceObject((srcObj!=null?srcObj.getText():null)); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:141:3: ( LPAREN trgCls= IDENT RPAREN )?
-			int alt11=2;
-			int LA11_0 = input.LA(1);
-			if ( (LA11_0==LPAREN) ) {
-				alt11=1;
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:148:3: ( LPAREN trgCls= IDENT RPAREN )?
+			int alt12=2;
+			int LA12_0 = input.LA(1);
+			if ( (LA12_0==LPAREN) ) {
+				alt12=1;
 			}
-			switch (alt11) {
+			switch (alt12) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:141:4: LPAREN trgCls= IDENT RPAREN
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:148:4: LPAREN trgCls= IDENT RPAREN
 					{
-					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition550); 
-					trgCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition554); 
-					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition556); 
+					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition593); 
+					trgCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition597); 
+					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition599); 
 					 n.setTargetClass((trgCls!=null?trgCls.getText():null)); 
 					}
 					break;
 
 			}
 
-			trgObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition566); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:142:16: ( STAR )?
-			int alt12=2;
-			int LA12_0 = input.LA(1);
-			if ( (LA12_0==STAR) ) {
-				alt12=1;
+			trgObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition609); 
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:149:16: ( STAR )?
+			int alt13=2;
+			int LA13_0 = input.LA(1);
+			if ( (LA13_0==STAR) ) {
+				alt13=1;
 			}
-			switch (alt12) {
+			switch (alt13) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:142:17: STAR
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:149:17: STAR
 					{
-					match(input,STAR,FOLLOW_STAR_in_corrLinkDefinition569); 
+					match(input,STAR,FOLLOW_STAR_in_corrLinkDefinition612); 
 					 n.setMultipleTarget(); 
 					}
 					break;
 
 			}
 
-			match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition575); 
+			match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition618); 
 			 n.setTargetObject((trgObj!=null?trgObj.getText():null)); 
-			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:143:3: ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )?
-			int alt13=2;
-			int LA13_0 = input.LA(1);
-			if ( (LA13_0==46) ) {
-				alt13=1;
+			// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:150:3: ( 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN )?
+			int alt14=2;
+			int LA14_0 = input.LA(1);
+			if ( (LA14_0==48) ) {
+				alt14=1;
 			}
-			switch (alt13) {
+			switch (alt14) {
 				case 1 :
-					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:143:4: 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN
+					// /home/pnh/NCKH/workspace-java/RTLPlus/src/org/uet/dse/rtlplus/parser/RTL.g:150:4: 'as' LPAREN role1= IDENT COMMA role2= IDENT RPAREN
 					{
-					match(input,46,FOLLOW_46_in_corrLinkDefinition583); 
-					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition585); 
-					role1=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition589); 
-					match(input,COMMA,FOLLOW_COMMA_in_corrLinkDefinition591); 
-					role2=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition595); 
-					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition597); 
+					match(input,48,FOLLOW_48_in_corrLinkDefinition626); 
+					match(input,LPAREN,FOLLOW_LPAREN_in_corrLinkDefinition628); 
+					role1=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition632); 
+					match(input,COMMA,FOLLOW_COMMA_in_corrLinkDefinition634); 
+					role2=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition638); 
+					match(input,RPAREN,FOLLOW_RPAREN_in_corrLinkDefinition640); 
 					 n.setRoleNames((role1!=null?role1.getText():null), (role2!=null?role2.getText():null)); 
 					}
 					break;
 
 			}
 
-			match(input,55,FOLLOW_55_in_corrLinkDefinition606); 
-			corrObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition610); 
-			match(input,COLON,FOLLOW_COLON_in_corrLinkDefinition612); 
-			corrCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition616); 
+			match(input,57,FOLLOW_57_in_corrLinkDefinition649); 
+			corrObj=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition653); 
+			match(input,COLON,FOLLOW_COLON_in_corrLinkDefinition655); 
+			corrCls=(Token)match(input,IDENT,FOLLOW_IDENT_in_corrLinkDefinition659); 
 			 n.setName((corrObj!=null?corrObj.getText():null)); n.setClass((corrCls!=null?corrCls.getText():null)); 
 			}
 
@@ -832,72 +880,75 @@ public class RTLParser extends BaseParser {
 
 
 
-	public static final BitSet FOLLOW_61_in_tggRuleCollection56 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_tggRuleCollection60 = new BitSet(new long[]{0x0010000000000000L});
-	public static final BitSet FOLLOW_52_in_tggRuleCollection68 = new BitSet(new long[]{0x1D48800000000000L});
-	public static final BitSet FOLLOW_set_in_tggRuleCollection72 = new BitSet(new long[]{0x0200000000000000L});
-	public static final BitSet FOLLOW_tggRuleDefinition_in_tggRuleCollection95 = new BitSet(new long[]{0x0200000000000000L});
+	public static final BitSet FOLLOW_63_in_tggRuleCollection56 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_tggRuleCollection60 = new BitSet(new long[]{0x0040000000000000L});
+	public static final BitSet FOLLOW_54_in_tggRuleCollection68 = new BitSet(new long[]{0x7522000000000000L});
+	public static final BitSet FOLLOW_set_in_tggRuleCollection72 = new BitSet(new long[]{0x0800000000000000L});
+	public static final BitSet FOLLOW_tggRuleDefinition_in_tggRuleCollection95 = new BitSet(new long[]{0x0800000000000000L});
 	public static final BitSet FOLLOW_EOF_in_tggRuleCollection104 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_57_in_tggRuleDefinition122 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_tggRuleDefinition126 = new BitSet(new long[]{0x0002000000000000L});
-	public static final BitSet FOLLOW_49_in_tggRuleDefinition130 = new BitSet(new long[]{0x0000000008000000L});
-	public static final BitSet FOLLOW_ruleDefinition_in_tggRuleDefinition134 = new BitSet(new long[]{0x0004000000000000L});
-	public static final BitSet FOLLOW_50_in_tggRuleDefinition138 = new BitSet(new long[]{0x0000000008000000L});
-	public static final BitSet FOLLOW_ruleDefinition_in_tggRuleDefinition142 = new BitSet(new long[]{0x0001000000000000L});
-	public static final BitSet FOLLOW_48_in_tggRuleDefinition146 = new BitSet(new long[]{0x0000000008000000L});
-	public static final BitSet FOLLOW_corrRuleDefinition_in_tggRuleDefinition150 = new BitSet(new long[]{0x0020000000000000L});
-	public static final BitSet FOLLOW_53_in_tggRuleDefinition154 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_ruleDefinition177 = new BitSet(new long[]{0x0000004008208800L});
-	public static final BitSet FOLLOW_patternDefinition_in_ruleDefinition183 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_ruleDefinition187 = new BitSet(new long[]{0x0000000000800000L});
-	public static final BitSet FOLLOW_LBRACE_in_ruleDefinition189 = new BitSet(new long[]{0x0000000808208800L});
-	public static final BitSet FOLLOW_patternDefinition_in_ruleDefinition195 = new BitSet(new long[]{0x0000000800000000L});
+	public static final BitSet FOLLOW_59_in_tggRuleDefinition122 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_tggRuleDefinition126 = new BitSet(new long[]{0x0008000000000000L});
+	public static final BitSet FOLLOW_51_in_tggRuleDefinition130 = new BitSet(new long[]{0x0000000020000000L});
+	public static final BitSet FOLLOW_ruleDefinition_in_tggRuleDefinition134 = new BitSet(new long[]{0x0010000000000000L});
+	public static final BitSet FOLLOW_52_in_tggRuleDefinition138 = new BitSet(new long[]{0x0000000020000000L});
+	public static final BitSet FOLLOW_ruleDefinition_in_tggRuleDefinition142 = new BitSet(new long[]{0x0004000000000000L});
+	public static final BitSet FOLLOW_50_in_tggRuleDefinition146 = new BitSet(new long[]{0x0000000020000000L});
+	public static final BitSet FOLLOW_corrRuleDefinition_in_tggRuleDefinition150 = new BitSet(new long[]{0x0080000000000000L});
+	public static final BitSet FOLLOW_55_in_tggRuleDefinition154 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_ruleDefinition177 = new BitSet(new long[]{0x0000010020821000L});
+	public static final BitSet FOLLOW_patternDefinition_in_ruleDefinition183 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_ruleDefinition187 = new BitSet(new long[]{0x0000000002000000L});
+	public static final BitSet FOLLOW_LBRACE_in_ruleDefinition189 = new BitSet(new long[]{0x0000002020821000L});
+	public static final BitSet FOLLOW_patternDefinition_in_ruleDefinition195 = new BitSet(new long[]{0x0000002000000000L});
 	public static final BitSet FOLLOW_RBRACE_in_ruleDefinition199 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_corrRuleDefinition222 = new BitSet(new long[]{0x0000004008200000L});
-	public static final BitSet FOLLOW_corrPatternDefinition_in_corrRuleDefinition228 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_corrRuleDefinition232 = new BitSet(new long[]{0x0000000000800000L});
-	public static final BitSet FOLLOW_LBRACE_in_corrRuleDefinition234 = new BitSet(new long[]{0x0000000808200000L});
-	public static final BitSet FOLLOW_corrPatternDefinition_in_corrRuleDefinition240 = new BitSet(new long[]{0x0000000800000000L});
+	public static final BitSet FOLLOW_LPAREN_in_corrRuleDefinition222 = new BitSet(new long[]{0x0000010020800000L});
+	public static final BitSet FOLLOW_corrPatternDefinition_in_corrRuleDefinition228 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_corrRuleDefinition232 = new BitSet(new long[]{0x0000000002000000L});
+	public static final BitSet FOLLOW_LBRACE_in_corrRuleDefinition234 = new BitSet(new long[]{0x0000002020800000L});
+	public static final BitSet FOLLOW_corrPatternDefinition_in_corrRuleDefinition240 = new BitSet(new long[]{0x0000002000000000L});
 	public static final BitSet FOLLOW_RBRACE_in_corrRuleDefinition244 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_objectDefinition_in_patternDefinition275 = new BitSet(new long[]{0x0000000008208802L});
-	public static final BitSet FOLLOW_linkDefinition_in_patternDefinition286 = new BitSet(new long[]{0x0000000008008802L});
-	public static final BitSet FOLLOW_set_in_patternDefinition297 = new BitSet(new long[]{0x0000000000008802L});
-	public static final BitSet FOLLOW_corrLinkDefinition_in_corrPatternDefinition336 = new BitSet(new long[]{0x0000000008200002L});
-	public static final BitSet FOLLOW_invariantTGG_in_corrPatternDefinition350 = new BitSet(new long[]{0x0000000000200002L});
-	public static final BitSet FOLLOW_IDENT_in_invariantTGG380 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_COLON_in_invariantTGG386 = new BitSet(new long[]{0x0000000000008000L});
-	public static final BitSet FOLLOW_EQUAL_COND_EXPR_in_invariantTGG394 = new BitSet(new long[]{0x0000000000008002L});
-	public static final BitSet FOLLOW_IDENT_in_objectDefinition423 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_COLON_in_objectDefinition425 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_objectDefinition429 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_linkDefinition456 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_linkDefinition460 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COMMA_in_linkDefinition468 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_linkDefinition472 = new BitSet(new long[]{0x0000004000000400L});
-	public static final BitSet FOLLOW_RPAREN_in_linkDefinition479 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_COLON_in_linkDefinition481 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_linkDefinition487 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition513 = new BitSet(new long[]{0x0000000008200000L});
-	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition518 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition522 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition524 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition534 = new BitSet(new long[]{0x0000040000000400L});
-	public static final BitSet FOLLOW_STAR_in_corrLinkDefinition537 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COMMA_in_corrLinkDefinition543 = new BitSet(new long[]{0x0000000008200000L});
-	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition550 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition554 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition556 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition566 = new BitSet(new long[]{0x0000044000000000L});
-	public static final BitSet FOLLOW_STAR_in_corrLinkDefinition569 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition575 = new BitSet(new long[]{0x0080400000000000L});
-	public static final BitSet FOLLOW_46_in_corrLinkDefinition583 = new BitSet(new long[]{0x0000000008000000L});
-	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition585 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition589 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_COMMA_in_corrLinkDefinition591 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition595 = new BitSet(new long[]{0x0000004000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition597 = new BitSet(new long[]{0x0080000000000000L});
-	public static final BitSet FOLLOW_55_in_corrLinkDefinition606 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition610 = new BitSet(new long[]{0x0000000000000080L});
-	public static final BitSet FOLLOW_COLON_in_corrLinkDefinition612 = new BitSet(new long[]{0x0000000000200000L});
-	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition616 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_objectDefinition_in_patternDefinition275 = new BitSet(new long[]{0x0000000020821002L});
+	public static final BitSet FOLLOW_linkDefinition_in_patternDefinition286 = new BitSet(new long[]{0x0000000020021002L});
+	public static final BitSet FOLLOW_set_in_patternDefinition297 = new BitSet(new long[]{0x0000000000021002L});
+	public static final BitSet FOLLOW_corrLinkDefinition_in_corrPatternDefinition336 = new BitSet(new long[]{0x0000000020800002L});
+	public static final BitSet FOLLOW_invariantTGG_in_corrPatternDefinition350 = new BitSet(new long[]{0x0000000000800002L});
+	public static final BitSet FOLLOW_IDENT_in_invariantTGG380 = new BitSet(new long[]{0x0000000000000100L});
+	public static final BitSet FOLLOW_COLON_in_invariantTGG386 = new BitSet(new long[]{0x0000000000020000L});
+	public static final BitSet FOLLOW_invariantCondition_in_invariantTGG394 = new BitSet(new long[]{0x0000000000020002L});
+	public static final BitSet FOLLOW_EQUAL_COND_EXPR_in_invariantCondition419 = new BitSet(new long[]{0x0000000000002002L});
+	public static final BitSet FOLLOW_COND_IMPL_in_invariantCondition428 = new BitSet(new long[]{0x0000000000002000L});
+	public static final BitSet FOLLOW_COND_IMPL_in_invariantCondition437 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_IDENT_in_objectDefinition466 = new BitSet(new long[]{0x0000000000000100L});
+	public static final BitSet FOLLOW_COLON_in_objectDefinition468 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_objectDefinition472 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_linkDefinition499 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_linkDefinition503 = new BitSet(new long[]{0x0000000000000800L});
+	public static final BitSet FOLLOW_COMMA_in_linkDefinition511 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_linkDefinition515 = new BitSet(new long[]{0x0000010000000800L});
+	public static final BitSet FOLLOW_RPAREN_in_linkDefinition522 = new BitSet(new long[]{0x0000000000000100L});
+	public static final BitSet FOLLOW_COLON_in_linkDefinition524 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_linkDefinition530 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition556 = new BitSet(new long[]{0x0000000020800000L});
+	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition561 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition565 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition567 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition577 = new BitSet(new long[]{0x0000100000000800L});
+	public static final BitSet FOLLOW_STAR_in_corrLinkDefinition580 = new BitSet(new long[]{0x0000000000000800L});
+	public static final BitSet FOLLOW_COMMA_in_corrLinkDefinition586 = new BitSet(new long[]{0x0000000020800000L});
+	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition593 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition597 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition599 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition609 = new BitSet(new long[]{0x0000110000000000L});
+	public static final BitSet FOLLOW_STAR_in_corrLinkDefinition612 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition618 = new BitSet(new long[]{0x0201000000000000L});
+	public static final BitSet FOLLOW_48_in_corrLinkDefinition626 = new BitSet(new long[]{0x0000000020000000L});
+	public static final BitSet FOLLOW_LPAREN_in_corrLinkDefinition628 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition632 = new BitSet(new long[]{0x0000000000000800L});
+	public static final BitSet FOLLOW_COMMA_in_corrLinkDefinition634 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition638 = new BitSet(new long[]{0x0000010000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_corrLinkDefinition640 = new BitSet(new long[]{0x0200000000000000L});
+	public static final BitSet FOLLOW_57_in_corrLinkDefinition649 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition653 = new BitSet(new long[]{0x0000000000000100L});
+	public static final BitSet FOLLOW_COLON_in_corrLinkDefinition655 = new BitSet(new long[]{0x0000000000800000L});
+	public static final BitSet FOLLOW_IDENT_in_corrLinkDefinition659 = new BitSet(new long[]{0x0000000000000002L});
 }

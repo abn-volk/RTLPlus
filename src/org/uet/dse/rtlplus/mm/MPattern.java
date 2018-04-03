@@ -12,6 +12,7 @@ import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MLinkEnd;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
+import org.uet.dse.rtlplus.parser.ast.tgg.AstInvariantCondition;
 
 public class MPattern {
 
@@ -19,7 +20,7 @@ public class MPattern {
 	private List<MObject> objectList;
 	private List<MLink> linkList;
 	private List<String> conditionList;
-	private Map<String, List<String>> invariantList;
+	private Map<String, List<AstInvariantCondition>> invariantList;
 	private Map<String, List<String>> objMap;
 
 	public MSystemState getSystemState() {
@@ -38,7 +39,7 @@ public class MPattern {
 		return conditionList;
 	}
 
-	public Map<String, List<String>> getInvariantList() {
+	public Map<String, List<AstInvariantCondition>> getInvariantList() {
 		return invariantList;
 	}
 
@@ -52,7 +53,7 @@ public class MPattern {
 	}
 
 	public MPattern(MSystemState systemState, List<MObject> objectList, List<MLink> linkList,
-			Map<String, List<String>> invariantList) {
+			Map<String, List<AstInvariantCondition>> invariantList) {
 		this.systemState = systemState;
 		this.objectList = objectList;
 		this.linkList = linkList;
@@ -90,7 +91,7 @@ public class MPattern {
 		// Conditions satisfied
 		if (conditionList != null)
 			conditions.addAll(conditionList);
-		return conditions.stream().collect(Collectors.joining(hasLineBreaks? " and \n" : " and "));
+		return conditions.stream().collect(Collectors.joining(hasLineBreaks ? " and \n" : " and "));
 	}
 
 	public void genPostCondExisting(StringBuilder builder) {
@@ -135,10 +136,10 @@ public class MPattern {
 		// Attribute invariants
 		if (invariantList != null) {
 			for (MObject obj : objectList) {
-				List<String> invs = invariantList.get(obj.cls().name());
+				List<AstInvariantCondition> invs = invariantList.get(obj.cls().name());
 				if (invs != null) {
-					for (String ocl : invs) {
-						conditions.add(ocl.replace("self", obj.name()));
+					for (AstInvariantCondition inv : invs) {
+						conditions.add(inv.getCondition().replace("self.", obj.name() + "."));
 					}
 				}
 			}
