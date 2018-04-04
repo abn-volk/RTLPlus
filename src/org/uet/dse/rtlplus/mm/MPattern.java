@@ -148,4 +148,39 @@ public class MPattern {
 		builder.append(conditions.stream().collect(Collectors.joining(" and\n")));
 		return level;
 	}
+	
+	public String genPostCondNew() {
+		StringBuilder builder = new StringBuilder();
+		// Existence of new links
+		List<String> conditions = new ArrayList<>();
+		for (MLink lnk : linkList) {
+			for (MLinkEnd end : lnk.linkEnds()) {
+				for (MLinkEnd otherEnd : lnk.linkEnds()) {
+					if (!end.equals(otherEnd)) {
+						// theObjA.roleB->includes(theObjB)
+						String con = end.object().name() + "." + otherEnd.associationEnd().nameAsRolename()
+								+ "->includes(" + otherEnd.object().name() + ")";
+						conditions.add(con);
+					}
+				}
+			}
+		}
+		// OCL conditions
+		if (conditionList != null)
+			conditions.addAll(conditionList);
+		// Attribute invariants
+		if (invariantList != null) {
+			for (MObject obj : objectList) {
+				List<AstInvariantCondition> invs = invariantList.get(obj.cls().name());
+				if (invs != null) {
+					for (AstInvariantCondition inv : invs) {
+						conditions.add(inv.getCondition().replace("self.", obj.name() + "."));
+					}
+				}
+			}
+		}
+		
+		builder.append(conditions.stream().collect(Collectors.joining(" and\n")));
+		return builder.toString();
+	}
 }

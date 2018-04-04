@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.main.Session;
+import org.tzi.use.parser.ocl.OCLCompiler;
 import org.tzi.use.parser.shell.ShellCommandCompiler;
+import org.tzi.use.uml.ocl.expr.Evaluator;
 import org.tzi.use.uml.ocl.value.BooleanValue;
 import org.tzi.use.uml.ocl.value.ObjectValue;
 import org.tzi.use.uml.ocl.value.Value;
+import org.tzi.use.uml.ocl.value.VarBindings;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemException;
 import org.tzi.use.uml.sys.MSystemState;
@@ -26,6 +29,7 @@ import org.tzi.use.uml.sys.events.LinkInsertedEvent;
 import org.tzi.use.uml.sys.events.ObjectCreatedEvent;
 import org.tzi.use.uml.sys.events.ObjectDestroyedEvent;
 import org.tzi.use.uml.sys.soil.MStatement;
+import org.tzi.use.util.NullWriter;
 import org.tzi.use.util.soil.VariableEnvironment;
 import org.uet.dse.rtlplus.Main;
 import org.uet.dse.rtlplus.matching.BackwardMatchManager;
@@ -65,7 +69,7 @@ public class SyncWorker {
 	private OperationEnterEvent event;
 	// GUI
 	private SyncWorkerDialog dialog;
-	
+
 	public SyncWorker(SyncWorkerDialog dialog, PrintWriter logWriter, Session session) {
 		this.dialog = dialog;
 		api = UseSystemApi.create(session);
@@ -84,14 +88,14 @@ public class SyncWorker {
 		pastTransformations = Main.getSyncData().getPastTransformations();
 		transformationForCorrObj = Main.getSyncData().getTransformationForCorrObj();
 	}
-	
+
 	@Subscribe
 	public void onOperationEntered(OperationEnterEvent e) {
 		running = true;
 		// Initialise cache
 		event = e;
 	}
-	
+
 	@Subscribe
 	public void onOperationExited(OperationExitEvent e) {
 		if (e.isSuccess()) {
@@ -104,21 +108,23 @@ public class SyncWorker {
 	@Subscribe
 	public void onObjectCreated(ObjectCreatedEvent e) {
 		MObject obj = e.getCreatedObject();
-		//System.out.println("Object created: " + obj.name());
+		// System.out.println("Object created: " + obj.name());
 		Side side = classMap.get(obj.cls().name());
 		if (!running) {
 			switch (side) {
 			case SOURCE:
 				// Find forward matches
 				if (dialog != null)
-					dialog.findForwardMatches(state, rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), syncForward);
-				else 
+					dialog.findForwardMatches(state, rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj),
+							syncForward);
+				else
 					runForwardMatches(rulesForSrcClass.get(obj.cls().name()), Arrays.asList(obj), syncForward);
 				break;
 			case TARGET:
 				// Find backward matches
 				if (dialog != null)
-					dialog.findBackwardMatches(state, rulesForTrgClass.get(obj.cls().name()), Arrays.asList(obj), !syncForward);
+					dialog.findBackwardMatches(state, rulesForTrgClass.get(obj.cls().name()), Arrays.asList(obj),
+							!syncForward);
 				else
 					runBackwardMatches(rulesForTrgClass.get(obj.cls().name()), Arrays.asList(obj), !syncForward);
 				break;
@@ -131,7 +137,7 @@ public class SyncWorker {
 	@Subscribe
 	public void onObjectDestroyed(ObjectDestroyedEvent e) {
 		String objName = e.getDestroyedObject().name();
-		// System.out.println("Object destroyed: " + objName);
+		System.out.println("Object destroyed: " + objName);
 		MObject obj = e.getDestroyedObject();
 		if (!running) {
 			eventBus.unregister(this);
@@ -160,17 +166,17 @@ public class SyncWorker {
 			eventBus.register(this);
 		}
 	}
-	
+
 	private void undoTransformation(OperationEnterEvent event) {
-		//System.out.println("Undoing transformation: " + event.getOpName());
+		// System.out.println("Undoing transformation: " + event.getOpName());
 		// Delete links
 		List<CachedLink> linksToCreate = event.getLinksToCreate();
 		if (linksToCreate != null) {
 			for (CachedLink lnk : linksToCreate) {
 				try {
 					api.deleteLink(lnk.getAssociation(), lnk.getLinkedObjects());
+				} catch (UseApiException ignored) {
 				}
-				catch (UseApiException ignored) {}
 			}
 		}
 		// Delete objects
@@ -179,21 +185,24 @@ public class SyncWorker {
 			for (String objName : objectsToCreate.values()) {
 				try {
 					api.deleteObject(objName);
-				} catch (UseApiException ignored) {}
+					System.out.println("Deleted " + objName);
+				} catch (UseApiException ignored) {
+				}
 			}
 		}
 		// Delete correlation objects
-		Map<String, String> corrObjsToCreate = event.getCorrObjsToCreate(); 
+		Map<String, String> corrObjsToCreate = event.getCorrObjsToCreate();
 		if (corrObjsToCreate != null) {
 			for (String objName : corrObjsToCreate.values()) {
 				try {
 					api.deleteObject(objName);
-				} catch (UseApiException ignored) {}
+				} catch (UseApiException ignored) {
+				}
 			}
 		}
 		// logWriter.println("Transformation undone: " + event.getOpName());
 	}
-	
+
 	private Set<String> findAllDependencies(Set<String> corrObjs, Set<String> allDeps) {
 		Set<String> nextDeps = new HashSet<>();
 		for (String corrObj : corrObjs) {
@@ -238,10 +247,9 @@ public class SyncWorker {
 				}
 				if (side == Side.SOURCE) {
 					Collection<MTggRule> rules = rulesForSrcClass.get(obj.cls().name());
-					if (rules != null) 
+					if (rules != null)
 						ruleList.addAll(rules);
-				}
-				else if (side == Side.TARGET) {
+				} else if (side == Side.TARGET) {
 					Collection<MTggRule> rules = rulesForTrgClass.get(obj.cls().name());
 					if (rules != null)
 						ruleList.addAll(rules);
@@ -273,7 +281,7 @@ public class SyncWorker {
 		if (!running) {
 			List<MObject> objects = e.getLink().linkedObjects();
 			eventBus.unregister(this);
-			checkConsistencyAndUndo(objects.stream().map(it -> it.name()).collect(Collectors.toList()));	
+			checkConsistencyAndUndo(objects.stream().map(it -> it.name()).collect(Collectors.toList()));
 			eventBus.register(this);
 		}
 	}
@@ -282,7 +290,8 @@ public class SyncWorker {
 	public void onAttributeAssigned(AttributeAssignedEvent e) {
 		if (!running) {
 			eventBus.unregister(this);
-			//System.out.println("Attribute assignment: " + e.getObject().name() + "." + e.getAttribute().name() + " := " + e.getValue().toStringWithType());
+			// System.out.println("Attribute assignment: " + e.getObject().name() + "." +
+			// e.getAttribute().name() + " := " + e.getValue().toStringWithType());
 			switch (classMap.get(e.getObject().cls().name())) {
 			case SOURCE:
 				// System.out.println("Source object changed!");
@@ -294,18 +303,20 @@ public class SyncWorker {
 						if (corrObj != null) {
 							Set<String> strs = forwardCmdsForCorr.get(corrObj.cls().name());
 							if (strs != null) {
-								//System.out.println("Strs = " + strs.toString());
+								// System.out.println("Strs = " + strs.toString());
 								for (String str : strs) {
-									String line = "set " + str.replace("self.", corr + ".");
-									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
-											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
+									String line = str.replace("self.", corr + ".");
+									MStatement statement = ShellCommandCompiler.compileShellCommand(
+											state.system().model(), state, state.system().getVariableEnvironment(),
+											line, "<input>", logWriter, false);
 									if (statement == null) {
 										logWriter.println("Cannot parse command: " + line);
-									} else try {
-										state.system().execute(statement);
-									} catch (MSystemException exception) {
-										logWriter.println("MSystemException: " + exception.getMessage());
-									}
+									} else
+										try {
+											state.system().execute(statement);
+										} catch (MSystemException exception) {
+											logWriter.println("MSystemException: " + exception.getMessage());
+										}
 								}
 							}
 						}
@@ -313,9 +324,11 @@ public class SyncWorker {
 				}
 				checkConsistencyAndUndo(Arrays.asList(e.getObject().name()));
 				if (dialog != null)
-					dialog.findForwardMatches(state, rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), syncForward);
+					dialog.findForwardMatches(state, rulesForSrcClass.get(e.getObject().cls().name()),
+							Arrays.asList(e.getObject()), syncForward);
 				else
-					runForwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), syncForward);
+					runForwardMatches(rulesForSrcClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()),
+							syncForward);
 				break;
 			case TARGET:
 				Set<String> cObjs = corrObjsForTrg.get(e.getObject().name());
@@ -326,16 +339,18 @@ public class SyncWorker {
 							Set<String> strs = backwardCmdsForCorr.get(corrObj.cls().name());
 							if (strs != null) {
 								for (String str : strs) {
-									String line = "set " + str.replace("self.", corr + ".");
-									MStatement statement = ShellCommandCompiler.compileShellCommand(state.system().model(), state,
-											state.system().getVariableEnvironment(), line, "<input>", logWriter, false);
+									String line = str.replace("self.", corr + ".");
+									MStatement statement = ShellCommandCompiler.compileShellCommand(
+											state.system().model(), state, state.system().getVariableEnvironment(),
+											line, "<input>", logWriter, false);
 									if (statement == null) {
 										logWriter.println("Cannot parse command: " + line);
-									} else try {
-										state.system().execute(statement);
-									} catch (MSystemException exception) {
-										logWriter.println("MSystemException: " + exception.getMessage());
-									}
+									} else
+										try {
+											state.system().execute(statement);
+										} catch (MSystemException exception) {
+											logWriter.println("MSystemException: " + exception.getMessage());
+										}
 								}
 							}
 						}
@@ -343,9 +358,11 @@ public class SyncWorker {
 				}
 				checkConsistencyAndUndo(Arrays.asList(e.getObject().name()));
 				if (dialog != null)
-					dialog.findBackwardMatches(state, rulesForTrgClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), !syncForward);
+					dialog.findBackwardMatches(state, rulesForTrgClass.get(e.getObject().cls().name()),
+							Arrays.asList(e.getObject()), !syncForward);
 				else
-					runBackwardMatches(rulesForTrgClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()), !syncForward);
+					runBackwardMatches(rulesForTrgClass.get(e.getObject().cls().name()), Arrays.asList(e.getObject()),
+							!syncForward);
 				break;
 			default:
 				break;
@@ -353,48 +370,104 @@ public class SyncWorker {
 			eventBus.register(this);
 		}
 	}
-	
+
 	private void checkConsistencyAndUndo(List<String> objects) {
 		Set<OperationEnterEvent> transToUndo = new HashSet<>();
 		for (OperationEnterEvent e : pastTransformations.values()) {
 			if (e.getMatchedObjects().values().containsAll(objects)) {
-				MTggRule tggRule = Main.getTggRuleCollection().getRuleByName(e.getRuleName());
-				String preCond = syncForward? tggRule.getSrcRule().genPreCondBoth(false)
-						: tggRule.getTrgRule().genPreCondBoth(false);
-				preCond = preCond.trim();
-				if (!preCond.isEmpty()) {
-					// Assign variables
-					VariableEnvironment varEnv = state.system().getVariableEnvironment();
-					boolean mustUndo = false;
-					for(Map.Entry<String, String> assignment : e.getMatchedObjects().entrySet()) {
-						MObject obj = api.getObject(assignment.getValue());
-						// Object does not exist, inconsistency found
-						if (obj == null) {
-							mustUndo = true;
-							break;
-						}
-						varEnv.assign(assignment.getKey(), new ObjectValue(obj.cls(), obj));
+				MTggRule rule = Main.getTggRuleCollection().getRuleByName(e.getRuleName());
+				String postCondition = syncForward? rule.getSrcRule().genPostCond().trim() :
+					rule.getTrgRule().genPostCond().trim();
+				String invariantCondition = rule.getCorrRule().genPostCond();
+				if (!postCondition.isEmpty() && !invariantCondition.isEmpty())
+					postCondition += " and " + invariantCondition;
+				else
+					postCondition += invariantCondition;
+				boolean mustUndo = false;
+				VariableEnvironment varEnv = state.system().getVariableEnvironment();
+				for(Map.Entry<String, String> assignment : e.getMatchedObjects().entrySet()) {
+					MObject obj = api.getObject(assignment.getValue());
+					// Object does not exist, inconsistency found
+					if (obj == null) {
+						mustUndo = true;
+						break;
 					}
-					if (mustUndo)
-						transToUndo.add(e);
-					else {
-						// Evaluate preconditions
-						try {
-							Value val = api.evaluate(preCond);
-							if (val.isBoolean() && ((BooleanValue) val).isFalse())
-								mustUndo = true;
-						} catch (UseApiException ex) {
-							ex.printStackTrace();
-							mustUndo = true;
-						}
-						if (mustUndo)
-							transToUndo.add(e);
+					varEnv.assign(assignment.getKey(), new ObjectValue(obj.cls(), obj));
+				}
+				for(Map.Entry<String, String> assignment : e.getObjectsToCreate().entrySet()) {
+					MObject obj = api.getObject(assignment.getValue());
+					// Object does not exist, inconsistency found
+					if (obj == null) {
+						mustUndo = true;
+						break;
 					}
-				}				
+					varEnv.assign(assignment.getKey(), new ObjectValue(obj.cls(), obj));
+				}
+				for(Map.Entry<String, String> assignment : e.getCorrObjsToCreate().entrySet()) {
+					MObject obj = api.getObject(assignment.getValue());
+					// Object does not exist, inconsistency found
+					if (obj == null) {
+						mustUndo = true;
+						break;
+					}
+					varEnv.assign(assignment.getKey(), new ObjectValue(obj.cls(), obj));
+				}
+				if (mustUndo)
+					transToUndo.add(e);
+				else {
+					try {
+						VarBindings vbs = varEnv.constructVarBindings();
+						Evaluator ev = new Evaluator();
+ 						Value val = ev.eval(OCLCompiler.compileExpression(state.system().model(), postCondition, "rtl", new PrintWriter(new NullWriter()), vbs), state, vbs);
+						if (val.isBoolean() && ((BooleanValue) val).isFalse()) {
+							Collection<String> corrObjs = e.getCorrObjsToCreate().values();
+							if (corrObjs != null) {
+								// System.out.println(corrObjs);
+								for (String corr : corrObjs) {
+									MObject corrObj = state.objectByName(corr);
+									if (corrObj != null) {
+										Set<String> cmds = syncForward? 
+												forwardCmdsForCorr.get(corrObj.cls().name()) :
+												backwardCmdsForCorr.get(corrObj.cls().name());
+										if (cmds != null) {
+											executeAttributeCommands(cmds, corr);
+										}
+									}
+								}
+							}
+							Value val2 = ev.eval(OCLCompiler.compileExpression(state.system().model(), postCondition, "rtl", new PrintWriter(new NullWriter()), vbs), state, vbs);
+							mustUndo = val2.isBoolean() && ((BooleanValue) val2).isFalse();
+						}
+					}
+					catch (Exception exception) {
+						mustUndo = true;
+					}
+				}
+				if (mustUndo)
+					transToUndo.add(e);
 			}
 		}
 		for (OperationEnterEvent tran : transToUndo) {
 			undoTransformation(tran);
+		}
+	}
+	
+	private void executeAttributeCommands(Set<String> strs, String corr) {
+		for (String str : strs) {
+			String line = str.replace("self.", corr + ".");
+			MStatement statement = ShellCommandCompiler.compileShellCommand(
+					state.system().model(), state,
+					state.system().getVariableEnvironment(), line,
+					"<input>", logWriter, false);
+			if (statement == null) {
+				logWriter.println("Cannot parse command: " + line);
+			} else
+				try {
+					state.system().execute(statement);
+				} catch (MSystemException exception) {
+					logWriter.println(
+							"MSystemException: " + exception.getMessage());
+				}
 		}
 	}
 
@@ -410,11 +483,10 @@ public class SyncWorker {
 					if (res)
 						break;
 				}
-			}
-			while (fMatches.size() > 0);
+			} while (fMatches.size() > 0);
 		}
 	}
-	
+
 	private void runBackwardMatches(Collection<MTggRule> ruleList, List<MObject> objects, boolean sync) {
 		if (ruleList != null) {
 			List<Match> bMatches = new ArrayList<>();
@@ -426,8 +498,7 @@ public class SyncWorker {
 					if (res)
 						break;
 				}
-			}
-			while (bMatches.size() > 0);
+			} while (bMatches.size() > 0);
 		}
 	}
 }

@@ -128,6 +128,15 @@ public class MRule {
 			builder.append(sb).append(sb2);
 		return depth;
 	}
+	
+	public String genPostCond() {
+		StringBuilder sb = new StringBuilder();
+		lhs.genPostCondExisting(sb);
+		String s = rhs.genPostCondNew();
+		if (sb.length() > 0 && s.length() > 0)
+			sb.append(" and\n").append(s);
+		return sb.toString();
+	}
 
 	public List<MObject> getAllObjects() {
 		List<MObject> objList = new ArrayList<>(lhs.getObjectList());
