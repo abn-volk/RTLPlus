@@ -34,7 +34,7 @@ public class AstLink {
 
 	public MLink gen(Context ctx) throws MSystemException {
 		MSystemState systemState = ctx.systemState();
-		MAssociation asc = ctx.model().getAssociation(association);
+		MAssociation asc = ctx.getDiagramModel().getAssociation(association);
 		List<MObject> objs = objectList.stream().map(it -> systemState.objectByName(it)).collect(Collectors.toList());
 		Set<MLink> lnks = systemState.linkBetweenObjects(asc, objs);
 		if (lnks.isEmpty()) 

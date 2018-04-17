@@ -25,7 +25,7 @@ public class AstObject {
 
 	public MObject gen(Context ctx) throws MSystemException {
 		MSystemState systemState = ctx.systemState();
-		MClass cls = ctx.model().getClass(className);
+		MClass cls = ctx.getDiagramModel().getClass(className);
 		MObject existingObj = systemState.objectByName(name);
 		if (existingObj == null) {
 			return systemState.createObject(cls, name);

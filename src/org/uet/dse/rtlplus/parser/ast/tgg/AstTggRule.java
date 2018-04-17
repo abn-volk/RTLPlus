@@ -38,8 +38,8 @@ public class AstTggRule {
 
 
 	public MTggRule gen(Context ctx) throws MInvalidModelException, MSystemException {
-		ctx.setLhsState(new MSystem(ctx.model()).state());
-		ctx.setRhsState(new MSystem(ctx.model()).state());
+		ctx.setLhsState(new MSystem(ctx.getDiagramModel()).state());
+		ctx.setRhsState(new MSystem(ctx.getDiagramModel()).state());
 		List<String> srcLnkCons = new ArrayList<>();
 		List<String> trgLnkCons = new ArrayList<>();
 		MRule srcRule = src.gen(ctx);

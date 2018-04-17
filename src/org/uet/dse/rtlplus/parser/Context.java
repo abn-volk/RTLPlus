@@ -64,6 +64,7 @@ public class Context {
     private PrintWriter fOut;
     
     private MModel fModel;
+    private MModel diagramModel;
     private MClass fCurrentClass;
     private ModelFactory fModelFactory;
     private MSystemState fSystemState;
@@ -154,7 +155,15 @@ public class Context {
         return fModel;
     }
 
-    public void setSystemState(MSystemState systemState) {
+    public MModel getDiagramModel() {
+		return diagramModel;
+	}
+
+	public void setDiagramModel(MModel diagramModel) {
+		this.diagramModel = diagramModel;
+	}
+
+	public void setSystemState(MSystemState systemState) {
         fSystemState = systemState;
     }
 

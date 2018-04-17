@@ -21,7 +21,7 @@ public class RTLCompiler {
 	private RTLCompiler() {
 	};
 
-	public static MRuleCollection compileSpecification(String inName, PrintWriter err, MModel model)
+	public static MRuleCollection compileSpecification(String inName, PrintWriter err, MModel model, MModel diagramModel)
 			throws MSystemException, FileNotFoundException {
 		InputStream inStream = new FileInputStream(inName);
 		ParseErrorHandler errHandler = new ParseErrorHandler(inName, err);
@@ -43,6 +43,7 @@ public class RTLCompiler {
 			AstRuleCollection ruleCollection = parser.tggRuleCollection();
 			if (errHandler.errorCount() == 0) {
 				Context ctx = new Context(inName, err, null, new ModelFactory());
+				ctx.setDiagramModel(diagramModel);
 				ctx.setModel(model);
 				return ruleCollection.gen(ctx);
 			}

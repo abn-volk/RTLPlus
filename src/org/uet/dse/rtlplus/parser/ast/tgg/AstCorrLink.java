@@ -125,7 +125,7 @@ public class AstCorrLink {
 	}
 
 	public MCorrLink gen(Context ctx) throws MInvalidModelException, MSystemException {
-		MModel model = ctx.model();
+		MModel model = ctx.getDiagramModel();
 		MSystemState systemState = ctx.systemState();
 		MObject srcObj = systemState.objectByName(sourceObject);
 		MObject trgObj = systemState.objectByName(targetObject);
@@ -189,7 +189,7 @@ public class AstCorrLink {
 		Set<MClass> classes = new HashSet<>(2);
 		classes.add(corr);
 		classes.add(src);
-		Set<MAssociation> assocs = ctx.model().getAssociationsBetweenClasses(classes);
+		Set<MAssociation> assocs = ctx.getDiagramModel().getAssociationsBetweenClasses(classes);
 		List<MAssociation> result = new ArrayList<>(2);
 		if (assocs.isEmpty()) {
 			ModelFactory mf = ctx.modelFactory();
@@ -199,7 +199,7 @@ public class AstCorrLink {
 			MMultiplicity mult = multipleSource ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
 			ass.addAssociationEnd(
 					mf.createAssociationEnd(corr, corr.name().toLowerCase(), mult, MAggregationKind.NONE, false, null));
-			ctx.model().addAssociation(ass);
+			ctx.getDiagramModel().addAssociation(ass);
 			result.add(ass);
 			ctx.addCorrAssociation(ass);
 		} else
@@ -207,7 +207,7 @@ public class AstCorrLink {
 		classes = new HashSet<>(2);
 		classes.add(corr);
 		classes.add(trg);
-		assocs = ctx.model().getAssociationsBetweenClasses(classes);
+		assocs = ctx.getDiagramModel().getAssociationsBetweenClasses(classes);
 		if (assocs.isEmpty()) {
 			ModelFactory mf = ctx.modelFactory();
 			MAssociation ass = mf.createAssociation(corr.name() + "_" + trg.name());
@@ -216,7 +216,7 @@ public class AstCorrLink {
 			MMultiplicity mult = multipleTarget ? MMultiplicity.ZERO_MANY : MMultiplicity.ZERO_ONE;
 			ass.addAssociationEnd(
 					mf.createAssociationEnd(corr, corr.name().toLowerCase(), mult, MAggregationKind.NONE, false, null));
-			ctx.model().addAssociation(ass);
+			ctx.getDiagramModel().addAssociation(ass);
 			result.add(ass);
 			ctx.addCorrAssociation(ass);
 		} else

@@ -31,6 +31,7 @@ public class RTLLoader {
 	private MModel model1;
 	private MModel model2;
 	private MModel mergedModel;
+	private MModel diagramModel;
 	private MRuleCollection ruleCollection;
 	private String modelName;
 	private StringBuilder useContent = new StringBuilder();
@@ -127,14 +128,14 @@ public class RTLLoader {
 			model1 = USECompiler.compileSpecification(stream, srcModelFile.getName(), logWriter, new ModelFactory());
 			byte[] bytes = Files.readAllBytes(srcModelFile.toPath());
 			mm1 = new String(bytes, "UTF-8");
-			mm1 = mm1.substring(mm1.indexOf(RTLKeyword.startClass));
+			mm1 = mm1.substring(mm1.indexOf('\n', mm1.indexOf(RTLKeyword.model)));
 
 			
 			stream = new FileInputStream(trgModelFile);
 			model2 = USECompiler.compileSpecification(stream, trgModelFile.getName(), logWriter, new ModelFactory());
 			bytes = Files.readAllBytes(trgModelFile.toPath());
 			mm2 = new String(bytes, "UTF-8");
-			mm2 = mm2.substring(mm2.indexOf(RTLKeyword.startClass));
+			mm2 = mm2.substring(mm2.indexOf('\n', mm2.indexOf(RTLKeyword.model)));
 			modelName = model1.name() + "2" + model2.name();
 			// All model
 			result = RTLKeyword.model + " " + modelName + "\n" + mm1 + "\n" + mm2;
@@ -154,6 +155,7 @@ public class RTLLoader {
 		String model = unionModel();
 		useContent.append(model);
 		mergedModel = USECompiler.compileSpecification(model, modelName, logWriter, new ModelFactory());
+		diagramModel = USECompiler.compileSpecification(model.replace("abstract class ", "class "), modelName, logWriter, new ModelFactory());
 	}
 
 	/**
@@ -162,7 +164,7 @@ public class RTLLoader {
 	private void parseTGGRule() {
 		logWriter.println("Compile TGG rules...");
 		try {
-			ruleCollection = RTLCompiler.compileSpecification(tggName, logWriter, mergedModel);
+			ruleCollection = RTLCompiler.compileSpecification(tggName, logWriter, mergedModel, diagramModel);
 			ruleCollection.setSourceModel(model1);
 			ruleCollection.setTargetModel(model2);
 		} catch (MSystemException e) {
