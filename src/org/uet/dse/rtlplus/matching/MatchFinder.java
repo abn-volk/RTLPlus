@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.tzi.use.uml.mm.MClass;
 import org.tzi.use.uml.mm.MOperation;
+import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 
@@ -20,6 +21,7 @@ public class MatchFinder {
 	private MSystemState systemState;
 	private MOperation operation;
 	private List<MObject> ruleObjects;
+	private List<MLink> ruleLinks;
 	private List<Map<String, MObject>> matches;
 
 	public MatchFinder(MSystemState systemState, MOperation operation, List<MObject> ruleObjects) {
@@ -28,6 +30,12 @@ public class MatchFinder {
 		this.operation = operation;
 		this.ruleObjects = ruleObjects;
 		this.matches = new ArrayList<Map<String, MObject>>();
+	}
+
+	public MatchFinder(MSystemState systemState, MOperation operation, List<MObject> ruleObjects,
+			List<MLink> ruleLinks) {
+		this(systemState, operation, ruleObjects);
+		this.ruleLinks = ruleLinks;
 	}
 
 	/* Start finding a match */
@@ -57,6 +65,8 @@ public class MatchFinder {
 			for (MObject object : objects) {
 				if (objs.containsValue(object)) {
 					Map<String, MObject> objMap = new LinkedHashMap<String, MObject>(objs);
+					if (checkLinks(objMap))
+						matches.add(objMap);
 					matches.add(objMap);
 				}
 			}
@@ -81,7 +91,8 @@ public class MatchFinder {
 		// TODO: Filter by object?
 		if (position >= ruleObjects.size()) {
 			Map<String, MObject> objMap = new LinkedHashMap<String, MObject>(objs);
-			matches.add(objMap);
+			if (checkLinks(objMap))
+				matches.add(objMap);
 			//System.out.println(matches);
 		} else {
 			MClass cls = ruleObjects.get(position).cls();
@@ -94,5 +105,27 @@ public class MatchFinder {
 				}
 			}
 		}
+	}
+	
+	private boolean checkLinks(Map<String, MObject> objMap) {
+		if (ruleLinks != null) {
+			boolean hasLinks = true;
+			for (MLink lnk : ruleLinks) {
+				MObject obj1 = objMap.get(lnk.getLinkEnd(0).object().name());
+				MObject obj2 = objMap.get(lnk.getLinkEnd(1).object().name());
+				if (obj1 == null || obj2 == null) {
+					// System.out.println(lnk.getLinkEnd(0).object().name() + " or " + lnk.getLinkEnd(1).object().name() + " is null!");
+					hasLinks = false;
+					break;
+				}
+				if (!systemState.hasLinkBetweenObjects(systemState.system().model().getAssociation(lnk.association().name()), obj1, obj2)) {
+					// System.out.println("No assoc " + lnk.association().name() + " between " + obj1.name() + " and " + obj2.name());
+					hasLinks = false;
+					break;
+				}
+			}
+			return hasLinks;
+		} else 
+			return true;
 	}
 }

@@ -37,7 +37,7 @@ public class ForwardMatch extends Match {
 		// Create new target objects
 		commands.addAll(rule.getTrgRule().genCreationCommands("matchTL", systemState));
 		// Set attributes for target objects
-		commands.addAll(rule.getTrgRule().genSetCommands());
+		// commands.addAll(rule.getTrgRule().genSetCommands());
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes

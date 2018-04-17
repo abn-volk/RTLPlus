@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.tzi.use.uml.mm.MOperation;
+import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.Main;
@@ -72,13 +73,15 @@ public class IntegrationMatchManager extends MatchManager {
 
 	private List<? extends Map<String, MObject>> findSourceMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getSrcRule().getAllObjects();
-		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
+		List<MLink> ruleLinks = rule.getSrcRule().getAllLinks();
+		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects, ruleLinks);
 		return finder.run();
 	}
 
 	private List<? extends Map<String, MObject>> findTargetMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getTrgRule().getAllObjects();
-		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
+		List<MLink> ruleLinks = rule.getTrgRule().getAllLinks();
+		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects, ruleLinks);
 		return finder.run();
 	}
 

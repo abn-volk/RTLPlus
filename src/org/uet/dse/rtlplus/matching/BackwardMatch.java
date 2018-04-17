@@ -37,7 +37,7 @@ public class BackwardMatch extends Match {
 		// Create new source objects
 		commands.addAll(rule.getSrcRule().genCreationCommands("matchSL", systemState));
 		// Set attributes for source objects
-		commands.addAll(rule.getSrcRule().genSetCommands());
+		// commands.addAll(rule.getSrcRule().genSetCommands());
 		// Create new correlation objects
 		commands.addAll(rule.getCorrRule().genCreationCommands("matchCL", systemState));
 		// Update attributes

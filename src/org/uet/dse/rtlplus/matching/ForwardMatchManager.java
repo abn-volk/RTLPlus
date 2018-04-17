@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.tzi.use.uml.mm.MOperation;
+import org.tzi.use.uml.sys.MLink;
 import org.tzi.use.uml.sys.MObject;
 import org.tzi.use.uml.sys.MSystemState;
 import org.uet.dse.rtlplus.Main;
@@ -33,6 +34,7 @@ public class ForwardMatchManager extends MatchManager {
 			return matches;
 		// Normal
 		for (Map<String, MObject> srcMatch : srcMatches) {
+			// System.out.println("Source: " + srcMatch.toString());
 			Map<String, MObject> objs = new HashMap<>(srcMatch);
 			List<? extends Map<String, MObject>> trgMatches = findTargetMatch(rule, op);
 			if (trgMatches == null) {
@@ -42,6 +44,7 @@ public class ForwardMatchManager extends MatchManager {
 				return matches;
 			else {
 				for (Map<String, MObject> trgMatch : trgMatches) {
+					// System.out.println("Target: " + trgMatch.toString());
 					objs.putAll(trgMatch);
 					List<? extends Map<String, MObject>> corrMatches = findCorrelationMatch(rule, op);
 					if (corrMatches == null) {
@@ -51,6 +54,7 @@ public class ForwardMatchManager extends MatchManager {
 						return matches;
 					else {
 						for (Map<String, MObject> corrMatch : corrMatches) {
+							// System.out.println("Corr: " + corrMatch.toString());
 							objs.putAll(corrMatch);
 							if (validatePreconditions(op, objs))
 								matches.add(new ForwardMatch(rule, op, new HashMap<>(objs), sync));
@@ -66,19 +70,22 @@ public class ForwardMatchManager extends MatchManager {
 
 	private List<? extends Map<String, MObject>> findSourceMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getSrcRule().getAllObjects();
-		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
+		List<MLink> ruleLinks = rule.getSrcRule().getAllLinks();
+		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects, ruleLinks);
 		return finder.run();
 	}
 	
 	private List<? extends Map<String, MObject>> findSourceMatch(MTggRule rule, MOperation operation, List<MObject> objects) {
 		List<MObject> ruleObjects = rule.getSrcRule().getAllObjects();
-		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
+		List<MLink> ruleLinks = rule.getSrcRule().getAllLinks();
+		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects, ruleLinks);
 		return finder.run(objects);
 	}
 
 	private List<? extends Map<String, MObject>> findTargetMatch(MTggRule rule, MOperation operation) {
 		List<MObject> ruleObjects = rule.getTrgRule().getNonDeletingObjects();
-		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects);
+		List<MLink> ruleLinks = rule.getTrgRule().getNonDeletingLinks();
+		MatchFinder finder = new MatchFinder(systemState, operation, ruleObjects, ruleLinks);
 		return finder.run();
 	}
 
