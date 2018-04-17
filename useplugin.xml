@@ -53,7 +53,7 @@
 			toolbaritem="Incremental update"
 			id="org.uet.dse.rtlplus.actions.ActionIncrementalUpdate">
 		</action>
-		<action label="Integration check" 
+		<!-- <action label="Integration check" 
 			icon="resources/check.png" 
 			class="org.uet.dse.rtlplus.actions.ActionIntegrationCheck" 
 			tooltip="Integration check"
@@ -61,14 +61,14 @@
 			menuitem="Integration check"
 			toolbaritem="Integration check"
 			id="org.uet.dse.rtlplus.actions.ActionIntegrationCheck">
-		</action>
-		<action label="Execute co-evolution scenario" 
+		</action> -->
+		<action label="Execute scenario" 
 			icon="resources/scenario.png" 
 			class="org.uet.dse.rtlplus.actions.ActionRunCoevolScenario" 
-			tooltip="Execute co-evolution scenario" 
+			tooltip="Execute scenario" 
 			menu="RTL plugin" 
-			menuitem="Execute co-evolution scenario" 
-			toolbaritem="Execute co-evolution scenario" 
+			menuitem="Execute scenario" 
+			toolbaritem="Execute scenario" 
 			id="org.uet.dse.rtlplus.actions.ActionRunCoevolScenario">
 		</action>
 		<action label="Export model" 
@@ -80,13 +80,13 @@
 			toolbaritem="Export model" 
 			id="org.uet.dse.rtlplus.actions.ActionExportModel">
 		</action>
-		<action label="Test with classifying terms" 
+		<action label="Validation with classifying terms" 
 			icon="resources/test.png" 
 			class="org.uet.dse.rtlplus.actions.ActionTestWithCT" 
-			tooltip="Test with classifying terms" 
+			tooltip="Validation with classifying terms" 
 			menu="RTL plugin" 
-			menuitem="Test with classifying terms" 
-			toolbaritem="Test with classifying terms" 
+			menuitem="Validation with classifying terms" 
+			toolbaritem="Validation with classifying terms" 
 			id="org.uet.dse.rtlplus.actions.ActionTestWithCT">
 		</action>
 	</actions>
