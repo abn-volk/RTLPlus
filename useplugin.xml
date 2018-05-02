@@ -80,7 +80,7 @@
 			toolbaritem="Export model" 
 			id="org.uet.dse.rtlplus.actions.ActionExportModel">
 		</action>
-		<action label="Validation with classifying terms" 
+		<!-- <action label="Validation with classifying terms" 
 			icon="resources/test.png" 
 			class="org.uet.dse.rtlplus.actions.ActionTestWithCT" 
 			tooltip="Validation with classifying terms" 
@@ -88,6 +88,6 @@
 			menuitem="Validation with classifying terms" 
 			toolbaritem="Validation with classifying terms" 
 			id="org.uet.dse.rtlplus.actions.ActionTestWithCT">
-		</action>
+		</action> -->
 	</actions>
 </plugin>

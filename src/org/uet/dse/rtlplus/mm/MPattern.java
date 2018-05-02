@@ -112,7 +112,7 @@ public class MPattern {
 		// Creation of new objects
 		for (Entry<String, List<String>> entry : objMap.entrySet()) {
 			// Table.allInstances->exists(theTableA,theTableB|
-			builder.append(entry.getKey() + ".allInstances->exists("
+			builder.append("(" + entry.getKey() + ".allInstances - " + entry.getKey() + ".allInstances@pre)->exists("
 					+ entry.getValue().stream().collect(Collectors.joining(", ")) + "|\n");
 			level++;
 		}

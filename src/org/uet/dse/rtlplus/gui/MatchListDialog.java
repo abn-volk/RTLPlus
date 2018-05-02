@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -53,7 +54,7 @@ public class MatchListDialog extends JPanel {
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		list = new JList<>(model);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		add(list, BorderLayout.CENTER);
+		add(new JScrollPane(list), BorderLayout.CENTER);
 		btn = new JButton("Run");
 		btn.setMnemonic('R');
 		btn.setEnabled(false);
@@ -67,21 +68,25 @@ public class MatchListDialog extends JPanel {
 			}
 		});
 		add(btn, BorderLayout.PAGE_END);
-		label = new JLabel(String.format("<html>Found %d match(es). Click on a match to view matched objects, then click Run to execute the match.</html>", matches.size()));
+		label = new JLabel(String.format("<html>Found %d match(es). Click on a match to view matched objects, then click Run to execute it.</html>", matches.size()));
 		add(label, BorderLayout.PAGE_START);
-		list.addListSelectionListener(new SelectionHandler());
-	}
-
-	class SelectionHandler implements ListSelectionListener {
-		@Override
-		public void valueChanged(ListSelectionEvent arg0) {
-			if (!arg0.getValueIsAdjusting()) {
-				selectedMatch = matches.get(arg0.getLastIndex());
-				label.setText(String.format("<html>Number of objects to create: %d<br>Number of links to create: %d<br>Number of correlation objects to create: %d</html>", selectedMatch.getNewObjectsNum(), selectedMatch.getNewLinksNum(), selectedMatch.getNewCorrsNum()));
-				eventBus.post(new MatchSelectedEvent(selectedMatch.getObjectList().values()));
-				btn.setEnabled(true);
+		list.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()) {
+					selectedMatch = list.getSelectedValue();
+					if (selectedMatch != null) {
+						label.setText(String.format("<html>Number of objects to create: %d<br>Number of links to create: %d<br>Number of correspondence objects to create: %d</html>", selectedMatch.getNewObjectsNum(), selectedMatch.getNewLinksNum(), selectedMatch.getNewCorrsNum()));
+						eventBus.post(new MatchSelectedEvent(selectedMatch.getObjectList().values()));
+						btn.setEnabled(true);
+					} else {
+						label.setText("");
+						eventBus.post(new MatchSelectedEvent(new ArrayList<>()));
+						btn.setEnabled(false);
+					}
+				}
 			}
-		}
+		});
 	}
 
 	@Subscribe
